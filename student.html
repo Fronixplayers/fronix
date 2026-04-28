@@ -13,7 +13,6 @@
         * { box-sizing: border-box; }
         body { background: var(--bg); font-family: 'Montserrat', sans-serif; display: flex; margin: 0; min-height: 100vh; overflow-x: hidden; }
         
-        /* --- SIDEBAR --- */
         aside { 
             width: 280px; background: var(--white); padding: 25px; 
             display: flex; flex-direction: column; position: fixed; height: 100%; 
@@ -21,13 +20,11 @@
         }
         aside.open { transform: translateX(0); }
         
-        /* LOGO FIXED HERE */
         .logo { font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
         
         .nav-item { padding: 12px; margin-bottom: 5px; cursor: pointer; color: #8f9bba; border-radius: 12px; font-weight: 600; display: flex; gap: 12px; align-items: center; transition: 0.3s; }
         .nav-item.active, .nav-item:hover { background: #f4f7fe; color: var(--primary); }
         
-        /* --- MAIN --- */
         main { flex: 1; padding: 30px; margin-left: 280px; overflow-y: auto; height: 100vh; position: relative; z-index: 1; transition: margin 0.3s ease; }
         .mobile-menu-btn { display: none; position: fixed; top: 20px; right: 20px; z-index: 60; background: var(--white); padding: 10px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; }
 
@@ -40,7 +37,6 @@
         .card:hover { transform: translateY(-5px); border-color: var(--primary); }
         .thumbnail { width: 100%; height: 160px; border-radius: 15px; margin-bottom: 15px; background-size: cover; background-position: center; position: relative; }
         
-        /* --- RESOURCE HUB STYLES --- */
         .resource-card { background: white; border-radius: 20px; padding: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
         .resource-card:hover { border-color: var(--primary); transform: translateY(-3px); }
         .res-icon { width: 60px; height: 60px; border-radius: 15px; background: #e0e7ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-right: 20px; }
@@ -50,27 +46,23 @@
         .status-locked { background: #fee2e2; color: #ef4444; }
         .status-unlocked { background: #dcfce7; color: #16a34a; }
         
-        /* --- MODALS --- */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-box { background: white; width: 600px; max-width: 90%; border-radius: 20px; padding: 30px; position: relative; animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto; }
         .modal-close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
         
-        /* Leaderboard Items */
         .lb-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: 0.2s; border-radius: 8px; }
         .lb-item:hover { background: #f8fafc; }
         .lb-user { flex: 1; display: flex; align-items: center; gap: 10px; }
         .lb-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; }
 
-        /* Profile Tabs */
-        .profile-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
-        .p-tab { padding: 10px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 2px solid transparent; }
+        .profile-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; flex-wrap: wrap; }
+        .p-tab { padding: 10px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 2px solid transparent; font-size: 0.85rem; white-space: nowrap; }
         .p-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         
         .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
         .avatar-option { width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
         .avatar-option.selected { border-color: var(--primary); box-shadow: 0 0 10px rgba(67,24,255,0.3); }
 
-        /* Course Player & Interaction */
         #courseModal .modal-container { width: 95%; height: 90%; background: #111; border-radius: 20px; display: flex; overflow: hidden; border: 1px solid #333; position: relative; }
         .video-section { flex: 2; background: black; display: flex; flex-direction: column; }
         iframe { flex: 1; border: none; }
@@ -88,9 +80,182 @@
         .drive-locked { padding: 20px; background: #fff1f2; color: #be123c; border-radius: 10px; text-align: center; border: 1px solid #fda4af; }
         .drive-unlocked { padding: 20px; background: #f0fdf4; color: #15803d; border-radius: 10px; text-align: center; border: 1px solid #86efac; cursor: pointer; }
 
+        /* ===== DELETE ACCOUNT SECTION ===== */
+        .danger-zone {
+            margin-top: 10px;
+            border: 2px solid #fee2e2;
+            border-radius: 15px;
+            padding: 20px;
+            background: #fff5f5;
+        }
+        .danger-zone-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .danger-zone-header i {
+            color: #ef4444;
+            font-size: 1.2rem;
+        }
+        .danger-zone-header h3 {
+            margin: 0;
+            color: #991b1b;
+            font-size: 1rem;
+        }
+        .danger-zone p {
+            color: #7f1d1d;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .delete-confirm-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #fca5a5;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.3s;
+            background: white;
+        }
+        .delete-confirm-input:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+        }
+        .btn-delete-account {
+            width: 100%;
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .btn-delete-account.enabled {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .btn-delete-account.enabled:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(239,68,68,0.4);
+        }
+        .delete-warning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+        .delete-warning-list li {
+            font-size: 0.8rem;
+            color: #991b1b;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .delete-warning-list li i {
+            color: #ef4444;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Delete Confirmation Popup */
+        .delete-popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .delete-popup-overlay.show { display: flex; }
+        .delete-popup {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #fee2e2;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .delete-popup-icon {
+            width: 70px;
+            height: 70px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: #ef4444;
+        }
+        .delete-popup h2 {
+            color: #991b1b;
+            margin: 0 0 10px;
+            font-size: 1.3rem;
+        }
+        .delete-popup p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .delete-popup-btns {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-cancel-delete {
+            flex: 1;
+            padding: 12px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.2s;
+        }
+        .btn-cancel-delete:hover { background: #e2e8f0; }
+        .btn-confirm-delete {
+            flex: 1;
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.2s;
+        }
+        .btn-confirm-delete:hover { background: #dc2626; }
+        .btn-confirm-delete:disabled { opacity: 0.6; cursor: not-allowed; }
+        /* ===== END DELETE ACCOUNT ===== */
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 900px) { 
             aside { transform: translateX(-100%); width: 260px; } 
             aside.open { transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,0.1); } 
@@ -105,12 +270,34 @@
             .resource-card { flex-direction: column; text-align: center; gap: 15px; }
             .res-icon { margin-right: 0; margin-bottom: 10px; }
             .header-stats { grid-template-columns: 1fr; }
+
+            .profile-tabs { gap: 5px; }
+            .p-tab { padding: 8px 6px; font-size: 0.75rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="mobile-menu-btn" onclick="document.querySelector('aside').classList.toggle('open')"><i class="fas fa-bars"></i></div>
+
+    <!-- ===== DELETE ACCOUNT FINAL CONFIRMATION POPUP ===== -->
+    <div class="delete-popup-overlay" id="deleteConfirmPopup">
+        <div class="delete-popup">
+            <div class="delete-popup-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Bilkul Sure Ho?</h2>
+            <p>Aapka account <strong>permanently delete</strong> ho jayega. Yeh action <strong>undo nahi</strong> ho sakta. Saara data, progress aur certificates hamesha ke liye chale jayenge.</p>
+            <div class="delete-popup-btns">
+                <button class="btn-cancel-delete" onclick="closeDeletePopup()">
+                    <i class="fas fa-arrow-left"></i> Wapas Jao
+                </button>
+                <button class="btn-confirm-delete" id="finalDeleteBtn" onclick="window.finalDeleteAccount()">
+                    <i class="fas fa-trash"></i> Haan, Delete Karo
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="leaderboardModal">
         <div class="modal-box">
@@ -133,7 +320,8 @@
             <div class="profile-tabs">
                 <div class="p-tab active" onclick="switchProfileTab('edit')">Edit Profile</div>
                 <div class="p-tab" onclick="switchProfileTab('certs')">Certificates</div>
-                <div class="p-tab" onclick="switchProfileTab('id')">ID Verification</div>
+                <div class="p-tab" onclick="switchProfileTab('id')">ID Verify</div>
+                <div class="p-tab" style="color:#ef4444;" onclick="switchProfileTab('delete')">Delete Account</div>
             </div>
 
             <div id="tab-edit" style="display:block;">
@@ -162,6 +350,40 @@
                     <div id="verifiedMsg" style="display:none; color:var(--success); font-weight:bold;"><i class="fas fa-check-circle"></i> ID Verified. Access Granted.</div>
                 </div>
             </div>
+
+            <!-- ===== DELETE ACCOUNT TAB ===== -->
+            <div id="tab-delete" style="display:none;">
+                <div class="danger-zone">
+                    <div class="danger-zone-header">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <h3>Danger Zone — Account Delete</h3>
+                    </div>
+
+                    <ul class="delete-warning-list">
+                        <li><i class="fas fa-times-circle"></i> Aapka poora account permanently delete ho jayega</li>
+                        <li><i class="fas fa-times-circle"></i> Saari course progress aur history mit jayegi</li>
+                        <li><i class="fas fa-times-circle"></i> Saare certificates aur XP points kho jayenge</li>
+                        <li><i class="fas fa-times-circle"></i> Yeh action kabhi bhi reverse nahi ho sakta</li>
+                    </ul>
+
+                    <p>Confirm karne ke liye neeche <strong>"DELETE"</strong> type karein:</p>
+
+                    <input 
+                        type="text" 
+                        id="deleteConfirmText" 
+                        class="delete-confirm-input"
+                        placeholder='Yahan "DELETE" type karein'
+                        oninput="window.checkDeleteInput(this.value)"
+                        autocomplete="off"
+                    >
+
+                    <button class="btn-delete-account" id="deleteAccountBtn" onclick="window.showDeletePopup()">
+                        <i class="fas fa-trash-alt"></i> Mera Account Delete Karo
+                    </button>
+                </div>
+            </div>
+            <!-- ===== END DELETE ACCOUNT TAB ===== -->
+
         </div>
     </div>
 
@@ -252,7 +474,10 @@
     </main>
 
     <script type="module">
-        import { auth, db, onAuthStateChanged, signOut, collection, addDoc, getDoc, getDocs, doc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, increment, where, limit } from './firebase-config.js';
+        import { auth, db, onAuthStateChanged, signOut, collection, addDoc, getDoc, getDocs, doc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, increment, where, limit, deleteDoc } from './firebase-config.js';
+
+        // Firebase Auth ke liye deleteUser import karna hoga
+        import { deleteUser } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- SINGLE TAB ENFORCEMENT ---
         const channel = new BroadcastChannel('fronix_active_session');
@@ -272,11 +497,7 @@
         let selectedAvatar = "";
         const avatarSeeds = ['Felix', 'Aneka', 'Mittens', 'Bubba', 'Sorelle', 'Destiny'];
 
-        // ------------------------------------------------------------------
-        // PASTE YOUR REAL GOOGLE DRIVE FOLDER LINK HERE
-        // ------------------------------------------------------------------
         const BBA_DRIVE_LINK = "https://drive.google.com/drive/folders/1DNaT7uUiVoHKQkj8LejyUmKASot2gQz1"; 
-        // ------------------------------------------------------------------
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -377,6 +598,10 @@
             document.getElementById('settingsName').value = currentUser.name;
             document.getElementById('settingsBio').value = currentUser.bio || "";
             
+            // Reset delete tab input
+            const delInput = document.getElementById('deleteConfirmText');
+            if(delInput) { delInput.value = ''; window.checkDeleteInput(''); }
+
             const grid = document.getElementById('avatarGrid'); grid.innerHTML = "";
             avatarSeeds.forEach(seed => {
                 const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
@@ -387,16 +612,14 @@
 
         window.switchProfileTab = (tabName) => {
             document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('#tab-edit, #tab-certs, #tab-id').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('#tab-edit, #tab-certs, #tab-id, #tab-delete').forEach(d => d.style.display = 'none');
             
-            if(tabName === 'edit') { document.getElementById('tab-edit').style.display='block'; }
-            if(tabName === 'certs') { document.getElementById('tab-certs').style.display='block'; }
-            if(tabName === 'id') { document.getElementById('tab-id').style.display='block'; }
+            const tabMap = { edit: 'tab-edit', certs: 'tab-certs', id: 'tab-id', delete: 'tab-delete' };
+            if(tabMap[tabName]) document.getElementById(tabMap[tabName]).style.display = 'block';
             
             const tabs = document.querySelectorAll('.p-tab');
-            if(tabName === 'edit') tabs[0].classList.add('active');
-            if(tabName === 'certs') tabs[1].classList.add('active');
-            if(tabName === 'id') tabs[2].classList.add('active');
+            const tabIdx = { edit: 0, certs: 1, id: 2, delete: 3 };
+            if(tabs[tabIdx[tabName]]) tabs[tabIdx[tabName]].classList.add('active');
         };
 
         window.selectAvatar = (el, url) => {
@@ -432,6 +655,64 @@
             await updateDoc(doc(db, "users", currentUser.uid), { verificationPending: true, idProofUrl: fakeUrl, submittedAt: serverTimestamp() });
             alert("ID Submitted! Admin will review shortly.");
         };
+
+        // ===== DELETE ACCOUNT LOGIC =====
+
+        // Input check — "DELETE" type hone pe button enable hoga
+        window.checkDeleteInput = (val) => {
+            const btn = document.getElementById('deleteAccountBtn');
+            if(val.trim().toUpperCase() === 'DELETE') {
+                btn.classList.add('enabled');
+            } else {
+                btn.classList.remove('enabled');
+            }
+        };
+
+        // Step 1: Confirmation popup dikhao
+        window.showDeletePopup = () => {
+            document.getElementById('deleteConfirmPopup').classList.add('show');
+        };
+
+        // Popup band karo
+        window.closeDeletePopup = () => {
+            document.getElementById('deleteConfirmPopup').classList.remove('show');
+        };
+
+        // Step 2: Final delete — Firestore data + Auth account dono delete
+        window.finalDeleteAccount = async () => {
+            const btn = document.getElementById('finalDeleteBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error("No user logged in");
+
+                // 1. Firestore se user document delete karo
+                await deleteDoc(doc(db, "users", currentUser.uid));
+
+                // 2. Firebase Auth se account delete karo
+                await deleteUser(user);
+
+                // 3. Homepage pe redirect
+                alert("Aapka account successfully delete ho gaya. Alvida! 👋");
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                console.error("Delete error:", err);
+
+                // Agar recent login required ho (Firebase security)
+                if(err.code === 'auth/requires-recent-login') {
+                    alert("⚠️ Security ke liye pehle logout karein aur dobara login karein, phir account delete karein.");
+                } else {
+                    alert("Error: " + err.message);
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> Haan, Delete Karo';
+                window.closeDeletePopup();
+            }
+        };
+        // ===== END DELETE ACCOUNT LOGIC =====
 
         function loadCourses() {
             onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
