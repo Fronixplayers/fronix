@@ -1,4 +1,4 @@
-// js/student.js — FronixLearner Student Dashboard Logic
+// js/student.js — FronixLearner Student Dashboard Logic (FIXED)
 
 import {
     auth, db,
@@ -69,12 +69,32 @@ function updateUI() {
     if (currentUser.isVerified) {
         lockBadge.className = 'lock-badge status-unlocked';
         lockBadge.innerHTML = '<i class="fas fa-lock-open"></i> Access';
+    } else {
+        lockBadge.className = 'lock-badge status-locked';
+        lockBadge.innerHTML = '<i class="fas fa-lock"></i> Locked';
     }
 
-    document.getElementById('uploadSection').style.display = currentUser.isVerified ? 'none' : (currentUser.verificationPending ? 'none' : 'block');
-    document.getElementById('pendingMsg').style.display = currentUser.verificationPending && !currentUser.isVerified ? 'block' : 'none';
-    document.getElementById('verifiedMsg').style.display = currentUser.isVerified ? 'block' : 'none';
-    document.getElementById('verificationStatus').innerText = currentUser.isVerified ? "✓ Verified Student" : (currentUser.verificationPending ? "⏳ Pending Verification" : "Unverified");
+    const uploadSection = document.getElementById('uploadSection');
+    const pendingMsg = document.getElementById('pendingMsg');
+    const verifiedMsg = document.getElementById('verifiedMsg');
+
+    if (currentUser.isVerified) {
+        uploadSection.style.display = 'none';
+        pendingMsg.style.display = 'none';
+        verifiedMsg.style.display = 'block';
+    } else if (currentUser.verificationPending) {
+        uploadSection.style.display = 'none';
+        pendingMsg.style.display = 'block';
+        verifiedMsg.style.display = 'none';
+    } else {
+        uploadSection.style.display = 'block';
+        pendingMsg.style.display = 'none';
+        verifiedMsg.style.display = 'none';
+    }
+
+    document.getElementById('verificationStatus').innerText = currentUser.isVerified
+        ? "✓ Verified Student"
+        : (currentUser.verificationPending ? "⏳ Pending Verification" : "Unverified");
 }
 
 // ─── NAVIGATION ───────────────────────────────────────
@@ -89,13 +109,13 @@ window.switchView = (view) => {
 window.toggleSidebar = () => document.querySelector('aside').classList.toggle('open');
 window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
 
-// ─── COURSES ──────────────────────────────────────────
+// ─── COURSES (real-time) ──────────────────────────────
 function loadCourses() {
     onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
         const g = document.getElementById('courseGrid');
         g.innerHTML = "";
         if (snap.empty) {
-            g.innerHTML = `<p style="color:#999; grid-column:1/-1; text-align:center;">No courses available yet.</p>`;
+            g.innerHTML = `<p style="color:#999; grid-column:1/-1; text-align:center; padding:40px;">No courses available yet.</p>`;
             return;
         }
         snap.forEach(d => {
@@ -106,7 +126,8 @@ function loadCourses() {
                 : `<span class="badge badge-paid" style="font-size:0.72rem;"><i class="fas fa-lock"></i> Paid</span>`;
             g.innerHTML += `
             <div class="course-card" onclick="window.openCourse('${d.id}')">
-                <img class="course-thumbnail" src="https://img.youtube.com/vi/${v}/hqdefault.jpg" alt="${c.title}" onerror="this.src='https://via.placeholder.com/400x220'">
+                <img class="course-thumbnail" src="https://img.youtube.com/vi/${v}/hqdefault.jpg"
+                     alt="${c.title}" onerror="this.src='https://placehold.co/400x220/6366f1/white?text=Course'">
                 <div class="course-badge">${priceBadge}</div>
                 <div class="course-info">
                     <h4>${c.title}</h4>
@@ -145,15 +166,24 @@ window.loadVideo = (idx) => {
 window.switchTab = (t) => {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-    document.getElementById(t + 'Tab').classList.add('active');
+    const tabEl = document.getElementById(t + 'Tab');
+    if (tabEl) tabEl.classList.add('active');
     const tabEls = document.querySelectorAll('.tab');
     const map = { 'lessons': 0, 'drive': 1, 'chat': 2 };
     if (tabEls[map[t]]) tabEls[map[t]].classList.add('active');
     if (t === 'drive') {
         const div = document.getElementById('driveAccessMsg');
         div.innerHTML = currentUser?.isVerified
-            ? `<div class="drive-unlocked" onclick="window.open('${BBA_DRIVE_LINK}','_blank')"><i class="fab fa-google-drive"></i><br><strong>Click to Open Resources</strong><br><small>Verified Access Granted</small></div>`
-            : `<div class="drive-locked"><i class="fas fa-lock" style="font-size:2rem; margin-bottom:10px;"></i><br><strong>Verification Required</strong><br><small>Upload your College ID in Profile → ID Verification tab.</small></div>`;
+            ? `<div class="drive-unlocked" onclick="window.open('${BBA_DRIVE_LINK}','_blank')">
+                <i class="fab fa-google-drive"></i><br>
+                <strong>Click to Open Resources</strong><br>
+                <small>Verified Access Granted</small>
+               </div>`
+            : `<div class="drive-locked">
+                <i class="fas fa-lock" style="font-size:2rem; margin-bottom:10px;"></i><br>
+                <strong>Verification Required</strong><br>
+                <small>Upload your College ID in Profile → ID Verification tab.</small>
+               </div>`;
     } else if (t === 'chat') {
         loadCourseComments();
     }
@@ -173,11 +203,11 @@ function loadCourseComments() {
             l.innerHTML = "";
             snap.forEach(d => {
                 const m = d.data();
-                const isMe = m.userName === currentUser?.name;
+                const isMe = m.userId === currentUser?.uid;
                 l.innerHTML += `
                 <div class="chat-msg ${isMe ? 'mine' : 'other'}">
                     ${!isMe ? `<div class="sender">${m.userName}</div>` : ''}
-                    ${m.text}
+                    <div>${m.text}</div>
                 </div>`;
             });
             l.scrollTop = l.scrollHeight;
@@ -189,8 +219,10 @@ window.handleSend = async () => {
     const txt = document.getElementById('interactionInput').value.trim();
     if (!txt || !currentUser) return;
     await addDoc(collection(db, "comments"), {
-        courseId: currentCourseId, text: txt,
-        userName: currentUser.name, userId: currentUser.uid,
+        courseId: currentCourseId,
+        text: txt,
+        userName: currentUser.name,
+        userId: currentUser.uid,
         createdAt: serverTimestamp()
     });
     document.getElementById('interactionInput').value = "";
@@ -209,7 +241,11 @@ window.closeCourseModal = () => {
 // ─── RESOURCES ────────────────────────────────────────
 window.accessDrive = () => {
     if (currentUser?.isVerified) window.open(BBA_DRIVE_LINK, '_blank');
-    else { showToast("🔒 Verify your College ID first!", 'error'); window.openProfile(); window.switchProfileTab('id'); }
+    else {
+        showToast("🔒 Verify your College ID first!", 'error');
+        window.openProfile();
+        window.switchProfileTab('id');
+    }
 };
 
 // ─── LEADERBOARD ─────────────────────────────────────
@@ -235,6 +271,9 @@ window.openLeaderboard = () => {
             </div>`;
         });
         if (snap.empty) list.innerHTML = '<p style="text-align:center; color:#999;">No rankings yet.</p>';
+    }, (err) => {
+        // xp field may not exist yet — show empty state
+        list.innerHTML = '<p style="text-align:center; color:#999;">No rankings yet.</p>';
     });
 };
 
@@ -251,6 +290,12 @@ window.openProfile = () => {
         const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
         grid.innerHTML += `<img src="${url}" class="avatar-option ${currentUser?.avatar === url ? 'selected' : ''}" onclick="window.selectAvatar(this,'${url}')">`;
     });
+    document.getElementById('profileCurrentAvatar').src = currentUser?.avatar;
+    document.getElementById('profileNameDisplay').innerText = currentUser?.name;
+    document.getElementById('verificationStatus').innerText = currentUser?.isVerified
+        ? "✓ Verified Student"
+        : (currentUser?.verificationPending ? "⏳ Pending Verification" : "Unverified Student");
+    switchProfileTab('edit');
     loadCertWallet();
 };
 
@@ -262,6 +307,8 @@ window.switchProfileTab = (tab) => {
     document.querySelectorAll('.p-tab')[map[tab][1]]?.classList.add('active');
 };
 
+function switchProfileTab(tab) { window.switchProfileTab(tab); }
+
 window.selectAvatar = (el, url) => {
     document.querySelectorAll('.avatar-option').forEach(i => i.classList.remove('selected'));
     el.classList.add('selected');
@@ -271,8 +318,10 @@ window.selectAvatar = (el, url) => {
 window.saveProfile = async () => {
     const newName = document.getElementById('settingsName').value.trim();
     const newBio = document.getElementById('settingsBio').value.trim();
+    if (!newName) return showToast("Name cannot be empty.", 'error');
     await updateDoc(doc(db, "users", currentUser.uid), {
-        name: newName, bio: newBio,
+        name: newName,
+        bio: newBio,
         avatar: selectedAvatar || currentUser.avatar
     });
     showToast("Profile updated!", 'success');
@@ -283,29 +332,64 @@ async function loadCertWallet() {
     const list = document.getElementById('walletList');
     list.innerHTML = "";
     const ids = currentUser.completedCourses || [];
-    if (!ids.length) { list.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>No certificates yet.</p>"; return; }
+    if (!ids.length) {
+        list.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>No certificates yet.</p>";
+        return;
+    }
     for (const id of ids) {
         const cSnap = await getDoc(doc(db, "courses", id));
         if (cSnap.exists()) {
-            list.innerHTML += `<div style="padding:12px; border:1px solid #eee; margin-bottom:8px; border-radius:8px; display:flex; align-items:center; gap:10px;"><i class="fas fa-certificate" style="color:#fbbf24; font-size:1.4rem;"></i><strong>${cSnap.data().title}</strong></div>`;
+            list.innerHTML += `
+            <div style="padding:12px; border:1px solid #eee; margin-bottom:8px; border-radius:8px; display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-certificate" style="color:#fbbf24; font-size:1.4rem;"></i>
+                <strong>${cSnap.data().title}</strong>
+            </div>`;
         }
     }
 }
 
+// ─── FIX: ID Verification with base64 image storage ───
 window.submitVerification = async () => {
     const file = document.getElementById('idProofInput').files[0];
     if (!file) { showToast("Please select an image file.", 'error'); return; }
-    await updateDoc(doc(db, "users", currentUser.uid), {
-        verificationPending: true,
-        idProofUrl: "https://via.placeholder.com/150",
-        submittedAt: serverTimestamp()
-    });
-    showToast("ID submitted! Admin will review shortly.", 'success');
+
+    const btn = document.querySelector('#tab-id button');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…'; }
+
+    try {
+        // Convert image to base64 so it's stored directly in Firestore
+        // (No Firebase Storage needed)
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsDataURL(file);
+        });
+
+        // Store base64 string as idProofUrl in Firestore
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            verificationPending: true,
+            idProofUrl: base64,          // admin can see this in verification table
+            submittedAt: serverTimestamp()
+        });
+
+        showToast("✅ ID submitted! Admin will review shortly.", 'success');
+
+        // Update local state
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('pendingMsg').style.display = 'block';
+
+    } catch (err) {
+        showToast("Upload failed: " + err.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload"></i> Submit ID'; }
+    }
 };
 
 // ─── CHATBOT ──────────────────────────────────────────
 let chatbotOpen = false;
 let chatListenerUnsub = null;
+let chatInitialized = false;
 
 window.toggleChatbot = () => {
     chatbotOpen = !chatbotOpen;
@@ -319,6 +403,7 @@ window.toggleChatbot = () => {
         win.classList.remove('open');
         fab.querySelector('i').className = 'fas fa-comment-dots';
         if (chatListenerUnsub) { chatListenerUnsub(); chatListenerUnsub = null; }
+        chatInitialized = false;
     }
 };
 
@@ -327,30 +412,42 @@ window.closeChatbot = () => {
     document.getElementById('chatbotWindow').classList.remove('open');
     document.getElementById('chatbotFab').querySelector('i').className = 'fas fa-comment-dots';
     if (chatListenerUnsub) { chatListenerUnsub(); chatListenerUnsub = null; }
+    chatInitialized = false;
 };
 
 function initChatbot() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+
     const msgs = document.getElementById('chatbotMsgs');
     if (!msgs.hasChildNodes()) {
         appendBotMsg("👋 Hi " + (currentUser?.name?.split(' ')[0] || 'there') + "! I'm the Fronix Assistant. How can I help you today?");
     }
-    // Listen for admin replies from Firestore
+
+    if (!currentUser) return;
+
+    // FIX: Listen for admin replies — only show NEW ones not seen yet
     const q = query(
         collection(db, "chatbot_messages"),
         where("studentId", "==", currentUser.uid),
+        where("type", "==", "admin_reply"),
         orderBy("createdAt", "asc")
     );
+
     chatListenerUnsub = onSnapshot(q, (snap) => {
         snap.docChanges().forEach(change => {
             if (change.type === 'added') {
                 const m = change.doc.data();
-                if (m.type === 'admin_reply' && m.seen === false) {
+                // Only show if not seen (i.e. new reply from admin)
+                if (!m.seen) {
                     appendBotMsg("🛡️ <strong>Admin:</strong> " + m.text);
-                    // Mark as seen
                     updateDoc(change.doc.ref, { seen: true });
                 }
             }
         });
+    }, (err) => {
+        console.error("Chatbot listener error:", err);
+        // If index missing, fall back without admin reply listener
     });
 }
 
@@ -388,14 +485,18 @@ window.sendChatbotMsg = async () => {
     msgs.scrollTop = msgs.scrollHeight;
 
     // Save to Firestore so admin can see and reply
-    await addDoc(collection(db, "chatbot_messages"), {
-        studentId: currentUser.uid,
-        studentName: currentUser.name,
-        text: text,
-        type: 'student_msg',
-        seen: false,
-        createdAt: serverTimestamp()
-    });
+    try {
+        await addDoc(collection(db, "chatbot_messages"), {
+            studentId: currentUser.uid,
+            studentName: currentUser.name,
+            text: text,
+            type: 'student_msg',
+            seen: false,
+            createdAt: serverTimestamp()
+        });
+    } catch (err) {
+        console.error("Failed to save message:", err);
+    }
 
     // Auto-reply logic (FAQ)
     setTimeout(() => {

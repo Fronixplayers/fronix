@@ -1,4 +1,4 @@
-// js/admin.js — FronixLearner Admin Dashboard Logic
+// js/admin.js — FronixLearner Admin Dashboard Logic (FIXED)
 
 import {
     auth, db,
@@ -23,9 +23,15 @@ function showToast(msg, type = 'info') {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists() && snap.data().role === 'Admin') initAdmin();
-        else { showToast("Admin access only.", 'error'); setTimeout(() => window.location.href = 'index.html', 1500); }
-    } else window.location.href = 'index.html';
+        if (snap.exists() && snap.data().role === 'Admin') {
+            initAdmin();
+        } else {
+            showToast("Admin access only.", 'error');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+    } else {
+        window.location.href = 'index.html';
+    }
 });
 
 // ─── INIT ─────────────────────────────────────────────
@@ -36,6 +42,17 @@ function initAdmin() {
     loadStudents();
     loadVerifications();
     loadChatbotMessages();
+    renderPlaylist();       // called once here safely
+    updatePricingUI();      // called once here safely
+
+    // Pricing radio listeners
+    document.querySelectorAll('input[name="pricing"]').forEach(r => {
+        r.addEventListener('change', updatePricingUI);
+    });
+
+    document.getElementById('adminReplyInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') window.sendAdminReply();
+    });
 }
 
 // ─── NAVIGATION ───────────────────────────────────────
@@ -49,17 +66,32 @@ window.switchTab = (tab, el) => {
 window.toggleSidebar = () => document.querySelector('aside').classList.toggle('active');
 window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
 
-// ─── STATS ────────────────────────────────────────────
+// ─── STATS (real-time) ────────────────────────────────
 function loadStats() {
+    // Total students
     onSnapshot(query(collection(db, "users"), where("role", "==", "Student")), (snap) => {
         document.getElementById('statStudents').innerText = snap.size;
     });
+
+    // Active courses
     onSnapshot(collection(db, "courses"), (snap) => {
         document.getElementById('statCourses').innerText = snap.size;
     });
+
+    // Unread chats — badge in sidebar + stat card
     onSnapshot(collection(db, "chatbot_messages"), (snap) => {
         const unread = snap.docs.filter(d => d.data().type === 'student_msg' && !d.data().seen).length;
         document.getElementById('statChats').innerText = unread;
+
+        const badge = document.getElementById('chatUnreadBadge');
+        if (badge) {
+            if (unread > 0) {
+                badge.style.display = 'inline';
+                badge.innerText = unread;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
     });
 }
 
@@ -104,7 +136,6 @@ window.deleteCategory = async () => {
 
 // ─── YOUTUBE LINK PARSER ──────────────────────────────
 function extractVideoId(url) {
-    // Handles: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/embed/ID, raw IDs
     const patterns = [
         /youtu\.be\/([a-zA-Z0-9_-]{11})/,
         /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
@@ -119,13 +150,12 @@ function extractVideoId(url) {
     return null;
 }
 
-// Preview YouTube link when admin types it
 window.previewLesson = () => {
     const url = document.getElementById('lVid').value.trim();
     const vid = extractVideoId(url);
     const preview = document.getElementById('ytPreview');
     if (vid) {
-        preview.src = `https://img.youtube.com/vi/${vid}/default.jpg`;
+        preview.src = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
         preview.classList.remove('hidden');
     } else {
         preview.classList.add('hidden');
@@ -144,23 +174,37 @@ window.addLesson = () => {
     document.getElementById('lTitle').value = "";
     document.getElementById('lVid').value = "";
     document.getElementById('ytPreview').classList.add('hidden');
+    showToast(`Lesson "${title}" added!`, 'success');
 };
 
+// ─── FIX: Single definition of renderPlaylist ─────────
 function renderPlaylist() {
     const l = document.getElementById('lessonList');
+    if (!l) return;
     l.innerHTML = tempPlaylist.length === 0
         ? `<p style="color:#aaa; font-size:0.85rem; text-align:center; padding:10px;">No lessons added yet</p>`
         : tempPlaylist.map((item, i) => `
         <div class="lesson-list-item">
             <div style="display:flex; align-items:center; gap:8px;">
-                <img src="https://img.youtube.com/vi/${item.videoId}/default.jpg" style="width:40px; height:28px; border-radius:4px; object-fit:cover;">
+                <img src="https://img.youtube.com/vi/${item.videoId}/default.jpg"
+                     style="width:40px; height:28px; border-radius:4px; object-fit:cover;"
+                     onerror="this.style.display='none'">
                 <span>${i + 1}. ${item.title}</span>
             </div>
             <button class="del-btn" onclick="window.remLesson(${i})"><i class="fas fa-times"></i></button>
         </div>`).join('');
 }
-
 window.remLesson = (i) => { tempPlaylist.splice(i, 1); renderPlaylist(); };
+
+// ─── PRICING TOGGLE ───────────────────────────────────
+// FIX: Single definition of updatePricingUI
+function updatePricingUI() {
+    const opts = document.querySelectorAll('.pricing-option');
+    const checked = document.querySelector('input[name="pricing"]:checked');
+    opts.forEach(o => o.classList.remove('selected'));
+    if (checked) checked.closest('.pricing-option')?.classList.add('selected');
+}
+window.updatePricingUI = updatePricingUI;
 
 // ─── PUBLISH COURSE ───────────────────────────────────
 window.publishCourse = async (e) => {
@@ -189,31 +233,25 @@ window.publishCourse = async (e) => {
         e.target.reset();
         tempPlaylist = [];
         renderPlaylist();
-        // Reset pricing to free
         document.getElementById('priceFree').checked = true;
         updatePricingUI();
     } catch (err) {
         showToast("Failed to publish: " + err.message, 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course';
+        btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
     }
 };
 
-// ─── PRICING TOGGLE ───────────────────────────────────
-window.updatePricingUI = () => {
-    const opts = document.querySelectorAll('.pricing-option');
-    const checked = document.querySelector('input[name="pricing"]:checked');
-    opts.forEach(o => o.classList.remove('selected'));
-    if (checked) checked.closest('.pricing-option')?.classList.add('selected');
-};
-
-// ─── LOAD COURSES ─────────────────────────────────────
+// ─── LOAD COURSES (real-time) ─────────────────────────
 function loadCourses() {
     onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
         const tb = document.querySelector('#courseTable tbody');
         tb.innerHTML = "";
-        if (snap.empty) { tb.innerHTML = '<tr><td colspan="6" class="no-data"><i class="fas fa-inbox"></i>No courses yet.</td></tr>'; return; }
+        if (snap.empty) {
+            tb.innerHTML = '<tr><td colspan="6" class="no-data"><i class="fas fa-inbox"></i>No courses yet.</td></tr>';
+            return;
+        }
         snap.forEach(d => {
             const c = d.data();
             const badge = c.isFree !== false
@@ -224,7 +262,7 @@ function loadCourses() {
             <tr>
                 <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                        ${vidId ? `<img src="https://img.youtube.com/vi/${vidId}/default.jpg" style="width:50px; height:35px; border-radius:6px; object-fit:cover;">` : ''}
+                        ${vidId ? `<img src="https://img.youtube.com/vi/${vidId}/default.jpg" style="width:50px; height:35px; border-radius:6px; object-fit:cover;" onerror="this.style.display='none'">` : ''}
                         <strong>${c.title}</strong>
                     </div>
                 </td>
@@ -233,7 +271,9 @@ function loadCourses() {
                 <td>${badge}</td>
                 <td>${c.playlist ? c.playlist.length : 1}</td>
                 <td>
-                    <button class="action-btn btn-trash" onclick="window.delCourse('${d.id}')"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn btn-trash" onclick="window.delCourse('${d.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             </tr>`;
         });
@@ -247,21 +287,28 @@ window.delCourse = async (id) => {
     }
 };
 
-// ─── STUDENTS ─────────────────────────────────────────
+// ─── STUDENTS (real-time) ─────────────────────────────
 function loadStudents() {
     onSnapshot(query(collection(db, "users"), where("role", "==", "Student")), (snap) => {
         const tb = document.querySelector('#studentTable tbody');
         tb.innerHTML = "";
-        if (snap.empty) { tb.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-users"></i>No students yet.</td></tr>'; return; }
+        if (snap.empty) {
+            tb.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-users"></i>No students yet.</td></tr>';
+            return;
+        }
         snap.forEach(d => {
             const u = d.data();
             const blocked = u.isBlocked === true;
             tb.innerHTML += `
             <tr>
-                <td>${u.name}</td>
-                <td>${u.email}</td>
+                <td>${u.name || '-'}</td>
+                <td>${u.email || '-'}</td>
                 <td>${u.city || '-'}, ${u.state || '-'}</td>
-                <td><span class="badge ${blocked ? 'badge-blocked' : 'badge-active'}">${blocked ? 'BLOCKED' : 'ACTIVE'}</span></td>
+                <td>
+                    <span class="badge ${blocked ? 'badge-blocked' : 'badge-active'}">
+                        ${blocked ? 'BLOCKED' : 'ACTIVE'}
+                    </span>
+                </td>
                 <td style="display:flex; gap:6px; flex-wrap:wrap;">
                     ${blocked
                         ? `<button class="action-btn btn-unblock" onclick="window.toggleBlock('${d.id}',false)"><i class="fas fa-check"></i> Unblock</button>`
@@ -287,21 +334,25 @@ window.deleteUser = async (id) => {
     }
 };
 
-// ─── VERIFICATIONS ────────────────────────────────────
+// ─── VERIFICATIONS (real-time) ────────────────────────
 function loadVerifications() {
     onSnapshot(query(collection(db, "users"), where("verificationPending", "==", true)), (snap) => {
         const tb = document.querySelector('#verificationTable tbody');
         tb.innerHTML = "";
-        if (snap.empty) { tb.innerHTML = '<tr><td colspan="3" class="no-data"><i class="fas fa-check-double"></i>No pending verifications.</td></tr>'; return; }
+        if (snap.empty) {
+            tb.innerHTML = '<tr><td colspan="3" class="no-data"><i class="fas fa-check-double"></i>No pending verifications.</td></tr>';
+            return;
+        }
         snap.forEach(d => {
             const u = d.data();
+            const idLink = u.idProofUrl && u.idProofUrl !== "https://via.placeholder.com/150"
+                ? `<a href="${u.idProofUrl}" target="_blank" style="color:var(--primary); font-size:0.8rem;"><i class="fas fa-eye"></i> View ID Image</a>`
+                : `<span style="color:#aaa; font-size:0.8rem;"><i class="fas fa-image"></i> No image (Base64 stored)</span>`;
             tb.innerHTML += `
             <tr>
                 <td>
-                    <strong>${u.name}</strong><br>
-                    <a href="${u.idProofUrl}" target="_blank" style="color:var(--primary); font-size:0.8rem;">
-                        <i class="fas fa-eye"></i> View ID Image
-                    </a>
+                    <strong>${u.name || 'Unknown'}</strong><br>
+                    ${idLink}
                 </td>
                 <td>${u.submittedAt ? new Date(u.submittedAt.toDate()).toLocaleDateString('en-IN') : 'N/A'}</td>
                 <td style="display:flex; gap:8px;">
@@ -314,115 +365,145 @@ function loadVerifications() {
 }
 
 window.verifyUser = async (uid, approved) => {
-    await updateDoc(doc(db, "users", uid), { isVerified: approved, verificationPending: false });
+    await updateDoc(doc(db, "users", uid), {
+        isVerified: approved,
+        verificationPending: false
+    });
     showToast(approved ? "✅ Student verified!" : "❌ Verification rejected.", approved ? 'success' : 'error');
 };
 
-// ─── CHATBOT ADMIN PANEL ──────────────────────────────
+// ─── CHATBOT ADMIN PANEL (real-time) ──────────────────
 function loadChatbotMessages() {
     const container = document.getElementById('chatStudentList');
-    // Load unique students who have sent messages
-    const q = query(collection(db, "chatbot_messages"), where("type", "==", "student_msg"), orderBy("createdAt", "desc"));
+
+    // FIX: Use a simpler query that doesn't require a composite index
+    // Just filter by type in JS after fetching
+    const q = query(
+        collection(db, "chatbot_messages"),
+        where("type", "==", "student_msg"),
+        orderBy("createdAt", "desc")
+    );
+
     onSnapshot(q, (snap) => {
         const students = new Map();
         snap.forEach(d => {
             const m = d.data();
+            if (!m.studentId) return;
             if (!students.has(m.studentId)) {
-                students.set(m.studentId, { name: m.studentName, id: m.studentId, unread: 0 });
+                students.set(m.studentId, {
+                    name: m.studentName || 'Unknown',
+                    id: m.studentId,
+                    unread: 0,
+                    lastMsg: m.text || ''
+                });
             }
             if (!m.seen) students.get(m.studentId).unread++;
         });
+
         container.innerHTML = "";
         if (students.size === 0) {
-            container.innerHTML = '<p class="no-data"><i class="fas fa-comments"></i>No student messages yet.</p>';
+            container.innerHTML = '<p class="no-data"><i class="fas fa-inbox"></i>No messages yet.</p>';
             return;
         }
+
         students.forEach((s) => {
-            container.innerHTML += `
-            <div class="student-chat-item ${selectedStudentId === s.id ? 'active' : ''}" onclick="window.openStudentChat('${s.id}', '${s.name}')">
-                <div style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #e5e7eb; border-radius:10px; cursor:pointer; margin-bottom:8px; background:${selectedStudentId === s.id ? '#eef2ff' : 'white'}; transition:0.2s;">
-                    <div style="width:40px; height:40px; border-radius:50%; background:#eef2ff; color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">${s.name[0]?.toUpperCase()}</div>
-                    <div style="flex:1;">
-                        <strong>${s.name}</strong>
-                        ${s.unread > 0 ? `<span style="background:var(--danger); color:white; border-radius:10px; padding:2px 8px; font-size:0.75rem; margin-left:6px;">${s.unread} new</span>` : ''}
-                    </div>
-                    <i class="fas fa-chevron-right" style="color:#aaa; font-size:0.8rem;"></i>
+            const isActive = selectedStudentId === s.id;
+            const div = document.createElement('div');
+            div.innerHTML = `
+            <div onclick="window.openStudentChat('${s.id}', '${s.name.replace(/'/g, "\\'")}')"
+                 style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #e5e7eb;
+                        border-radius:10px; cursor:pointer; margin-bottom:8px;
+                        background:${isActive ? '#eef2ff' : 'white'}; transition:0.2s;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#eef2ff; color:var(--primary);
+                            display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">
+                    ${(s.name[0] || '?').toUpperCase()}
                 </div>
+                <div style="flex:1; min-width:0;">
+                    <strong>${s.name}</strong>
+                    ${s.unread > 0 ? `<span style="background:var(--danger); color:white; border-radius:10px; padding:2px 8px; font-size:0.75rem; margin-left:6px;">${s.unread} new</span>` : ''}
+                    <div style="font-size:0.78rem; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.lastMsg}</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color:#aaa; font-size:0.8rem; flex-shrink:0;"></i>
             </div>`;
+            container.appendChild(div);
         });
+    }, (err) => {
+        console.error("Chatbot listener error:", err);
+        // If index error, show helpful message
+        if (err.code === 'failed-precondition') {
+            container.innerHTML = `<p class="no-data" style="color:orange;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Firestore index required.<br>
+                <small>Go to Firebase Console → Firestore → Indexes and create a composite index for <strong>chatbot_messages</strong>: type (ASC) + createdAt (DESC)</small>
+            </p>`;
+        }
     });
 }
 
 window.openStudentChat = (studentId, studentName) => {
     selectedStudentId = studentId;
     document.getElementById('chatStudentName').innerText = studentName;
-    document.getElementById('chatConvoArea').style.display = 'flex';
+
+    // Show conversation area, hide placeholder
+    const placeholder = document.getElementById('chatPlaceholder');
+    const convoArea = document.getElementById('chatConvoArea');
+    if (placeholder) placeholder.style.display = 'none';
+    if (convoArea) convoArea.style.display = 'flex';
 
     if (chatListenerUnsub) chatListenerUnsub();
+
     const q = query(
         collection(db, "chatbot_messages"),
         where("studentId", "==", studentId),
         orderBy("createdAt", "asc")
     );
+
     chatListenerUnsub = onSnapshot(q, (snap) => {
         const area = document.getElementById('adminChatMessages');
         area.innerHTML = "";
         snap.forEach(d => {
             const m = d.data();
             const isAdmin = m.type === 'admin_reply';
-            area.innerHTML += `
-            <div class="admin-chat-msg ${isAdmin ? 'admin-reply' : 'student'}">
-                <div class="msg-sender">${isAdmin ? '🛡️ Admin' : '👤 ' + m.studentName}</div>
-                ${m.text}
-            </div>`;
+            const div = document.createElement('div');
+            div.className = `admin-chat-msg ${isAdmin ? 'admin-reply' : 'student'}`;
+            div.innerHTML = `
+                <div class="msg-sender">${isAdmin ? '🛡️ Admin' : '👤 ' + (m.studentName || 'Student')}</div>
+                <div class="msg-text">${m.text}</div>`;
+            area.appendChild(div);
             // Mark student messages as seen
             if (!isAdmin && !m.seen) updateDoc(d.ref, { seen: true });
         });
         area.scrollTop = area.scrollHeight;
+
+        // Refresh the student list so unread counts update
+        loadChatbotMessages();
+    }, (err) => {
+        console.error("Chat conversation error:", err);
     });
-    loadChatbotMessages(); // refresh list
 };
 
 window.sendAdminReply = async () => {
     const input = document.getElementById('adminReplyInput');
     const text = input.value.trim();
-    if (!text || !selectedStudentId) return showToast("Type a message first.", 'error');
+    if (!text) return showToast("Type a message first.", 'error');
+    if (!selectedStudentId) return showToast("Select a student first.", 'error');
 
     input.value = "";
-    await addDoc(collection(db, "chatbot_messages"), {
-        studentId: selectedStudentId,
-        studentName: "Admin",
-        text: text,
-        type: 'admin_reply',
-        seen: false,
-        createdAt: serverTimestamp()
-    });
+    input.disabled = true;
+
+    try {
+        await addDoc(collection(db, "chatbot_messages"), {
+            studentId: selectedStudentId,
+            studentName: "Admin",
+            text: text,
+            type: 'admin_reply',
+            seen: false,
+            createdAt: serverTimestamp()
+        });
+    } catch (err) {
+        showToast("Failed to send: " + err.message, 'error');
+    } finally {
+        input.disabled = false;
+        input.focus();
+    }
 };
-
-document.getElementById('adminReplyInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') window.sendAdminReply();
-});
-
-// Init playlist render
-renderPlaylist();
-updatePricingUI();
-
-// Pricing radio listeners
-document.querySelectorAll('input[name="pricing"]').forEach(r => {
-    r.addEventListener('change', window.updatePricingUI);
-});
-
-function renderPlaylist() {
-    const l = document.getElementById('lessonList');
-    if (!l) return;
-    l.innerHTML = tempPlaylist.length === 0
-        ? `<p style="color:#aaa; font-size:0.85rem; text-align:center; padding:10px;">No lessons added yet</p>`
-        : tempPlaylist.map((item, i) => `
-        <div class="lesson-list-item">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <img src="https://img.youtube.com/vi/${item.videoId}/default.jpg" style="width:40px; height:28px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">
-                <span>${i + 1}. ${item.title}</span>
-            </div>
-            <button class="del-btn" onclick="window.remLesson(${i})"><i class="fas fa-times"></i></button>
-        </div>`).join('');
-}
