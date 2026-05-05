@@ -1,8 +1,7 @@
-// js/firebase-config.js
+// js/firebase-config.js — FronixLearner Shared Firebase Config
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-
 import {
     getAuth,
     createUserWithEmailAndPassword,
@@ -11,7 +10,6 @@ import {
     onAuthStateChanged,
     sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import {
     getFirestore,
     collection,
@@ -31,40 +29,26 @@ import {
     increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-    getStorage,
-    ref,
-    uploadBytes,
-    getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
 const firebaseConfig = {
-    apiKey: "YOUR_KEY",
-    authDomain: "YOUR_DOMAIN",
-    projectId: "YOUR_ID",
-    storageBucket: "YOUR_BUCKET",
-    messagingSenderId: "YOUR_MSG",
-    appId: "YOUR_APP"
+    apiKey: "AIzaSyC6w88P1Nrgp4djwrjJf0K2i2l6xQG8FEI",
+    authDomain: "fronix-afde1.firebaseapp.com",
+    projectId: "fronix-afde1",
+    storageBucket: "fronix-afde1.appspot.com",
+    messagingSenderId: "942976075894",
+    appId: "1:942976075894:web:dfab62b417f89cc66c3757",
+    measurementId: "G-DR773T6QF1"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 export {
-    auth, db, storage,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-
-    collection, addDoc, getDoc, getDocs, doc,
-    setDoc, deleteDoc, onSnapshot, query, where,
-    updateDoc, serverTimestamp, orderBy, limit, increment,
-
-    ref, uploadBytes, getDownloadURL
+    auth, db,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signOut, onAuthStateChanged, sendPasswordResetEmail,
+    collection, addDoc, getDoc, getDocs, doc, setDoc, deleteDoc,
+    onSnapshot, query, where, updateDoc, serverTimestamp,
+    orderBy, limit, increment
 };
