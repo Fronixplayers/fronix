@@ -496,7 +496,7 @@ window.sendAdminReply = async () => {
             studentId: selectedStudentId,
             studentName: "Admin",
             text: text,
-            type: 'admin_reply',
+            type: 'admin_msg',
             seen: false,
             createdAt: serverTimestamp()
         });
