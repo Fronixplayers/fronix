@@ -109,6 +109,7 @@ window.switchMode = (mode) => {
     const title = document.getElementById('formTitle');
     const btn = document.getElementById('submitBtn');
     const roleGroup = document.getElementById('roleGroup');
+    const adminOption = document.getElementById('adminOption');
 
     // Reset required
     ['fullName','age','phone','state','city'].forEach(id => {
@@ -122,6 +123,8 @@ window.switchMode = (mode) => {
         termsGroup.classList.add('hidden');
         forgotLinks.classList.remove('hidden'); backLink.classList.add('hidden');
         roleGroup.classList.remove('hidden');
+        // Show Admin option only on Login
+        if (adminOption) adminOption.style.display = '';
         title.innerText = "Welcome Back"; btn.innerHTML = '<i class="fas fa-arrow-right"></i> Access Dashboard';
     } else if (mode === 'signup') {
         btns[0].classList.remove('active'); btns[1].classList.add('active');
@@ -129,6 +132,11 @@ window.switchMode = (mode) => {
         termsGroup.classList.remove('hidden');
         forgotLinks.classList.add('hidden'); backLink.classList.add('hidden');
         roleGroup.classList.remove('hidden');
+        // Hide Admin option — only Students can sign up
+        if (adminOption) adminOption.style.display = 'none';
+        // Force select to Student if Admin was selected
+        const roleEl = document.getElementById('role');
+        if (roleEl && roleEl.value === 'Admin') roleEl.value = 'Student';
         ['fullName','age','phone','state','city'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.required = true;
@@ -140,6 +148,7 @@ window.switchMode = (mode) => {
         termsGroup.classList.add('hidden');
         forgotLinks.classList.add('hidden'); backLink.classList.remove('hidden');
         roleGroup.classList.add('hidden');
+        if (adminOption) adminOption.style.display = 'none';
         title.innerText = "Reset Password"; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reset Link';
     }
 };
