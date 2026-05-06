@@ -3,464 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FronixLearner — Master the Future</title>
+    <title>FronixLearner - Master the Future</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
 
 <div id="toast"></div>
-<div class="noise"></div>
-<div class="cursor"></div>
-<div class="cursor-follower"></div>
 
 <!-- ─── NAVBAR ─────────────────────────────────────── -->
-<nav id="navbar">
-    <a href="#home" class="logo">
-        <img src="images/fronixlogo.jpg" alt="FronixLearner" class="logo-img">
-        <span>FronixLearner</span>
-    </a>
+<nav>
+    <div class="logo"><i class="fas fa-graduation-cap"></i> FronixLearner</div>
     <div class="nav-links" id="navLinks">
-        <a href="#home" class="nav-link active">Home</a>
-        <a href="#about" class="nav-link">About</a>
-        <a href="#courses" class="nav-link">Courses</a>
-        <a href="#team" class="nav-link">Team</a>
-        <a href="#contact" class="nav-link">Contact</a>
-        <button onclick="window.openModal('login')" class="nav-cta">Log In <i class="fas fa-arrow-right"></i></button>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#courses">Courses</a>
+        <a href="#team">Team</a>
+        <a href="#contact">Contact</a>
+        <button onclick="window.openModal('login')" class="btn btn-fill" style="padding:0.6rem 1.4rem;">Log In</button>
     </div>
-    <div class="hamburger" onclick="toggleMenu()" id="hamburger">
-        <span></span><span></span><span></span>
-    </div>
+    <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
 </nav>
 
 <!-- ─── HERO ───────────────────────────────────────── -->
 <section class="hero" id="home">
-    <div class="hero-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="grid-overlay"></div>
-    </div>
-    <div class="hero-content">
-        <div class="hero-badge">
-            <span class="badge-dot"></span> Free World-Class Education
-        </div>
-        <h1 class="hero-title">
-            Unlock Your <span class="gradient-text">Potential</span><br>
-            with the Ultimate<br>Learning Hub 🚀
-        </h1>
-        <p class="hero-desc">Step into FronixLearner — where expert mentors bring you free, world-class education. Access curated courses, real-world projects, and a supportive community.</p>
+    <div class="hero-text">
+        <h1>Unlock your potential with the ultimate <span>learning hub</span> 🚀</h1>
+        <p class="hero-p">Step into FronixLearner — where expert mentors bring you free, world-class education. Access curated courses, real-world projects, and a supportive community.</p>
         <div class="hero-btns">
-            <button onclick="window.openModal('signup')" class="btn-primary">
-                <span>Start Learning</span> <i class="fas fa-arrow-right"></i>
-            </button>
-            <a href="#courses" class="btn-ghost">
-                <i class="fas fa-search"></i> <span>Explore Courses</span>
-            </a>
-        </div>
-        <div class="hero-stats">
-            <div class="stat-pill"><span class="stat-n">10k+</span><span class="stat-l">Students</span></div>
-            <div class="stat-div"></div>
-            <div class="stat-pill"><span class="stat-n">100%</span><span class="stat-l">Free Access</span></div>
-            <div class="stat-div"></div>
-            <div class="stat-pill"><span class="stat-n">50+</span><span class="stat-l">Courses</span></div>
+            <button onclick="window.openModal('signup')" class="btn btn-fill">Start Learning <i class="fas fa-arrow-right"></i></button>
+            <a href="#courses" class="btn btn-outline"><i class="fas fa-search"></i> Explore Courses</a>
         </div>
     </div>
-    <div class="hero-visual">
-        <div class="hero-slider-wrap glass-card">
-            <div class="slide active" style="background-image:url('https://i.pinimg.com/736x/50/e5/f5/50e5f5823d169a4162972baaadfbad16.jpg');"></div>
-            <div class="slide" style="background-image:url('https://i.pinimg.com/736x/12/96/1d/12961d8bd9bac727ca39b22a52e6228b.jpg');"></div>
-            <div class="slide" style="background-image:url('https://i.pinimg.com/1200x/e6/5c/e5/e65ce52104bcfe4c69076025a8d179dc.jpg');"></div>
-            <div class="slide-dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
-        <div class="float-chip chip-a glass-chip"><i class="fas fa-graduation-cap"></i> Free Courses</div>
-        <div class="float-chip chip-b glass-chip"><i class="fas fa-certificate"></i> Certificates</div>
-        <div class="float-chip chip-c glass-chip"><i class="fas fa-users"></i> Community</div>
+    <div class="hero-slider-container">
+        <div class="slide active" style="background-image:url('https://i.pinimg.com/736x/50/e5/f5/50e5f5823d169a4162972baaadfbad16.jpg');"></div>
+        <div class="slide" style="background-image:url('https://i.pinimg.com/736x/12/96/1d/12961d8bd9bac727ca39b22a52e6228b.jpg');"></div>
+        <div class="slide" style="background-image:url('https://i.pinimg.com/1200x/e6/5c/e5/e65ce52104bcfe4c69076025a8d179dc.jpg');"></div>
     </div>
 </section>
 
 <!-- ─── ABOUT ──────────────────────────────────────── -->
-<section id="about" class="about-section">
-    <div class="section-tag">Who We Are</div>
+<section id="about">
     <div class="about-grid">
-        <div class="about-visual">
-            <div class="about-img-wrap glass-card">
-                <img src="images/about.png" alt="About FronixLearner" class="about-img">
-            </div>
-            <div class="about-badge glass-chip">
-                <i class="fas fa-trophy"></i>
-                <div><strong>2+ Years</strong><span>of Excellence</span></div>
-            </div>
+        <div class="about-img">
+            <img src="https://img.freepik.com/free-vector/team-checklist-concept-illustration_114360-10086.jpg?w=740" alt="About Fronix">
         </div>
-        <div class="about-content">
-            <h2 class="section-title">2 Years of <span class="gradient-text">Excellence</span> 🏆</h2>
-            <p class="about-lead">At FronixLearner, get guided by expert mentors with 3+ years of experience — access top-notch study material, clear notes, and powerful self-growth courses. All absolutely free 🎓📘</p>
-            <p class="about-sub">We're not just a platform — we're your learning partners for life 🚀 Join thousands of students already growing with us!</p>
-            <div class="about-stats">
-                <div class="astat glass-card"><h3>10k+</h3><p>Students</p></div>
-                <div class="astat glass-card"><h3>100%</h3><p>Free Access</p></div>
-                <div class="astat glass-card"><h3>50+</h3><p>Courses</p></div>
+        <div class="about-text">
+            <h2>2 Years of Excellence 🏆</h2>
+            <p>At FronixLearner, get guided by expert mentors with 3+ years of experience — access top-notch study material, clear notes, and powerful self-growth courses. All absolutely free 🎓📘</p>
+            <p>We're not just a platform — we're your learning partners for life 🚀 Join thousands of students already growing with us!</p>
+            <div class="stats-row">
+                <div class="stat"><h3>10k+</h3><p>Students</p></div>
+                <div class="stat"><h3>100%</h3><p>Free Access</p></div>
+                <div class="stat"><h3>50+</h3><p>Courses</p></div>
             </div>
-            <button onclick="window.openModal('signup')" class="btn-primary">Join for Free <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 </section>
 
 <!-- ─── COURSES ─────────────────────────────────────── -->
-<section id="courses" class="courses-section">
-    <div class="section-tag">Learn Anything</div>
-    <h2 class="section-title center-title">Our Popular <span class="gradient-text">Courses</span></h2>
-    <p class="section-sub">Hand-picked playlists to help you master new skills. Click any course to start watching!</p>
-    <div class="search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" onkeyup="window.filterCourses()" placeholder="Search courses by title or category…">
+<section id="courses">
+    <div class="section-header">
+        <h2>Our Popular Courses</h2>
+        <p>Hand-picked playlists to help you master new skills. Click any course to start watching!</p>
+    </div>
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" onkeyup="window.filterCourses()" placeholder="Search courses…">
     </div>
     <div class="course-grid" id="courseGrid">
-        <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading courses…</p>
-        </div>
+        <p style="grid-column:1/-1; text-align:center; color:#999;">Loading courses…</p>
     </div>
 </section>
 
 <!-- ─── TEAM ────────────────────────────────────────── -->
-<section id="team" class="team-section">
-    <div class="section-tag">The People</div>
-    <h2 class="section-title center-title">Meet Our <span class="gradient-text">Team</span></h2>
-    <p class="section-sub">The minds behind FronixLearner.</p>
+<section id="team">
+    <div class="section-header"><h2>Our Team</h2><p>The minds behind FronixLearner.</p></div>
     <div class="team-grid">
-        <div class="team-card glass-card">
-            <div class="team-img-wrap">
-                <img src="images/team1__2_.jpg" alt="Diljeet Singh Sran">
-                <div class="team-overlay">
-                    <a href="https://www.instagram.com/diljeet_singh_sran_" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                </div>
-            </div>
-            <div class="team-info">
-                <h3>Diljeet Singh Sran</h3>
-                <span>Founder</span>
-            </div>
+        <div class="team-card">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Diljeet" class="team-img" alt="Diljeet">
+            <h3 class="team-name">Diljeet Singh Sran</h3>
+            <p class="team-role">Founder</p>
+            <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div>
         </div>
-        <div class="team-card glass-card">
-            <div class="team-img-wrap">
-                <img src="images/rs.jpeg" alt="Rishabh">
-                <div class="team-overlay">
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="team-info">
-                <h3>Rishabh</h3>
-                <span>CEO</span>
-            </div>
+        <div class="team-card">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rishabh" class="team-img" alt="Rishabh">
+            <h3 class="team-name">Rishabh</h3>
+            <p class="team-role">CEO</p>
+            <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-twitter"></i></a></div>
         </div>
-        <div class="team-card glass-card">
-            <div class="team-img-wrap">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ayushi" alt="Ayushi Singh" style="background:#eef2ff;">
-                <div class="team-overlay">
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-            <div class="team-info">
-                <h3>Ayushi Singh</h3>
-                <span>Software Developer</span>
-            </div>
+        <div class="team-card">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ayushi" class="team-img" alt="Ayushi">
+            <h3 class="team-name">Ayushi Singh</h3>
+            <p class="team-role">Software Developer</p>
+            <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-github"></i></a></div>
         </div>
-        <div class="team-card glass-card">
-            <div class="team-img-wrap">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kratika" alt="Kratika Gupta" style="background:#eef2ff;">
-                <div class="team-overlay">
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-            <div class="team-info">
-                <h3>Kratika Gupta</h3>
-                <span>R&D Leader</span>
-            </div>
+        <div class="team-card">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kratika" class="team-img" alt="Kratika">
+            <h3 class="team-name">Kratika Gupta</h3>
+            <p class="team-role">R&D Leader</p>
+            <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-github"></i></a></div>
         </div>
-        <div class="team-card glass-card">
-            <div class="team-img-wrap">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Preet" alt="Preet Kushwaha" style="background:#eef2ff;">
-                <div class="team-overlay">
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-            <div class="team-info">
-                <h3>Preet Kushwaha</h3>
-                <span>Graphic Designer</span>
-            </div>
+        <div class="team-card">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Preet" class="team-img" alt="Preet">
+            <h3 class="team-name">Preet Kushwaha</h3>
+            <p class="team-role">Graphic Designer</p>
+            <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-github"></i></a></div>
         </div>
     </div>
 </section>
 
 <!-- ─── REVIEWS ─────────────────────────────────────── -->
-<section id="reviews" class="reviews-section">
-    <div class="section-tag">What Students Say</div>
-    <h2 class="section-title center-title">Student <span class="gradient-text">Reviews</span></h2>
-    <div class="review-card glass-card">
-        <div class="review-stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-        </div>
+<section id="reviews">
+    <div class="section-header"><h2>Student Reviews</h2></div>
+    <div class="review-card">
         <p class="review-text">"Thank you so much for the amazing courses! I've completed the Canva course and now learning CorelDRAW — the experience is great! Your simple and clear teaching makes learning so easy. Excited to start earning soon! 🙌✨"</p>
         <div class="review-author">
-            <div class="review-avatar" style="background-image:url('https://api.dicebear.com/7.x/avataaars/svg?seed=Kinjal');background-color:#eef2ff;"></div>
-            <div><strong>Kinjal</strong><br><span>Student</span></div>
+            <div class="review-avatar" style="background-image:url('https://api.dicebear.com/7.x/avataaars/svg?seed=Kinjal'); background-size:cover;"></div>
+            <div><strong>Kinjal</strong><br><span style="font-size:0.85rem; color:#888;">Student</span></div>
         </div>
     </div>
 </section>
 
-<!-- ─── PROJECTS ─────────────────────────────────────── -->
-<section id="blog" class="projects-section">
-    <div class="section-tag">What We Build</div>
-    <h2 class="section-title center-title">Our <span class="gradient-text">Projects</span></h2>
-    <p class="section-sub">What we are building for the future.</p>
-    <div class="projects-grid">
-        <div class="project-card glass-card">
-            <div class="project-icon"><i class="fas fa-building-columns"></i></div>
-            <div class="project-tag">Foundation</div>
-            <h3>We run Foundations</h3>
-            <p>Building a foundation for lifelong learning across India.</p>
-            <span class="project-date"><i class="far fa-calendar"></i> Dec 2022</span>
-        </div>
-        <div class="project-card glass-card featured-proj">
-            <div class="project-icon"><i class="fas fa-laptop-code"></i></div>
-            <div class="project-tag">E-Learning</div>
-            <h3>E-learning Platform</h3>
-            <p>Providing world-class education for free to everyone.</p>
-            <span class="project-date"><i class="far fa-calendar"></i> Dec 2022</span>
-        </div>
-        <div class="project-card glass-card">
-            <div class="project-icon"><i class="fas fa-bullhorn"></i></div>
-            <div class="project-tag">Agency</div>
-            <h3>Social Media Agency</h3>
-            <p>Helping brands grow with expert marketing strategies.</p>
-            <span class="project-date"><i class="far fa-calendar"></i> Dec 2022</span>
-        </div>
+<!-- ─── BLOG / PROJECTS ─────────────────────────────── -->
+<section id="blog">
+    <div class="section-header"><h2>Our Projects</h2><p>What we are building for the future.</p></div>
+    <div class="blog-grid">
+        <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">We run Foundations</h3><p class="blog-desc">Building a foundation for lifelong learning across India.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>
+        <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">E-learning Platform</h3><p class="blog-desc">Providing world-class education for free to everyone.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>
+        <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">Social Media Agency</h3><p class="blog-desc">Helping brands grow with expert marketing strategies.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>
     </div>
 </section>
 
 <!-- ─── CONTACT ─────────────────────────────────────── -->
-<section id="contact" class="contact-section">
-    <div class="section-tag">Get in Touch</div>
-    <h2 class="section-title center-title">Find Us <span class="gradient-text">Here</span></h2>
-    <p class="section-sub">Reach out for updates, queries, or just to say hello!</p>
-    <div class="contact-grid">
-        <div class="contact-left">
-            <div class="contact-item glass-chip"><div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div><div><strong>Location</strong><p>Kalanwali, Sirsa, Haryana, India</p></div></div>
-            <div class="contact-item glass-chip"><div class="ci-icon"><i class="fas fa-envelope"></i></div><div><strong>Email</strong><p>fronixplayers@gmail.com</p></div></div>
-            <div class="contact-item glass-chip"><div class="ci-icon"><i class="fas fa-phone"></i></div><div><strong>Phone</strong><p>+91 9115906955</p></div></div>
-            <div class="contact-socials">
-                <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-telegram"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
-            </div>
+<section id="contact">
+    <div class="section-header"><h2>Find Us Here</h2><p>Reach out for updates, queries, or just to say hello!</p></div>
+    <div class="contact-container">
+        <div class="contact-info">
+            <h3>Contact Info</h3>
+            <p>Feel free to reach out anytime.</p>
+            <div class="info-item"><div class="icon-wrap"><i class="fas fa-map-marker-alt"></i></div><div><strong>Location</strong><br>Kalanwali, Sirsa, Haryana, India</div></div>
+            <div class="info-item"><div class="icon-wrap"><i class="fas fa-envelope"></i></div><div><strong>Email</strong><br>fronixplayers@gmail.com</div></div>
+            <div class="info-item"><div class="icon-wrap"><i class="fas fa-phone"></i></div><div><strong>Phone</strong><br>+91 9115906955</div></div>
         </div>
-        <form class="contact-form glass-card" id="contactForm">
-            <h3>Send a Message</h3>
-            <div class="form-grp">
-                <i class="fas fa-user"></i>
+        <div class="contact-form">
+            <form id="contactForm">
                 <input type="text" placeholder="Your Name" required>
-            </div>
-            <div class="form-grp">
-                <i class="fas fa-envelope"></i>
                 <input type="email" placeholder="Your Email" required>
-            </div>
-            <div class="form-grp textarea-grp">
-                <i class="fas fa-comment"></i>
                 <textarea rows="5" placeholder="Your message…" required></textarea>
-            </div>
-            <button type="submit" class="btn-primary full-w">Send Message <i class="fas fa-paper-plane"></i></button>
-        </form>
+                <button type="submit" class="btn btn-fill" style="width:100%; justify-content:center;">Send Message <i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
     </div>
 </section>
 
 <!-- ─── FOOTER ──────────────────────────────────────── -->
 <footer>
-    <div class="footer-inner">
+    <div class="footer-grid">
         <div class="footer-col">
-            <a href="#home" class="logo">
-                <img src="images/fronixlogo.jpg" alt="FronixLearner" class="logo-img">
-                <span>FronixLearner</span>
-            </a>
-            <p>Free world-class education for everyone. Powered by expert mentors.</p>
-            <div class="footer-socials">
+            <div class="logo" style="margin-bottom:1rem;"><i class="fas fa-graduation-cap"></i> FronixLearner</div>
+            <p>Created by Altmediia | All rights reserved!</p>
+            <div class="social-icons">
                 <a href="#"><i class="fab fa-facebook-f"></i></a>
                 <a href="#"><i class="fab fa-instagram"></i></a>
                 <a href="#"><i class="fab fa-youtube"></i></a>
-                <a href="#"><i class="fab fa-telegram"></i></a>
             </div>
         </div>
         <div class="footer-col">
-            <h4>Quick Links</h4>
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#courses">Courses</a>
-            <a href="#team">Team</a>
-            <a href="#contact">Contact</a>
-        </div>
-        <div class="footer-col">
-            <h4>Platform</h4>
-            <a href="student.html">Student Dashboard</a>
-            <a href="admin.html">Admin Panel</a>
-            <a onclick="window.openModal('signup')" href="#">Sign Up Free</a>
-            <a onclick="window.openModal('login')" href="#">Login</a>
-        </div>
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p style="font-size:1.4rem;color:var(--text-muted);line-height:1.8;margin:0;">fronixplayers@gmail.com<br>+91 9115906955<br>Kalanwali, Sirsa,<br>Haryana 125201</p>
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
         </div>
     </div>
-    <div class="footer-bottom">
-        <p>Created with 🔥 by <a href="https://altmediia.netlify.app/" target="_blank">Altmediia</a> | &copy; 2026 FronixLearner. All rights reserved.</p>
-    </div>
+    <div class="footer-bottom">&copy; 2025 FronixLearner. All rights reserved.</div>
 </footer>
-
-<!-- Scroll to top -->
-<button class="scroll-top" id="scrollTop"><i class="fas fa-arrow-up"></i></button>
 
 <!-- ─── AUTH MODAL ──────────────────────────────────── -->
 <div class="modal-overlay" id="authModal">
-    <div class="auth-container glass-card">
-        <span class="modal-close" onclick="window.closeModal()"><i class="fas fa-times"></i></span>
-        <div class="auth-visual">
-            <img src="https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg" alt="Login" class="auth-visual-img">
-            <h2>Welcome to <span class="gradient-text">Fronix!</span></h2>
-            <p>Login to continue your learning journey.</p>
-        </div>
-        <div class="auth-form-side">
-            <div class="toggle-box">
-                <div class="toggle-btn active" onclick="window.switchMode('login')">Log In</div>
-                <div class="toggle-btn" onclick="window.switchMode('signup')">Sign Up</div>
+    <div class="auth-container">
+        <div style="position:relative; width:100%; display:flex; overflow:hidden; border-radius:24px;">
+            <span class="modal-close" onclick="window.closeModal()">&times;</span>
+            <div class="auth-visual">
+                <img src="https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg" alt="Login">
+                <h2>Welcome to Fronix!</h2>
+                <p>Login to continue your learning journey.</p>
             </div>
-            <form id="authForm" onsubmit="window.handleAuth(event)">
-                <h2 id="formTitle">Welcome Back</h2>
-                <div id="nameGroup" class="hidden">
-                    <div class="auth-input-wrap"><i class="fas fa-user"></i><input type="text" id="fullName" class="custom-input" placeholder="Full Name"></div>
+            <div class="auth-form-side">
+                <div class="toggle-box">
+                    <div class="toggle-btn active" onclick="window.switchMode('login')">Log In</div>
+                    <div class="toggle-btn" onclick="window.switchMode('signup')">Sign Up</div>
                 </div>
-                <div id="extraFields" class="hidden">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div class="auth-input-wrap"><i class="fas fa-calendar"></i><input type="number" id="age" class="custom-input" placeholder="Age" min="5"></div>
-                        <div class="auth-input-wrap"><i class="fas fa-phone"></i><input type="tel" id="phone" class="custom-input" placeholder="Phone"></div>
+                <form id="authForm" onsubmit="window.handleAuth(event)">
+                    <h2 id="formTitle" style="margin-bottom:20px; font-weight:800; font-size:1.5rem;">Welcome Back</h2>
+
+                    <!-- Signup Extra Fields -->
+                    <div id="nameGroup" class="hidden">
+                        <input type="text" id="fullName" class="custom-input" placeholder="Full Name">
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div class="auth-input-wrap"><i class="fas fa-map-marker-alt"></i><input type="text" id="state" class="custom-input" placeholder="State"></div>
-                        <div class="auth-input-wrap"><i class="fas fa-city"></i><input type="text" id="city" class="custom-input" placeholder="City"></div>
+                    <div id="extraFields" class="hidden">
+                        <div class="input-row">
+                            <input type="number" id="age" class="custom-input" placeholder="Age" min="5">
+                            <input type="tel" id="phone" class="custom-input" placeholder="Phone Number">
+                        </div>
+                        <div class="input-row">
+                            <input type="text" id="state" class="custom-input" placeholder="State">
+                            <input type="text" id="city" class="custom-input" placeholder="City">
+                        </div>
                     </div>
-                </div>
-                <div class="auth-input-wrap"><i class="fas fa-envelope"></i><input type="email" id="email" class="custom-input" placeholder="Email Address" required></div>
-                <div class="auth-input-wrap"><i class="fas fa-lock"></i><input type="password" id="password" class="custom-input" placeholder="Password (min 6 chars)" required></div>
-                <div id="roleGroup" style="margin-bottom:15px;">
-                    <label class="auth-label">I am a:</label>
-                    <div class="auth-input-wrap"><i class="fas fa-user-tag"></i>
-                    <select id="role" class="custom-input">
-                        <option value="Student">Student</option>
-                        <option value="Admin">Admin</option>
-                    </select></div>
-                </div>
-                <div class="terms-group hidden" id="termsGroup">
-                    <input type="checkbox" id="termsCheck">
-                    <label for="termsCheck">I agree to the <a href="#" onclick="window.openTerms(event)">Terms & Conditions</a> and <a href="#" onclick="window.openTerms(event)">Privacy Policy</a></label>
-                </div>
-                <div id="forgotLinks" style="text-align:right;margin-bottom:15px;">
-                    <span onclick="window.switchMode('reset')" class="forgot-link">Forgot Password?</span>
-                </div>
-                <div id="backToLoginLink" class="hidden" style="text-align:center;margin-bottom:15px;">
-                    <span onclick="window.switchMode('login')" class="back-link"><i class="fas fa-arrow-left"></i> Back to Login</span>
-                </div>
-                <button type="submit" class="btn-primary full-w" id="submitBtn">
-                    <i class="fas fa-arrow-right"></i> Access Dashboard
-                </button>
-            </form>
+
+                    <input type="email" id="email" class="custom-input" placeholder="Email Address" required>
+                    <input type="password" id="password" class="custom-input" placeholder="Password (min 6 chars)" required>
+
+                    <!-- Role Select -->
+                    <div id="roleGroup" style="margin-bottom:15px;">
+                        <label style="font-size:0.82rem; font-weight:700; color:#666; display:block; margin-bottom:6px;">I am a:</label>
+                        <select id="role" class="custom-input">
+                            <option value="Student">Student</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <!-- Terms & Conditions (Signup only) -->
+                    <div class="terms-group hidden" id="termsGroup">
+                        <input type="checkbox" id="termsCheck">
+                        <label for="termsCheck">
+                            I have read and agree to the
+                            <a href="#" onclick="window.openTerms(event)">Terms &amp; Conditions</a>
+                            and <a href="#" onclick="window.openTerms(event)">Privacy Policy</a>
+                            of FronixLearner.
+                        </label>
+                    </div>
+
+                    <!-- Forgot Password -->
+                    <div id="forgotLinks" style="text-align:right; margin-bottom:15px;">
+                        <span onclick="window.switchMode('reset')" style="color:var(--primary); cursor:pointer; font-size:0.88rem; font-weight:600;">Forgot Password?</span>
+                    </div>
+                    <div id="backToLoginLink" class="hidden" style="text-align:center; margin-bottom:15px;">
+                        <span onclick="window.switchMode('login')" style="color:#888; cursor:pointer; font-size:0.9rem;"><i class="fas fa-arrow-left"></i> Back to Login</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-fill" id="submitBtn" style="width:100%; justify-content:center; padding:0.85rem;">
+                        <i class="fas fa-arrow-right"></i> Access Dashboard
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ─── TERMS MODAL ──────────────────────────────────── -->
+<!-- ─── TERMS & CONDITIONS MODAL ────────────────────── -->
 <div class="modal-overlay" id="termsModal">
-    <div class="modal-box glass-card terms-box">
-        <span class="modal-close" onclick="window.closeTerms()"><i class="fas fa-times"></i></span>
-        <h2><i class="fas fa-file-contract" style="color:var(--primary);"></i> Terms & Conditions</h2>
+    <div class="modal-box terms-modal-box">
+        <span class="modal-close" onclick="window.closeTerms()">&times;</span>
+        <h2 style="margin-bottom:16px; font-weight:800;"><i class="fas fa-file-contract" style="color:var(--primary);"></i> Terms &amp; Conditions</h2>
         <div class="terms-content">
-            <h3>1. Acceptance of Terms</h3><p>By creating an account on FronixLearner, you agree to be bound by these Terms & Conditions.</p>
-            <h3>2. User Eligibility</h3><p>You must be at least 13 years of age to use FronixLearner.</p>
-            <h3>3. Account Responsibilities</h3><p>You are responsible for maintaining the confidentiality of your account credentials.</p>
-            <h3>4. Acceptable Use</h3><p>You agree not to use FronixLearner to engage in any unlawful, abusive, or harmful activity.</p>
-            <h3>5. Course Content</h3><p>All course content is provided for educational purposes only. Videos are sourced from YouTube.</p>
-            <h3>6. Privacy Policy</h3><p>We collect your name, email, age, phone, and location when you register. Stored securely in Firebase.</p>
-            <h3>7. ID Verification</h3><p>You may optionally upload a College ID to unlock premium resources.</p>
-            <h3>8. Termination</h3><p>FronixLearner reserves the right to suspend or permanently block any account that violates these terms.</p>
-            <h3>9. Contact</h3><p>For queries, contact us at <strong>fronixplayers@gmail.com</strong></p>
+            <h3>1. Acceptance of Terms</h3>
+            <p>By creating an account on FronixLearner, you agree to be bound by these Terms &amp; Conditions. If you do not agree, please do not register.</p>
+
+            <h3>2. User Eligibility</h3>
+            <p>You must be at least 13 years of age to use FronixLearner. By registering, you confirm that the information you provide is accurate and complete.</p>
+
+            <h3>3. Account Responsibilities</h3>
+            <p>You are responsible for maintaining the confidentiality of your account credentials. You must not share your account with anyone else. Any activity under your account is your responsibility.</p>
+
+            <h3>4. Acceptable Use</h3>
+            <p>You agree not to use FronixLearner to engage in any unlawful, abusive, or harmful activity. You must not attempt to hack, scrape, or disrupt our services. Any misuse will result in immediate account suspension.</p>
+
+            <h3>5. Course Content</h3>
+            <p>All course content on FronixLearner is provided for educational purposes only. Videos are sourced from YouTube and are subject to their respective copyright holders. FronixLearner does not claim ownership of third-party content.</p>
+
+            <h3>6. Privacy Policy</h3>
+            <p>We collect your name, email, age, phone, and location when you register. This data is stored securely in Firebase and used only to provide and improve our services. We do not sell your data to third parties.</p>
+
+            <h3>7. ID Verification</h3>
+            <p>You may optionally upload a College ID to unlock premium resources. By doing so, you consent to an admin reviewing your submitted document for verification purposes only.</p>
+
+            <h3>8. Termination</h3>
+            <p>FronixLearner reserves the right to suspend or permanently block any account that violates these terms without prior notice.</p>
+
+            <h3>9. Changes to Terms</h3>
+            <p>We may update these Terms at any time. Continued use of the platform after changes constitutes acceptance of the new terms.</p>
+
+            <h3>10. Contact</h3>
+            <p>For any queries regarding these terms, please contact us at <strong>fronixplayers@gmail.com</strong></p>
         </div>
-        <div class="terms-actions">
-            <button onclick="window.acceptTerms()" class="btn-primary"><i class="fas fa-check"></i> Accept & Continue</button>
-            <button onclick="window.closeTerms()" class="btn-ghost">Close</button>
+        <div style="margin-top:20px; display:flex; gap:12px;">
+            <button onclick="window.acceptTerms()" class="btn btn-fill" style="flex:1; justify-content:center;"><i class="fas fa-check"></i> Accept &amp; Continue</button>
+            <button onclick="window.closeTerms()" class="btn btn-outline" style="flex:1; justify-content:center;">Close</button>
         </div>
     </div>
 </div>
 
 <script type="module" src="js/landing.js"></script>
 <script type="module" src="js/firebase-config.js"></script>
-<script>
-// Cursor
-const cursor = document.querySelector('.cursor');
-const follower = document.querySelector('.cursor-follower');
-let mx = 0, my = 0, fx = 0, fy = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.cssText = `left:${mx}px;top:${my}px`; });
-(function animF(){ fx += (mx-fx)*.12; fy += (my-fy)*.12; follower.style.cssText=`left:${fx}px;top:${fy}px`; requestAnimationFrame(animF); })();
-document.querySelectorAll('a,button').forEach(el => {
-    el.addEventListener('mouseenter', () => { cursor.style.transform='translate(-50%,-50%) scale(1.5)'; follower.style.transform='translate(-50%,-50%) scale(1.5)'; });
-    el.addEventListener('mouseleave', () => { cursor.style.transform='translate(-50%,-50%) scale(1)'; follower.style.transform='translate(-50%,-50%) scale(1)'; });
-});
-
-// Hamburger
-function toggleMenu() {
-    document.getElementById('navLinks').classList.toggle('active');
-    document.getElementById('hamburger').classList.toggle('active');
-}
-
-// Navbar scroll
-window.addEventListener('scroll', () => {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
-    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 300);
-});
-
-// Scroll top
-document.getElementById('scrollTop').addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
-
-// Slider
-let slide = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
-if(slides.length){ setInterval(() => {
-    slides[slide].classList.remove('active'); dots[slide].classList.remove('active');
-    slide = (slide+1) % slides.length;
-    slides[slide].classList.add('active'); dots[slide].classList.add('active');
-}, 4000); }
-
-// Reveal on scroll
-const obs = new IntersectionObserver(entries => entries.forEach((e,i) => { if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('revealed'), i*80); obs.unobserve(e.target); } }), {threshold:0.1});
-document.querySelectorAll('.glass-card,.team-card,.project-card,.contact-item,.astat').forEach(el => { el.classList.add('reveal'); obs.observe(el); });
-
-// Contact form
-document.getElementById('contactForm')?.addEventListener('submit', e => {
-    e.preventDefault();
-    const t = document.getElementById('toast');
-    t.innerHTML = `<div class="toast-inner success"><i class="fas fa-check-circle"></i><span>Message sent! We'll get back to you soon.</span></div>`;
-    t.style.display = 'block';
-    setTimeout(()=>t.style.display='none', 4500);
-    e.target.reset();
-});
-</script>
 </body>
 </html>
