@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link id='favicon' rel="shortcut icon" href="images/fronixplayers.jpg" type="image/x-png">
-    <title>Fronixlearnners - Master the Future</title>
+    <title>Fronixlearnners - Master the Future of Students</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
@@ -221,12 +221,12 @@
                     <input type="email" id="email" class="custom-input" placeholder="Email Address" required>
                     <input type="password" id="password" class="custom-input" placeholder="Password (min 6 chars)" required>
 
-                    <!-- Role Select -->
+                    <!-- Role Select — Admin hidden during signup, shown only during login -->
                     <div id="roleGroup" style="margin-bottom:15px;">
                         <label style="font-size:0.82rem; font-weight:700; color:#666; display:block; margin-bottom:6px;">I am a:</label>
                         <select id="role" class="custom-input">
                             <option value="Student">Student</option>
-                            <option value="Admin">Admin</option>
+                            <option value="Admin" id="adminOption" style="display:none;">Admin</option>
                         </select>
                     </div>
 
