@@ -51,7 +51,7 @@
     <!-- ═══════════════ COURSES SECTION ════════════════ -->
     <div id="coursesSection" class="section active">
         <div class="panel">
-            <h2><i class="fas fa-plus-circle" style="color:var(--primary);"></i> Publish New Course via YouTube</h2>
+            <h2 id="formModeLabel"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> Publish New Course via YouTube</h2>
             <form onsubmit="window.publishCourse(event)" id="courseForm">
                 <div class="form-grid">
                     <div>
@@ -91,6 +91,14 @@
                         </div>
                     </div>
 
+                    <label class="form-label">Google Drive Link (Course Notes)</label>
+                        <input type="url" id="cDriveLink" placeholder="https://drive.google.com/drive/folders/...">
+
+                        <label class="form-label">Custom Thumbnail (Optional)</label>
+                        <input type="file" id="cThumb" accept="image/*" onchange="window.previewThumbnail()" style="margin-bottom:8px;">
+                        <img id="thumbPreview" style="width:120px;height:68px;border-radius:8px;object-fit:cover;border:1.5px solid #e2e8f0;margin-bottom:10px;display:none;">
+
+                    </div>
                     <div class="playlist-box">
                         <label class="form-label" style="font-size:0.95rem;">
                             <i class="fab fa-youtube" style="color:#ef4444;"></i> Add Lessons via YouTube Links
@@ -111,9 +119,14 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary full" style="margin-top:18px;">
+                <div style="display:flex;gap:10px;margin-top:18px;">
+                <button type="submit" class="btn-primary full">
                     <i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately
                 </button>
+                <button type="button" id="cancelEditBtn" onclick="window.cancelEdit()" style="display:none;background:#fee2e2;color:#ef4444;border:none;border-radius:10px;padding:11px 18px;cursor:pointer;font-weight:700;white-space:nowrap;font-size:0.9rem;">
+                    <i class="fas fa-times"></i> Cancel Edit
+                </button>
+            </div>
             </form>
         </div>
 
@@ -121,7 +134,7 @@
             <h2><i class="fas fa-layer-group" style="color:var(--success);"></i> Live Course Library</h2>
             <div class="table-container">
                 <table id="courseTable">
-                    <thead><tr><th>Course</th><th>Instructor</th><th>Category</th><th>Pricing</th><th>Lessons</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Course</th><th>Instructor</th><th>Category</th><th>Pricing</th><th>Lessons</th><th>Drive</th><th>Action</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>

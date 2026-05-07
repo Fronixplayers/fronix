@@ -194,6 +194,13 @@ window.handleAuth = async (e) => {
             const state = document.getElementById('state').value.trim();
             const city = document.getElementById('city').value.trim();
 
+            // FIX 1: Validate all fields
+            if (!name) { showToast("⚠️ Full Name is required.", 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+            if (!age || age < 5 || age > 100) { showToast("⚠️ Please enter a valid age.", 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+            if (!phone || phone.length < 8) { showToast("⚠️ Please enter a valid phone number.", 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+            if (!state) { showToast("⚠️ State is required.", 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+            if (!city) { showToast("⚠️ City is required.", 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             await setDoc(doc(db, "users", cred.user.uid), {
                 name, email, role, age, phone, state, city,
@@ -223,10 +230,14 @@ window.handleAuth = async (e) => {
         }
     } catch (err) {
         let msg = err.message;
-        if (msg.includes('user-not-found') || msg.includes('invalid-credential')) msg = "No account found with this email.";
-        if (msg.includes('wrong-password')) msg = "Incorrect password.";
-        if (msg.includes('email-already-in-use')) msg = "Email is already registered.";
-        if (msg.includes('weak-password')) msg = "Password must be at least 6 characters.";
+        if (msg.includes('user-not-found') || msg.includes('invalid-credential') || msg.includes('INVALID_LOGIN_CREDENTIALS')) msg = "❌ No account found with this email or incorrect password.";
+        else if (msg.includes('wrong-password')) msg = "❌ Incorrect password. Please try again.";
+        else if (msg.includes('email-already-in-use')) msg = "⚠️ This email is already registered. Please log in.";
+        else if (msg.includes('weak-password')) msg = "⚠️ Password must be at least 6 characters.";
+        else if (msg.includes('too-many-requests')) msg = "🔒 Too many failed attempts. Account temporarily locked. Try again later or reset password.";
+        else if (msg.includes('blocked')) msg = "🚫 " + msg;
+        else if (msg.includes('Role mismatch')) msg = "⚠️ " + msg.replace('Role mismatch: ', '');
+        else if (msg.includes('network')) msg = "📶 Network error. Check your internet connection.";
         showToast(msg, 'error');
         btn.disabled = false; btn.innerHTML = orig;
     }
