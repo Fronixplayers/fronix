@@ -30,13 +30,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCwpiephfzh5lSPjtfpKKtaq8BPsa-qmuQ",
-    authDomain: "fronixlearner.firebaseapp.com",
-    projectId: "fronixlearner",
-    storageBucket: "fronixlearner.firebasestorage.app",
-    messagingSenderId: "625622702328",
-    appId: "1:625622702328:web:47c1d377f7fa3cc9d0030d",
-    measurementId: "G-Y7BBG1CE1J"
+    apiKey: "AIzaSyC6w88P1Nrgp4djwrjJf0K2i2l6xQG8FEI",
+    authDomain: "fronix-afde1.firebaseapp.com",
+    projectId: "fronix-afde1",
+    storageBucket: "fronix-afde1.appspot.com",
+    messagingSenderId: "942976075894",
+    appId: "1:942976075894:web:dfab62b417f89cc66c3757",
+    measurementId: "G-DR773T6QF1"
 };
 
 const app = initializeApp(firebaseConfig);
