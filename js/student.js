@@ -217,6 +217,8 @@ window.showVerifyAlert = () => {
 };
 
 // ─── COURSE PLAYER ──────────────────────────────────────
+let currentCourseDriveLink = '';
+
 window.openCourse = async (id) => {
     currentCourseId = id;
     document.getElementById('courseModal').style.display = 'flex';
@@ -226,7 +228,7 @@ window.openCourse = async (id) => {
     const c = snap.data();
     currentPlaylist = (c.playlist && c.playlist.length > 0) ? c.playlist
         : (c.videoId ? [{ title: c.title || 'Lesson 1', videoId: c.videoId }] : []);
-    document.getElementById('likeCount').innerText = c.likes || 0;
+    currentCourseDriveLink = c.driveLink || '';
     window.loadVideo(0);
     window.switchTab('lessons');
 };
@@ -234,7 +236,9 @@ window.openCourse = async (id) => {
 window.loadVideo = (idx) => {
     if (!currentPlaylist || !currentPlaylist[idx]) return;
     const lesson = currentPlaylist[idx];
-    const embedUrl = `https://www.youtube-nocookie.com/embed/${lesson.videoId}?autoplay=1&rel=0&modestbranding=1`;
+    // rel=0 hides related videos, modestbranding=1 removes YouTube logo branding
+    // iv_load_policy=3 hides annotations, fs=1 allows fullscreen only (no share)
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${lesson.videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&fs=1`;
     document.getElementById('playerFrame').src = embedUrl;
     const titleEl = document.getElementById('currentLessonTitle');
     if (titleEl) titleEl.innerText = lesson.title || `Lesson ${idx + 1}`;
@@ -254,17 +258,18 @@ window.switchTab = (t) => {
     document.querySelectorAll('#courseModal .tab').forEach(el => el.classList.remove('active'));
     const tabEl = document.getElementById(t + 'Tab');
     if (tabEl) tabEl.classList.add('active');
-    const map = { lessons:0, drive:1, chat:2 };
+    const map = { lessons:0, drive:1 };
     const tabs = document.querySelectorAll('#courseModal .tab');
-    if (tabs[map[t]]) tabs[map[t]].classList.add('active');
+    if (tabs[map[t]] !== undefined) tabs[map[t]].classList.add('active');
     if (t === 'drive') {
         const div = document.getElementById('driveAccessMsg');
         if (div) {
+            const driveLink = currentCourseDriveLink || BBA_DRIVE_LINK;
             div.innerHTML = currentUser?.isVerified
-                ? `<div style="text-align:center;padding:30px;cursor:pointer;" onclick="window.open('${BBA_DRIVE_LINK}','_blank')">
+                ? `<div style="text-align:center;padding:30px;cursor:pointer;" onclick="window.open('${driveLink}','_blank')">
                     <i class="fab fa-google-drive" style="font-size:3rem;color:#4285F4;margin-bottom:12px;display:block;"></i>
                     <strong style="font-size:1.1rem;">Open Course Resources</strong>
-                    <p style="color:#888;margin-top:8px;font-size:0.88rem;">Verified Access ✓</p>
+                    <p style="color:#888;margin-top:8px;font-size:0.88rem;">Verified Access ✓ — Click to open Google Drive</p>
                    </div>`
                 : `<div style="text-align:center;padding:30px;">
                     <i class="fas fa-lock" style="font-size:3rem;color:#ef4444;margin-bottom:12px;display:block;"></i>
@@ -275,56 +280,13 @@ window.switchTab = (t) => {
                     </button>
                    </div>`;
         }
-    } else if (t === 'chat') {
-        loadCourseComments();
     }
 };
-
-window.toggleLike = async () => {
-    if (!currentCourseId || !currentUser) return;
-    await updateDoc(doc(db, "courses", currentCourseId), { likes: increment(1) });
-    const el = document.getElementById('likeCount');
-    if (el) el.innerText = parseInt(el.innerText || '0') + 1;
-};
-
-let commentsUnsub = null;
-function loadCourseComments() {
-    if (commentsUnsub) commentsUnsub();
-    const q = query(collection(db,"comments"), where("courseId","==",currentCourseId), orderBy("createdAt","asc"));
-    commentsUnsub = onSnapshot(q, (snap) => {
-        const l = document.getElementById('chatList');
-        if (!l) return;
-        l.innerHTML = "";
-        if (snap.empty) { l.innerHTML = `<p style="text-align:center;color:#bbb;padding:20px;font-size:0.88rem;">No discussion yet. Be the first!</p>`; return; }
-        snap.forEach(d => {
-            const m = d.data();
-            const isMe = m.userId === currentUser?.uid;
-            l.innerHTML += `<div class="chat-msg ${isMe?'mine':'other'}">
-                ${!isMe?`<div class="sender">${m.userName}</div>`:''}
-                <div>${m.text}</div></div>`;
-        });
-        l.scrollTop = l.scrollHeight;
-    }, () => {});
-}
-
-window.handleSend = async () => {
-    const input = document.getElementById('interactionInput');
-    const txt = input ? input.value.trim() : '';
-    if (!txt || !currentUser || !currentCourseId) return;
-    await addDoc(collection(db, "comments"), {
-        courseId: currentCourseId, text: txt,
-        userName: currentUser.name, userId: currentUser.uid,
-        createdAt: serverTimestamp()
-    });
-    input.value = "";
-};
-document.getElementById('interactionInput')?.addEventListener('keypress', e => { if (e.key==='Enter') window.handleSend(); });
 
 window.closeCourseModal = () => {
     document.getElementById('courseModal').style.display = 'none';
     document.getElementById('playerFrame').src = '';
     document.body.style.overflow = '';
-    if (commentsUnsub) { commentsUnsub(); commentsUnsub = null; }
 };
 
 // ─── RESOURCES ──────────────────────────────────────────
