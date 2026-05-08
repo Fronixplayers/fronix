@@ -275,6 +275,10 @@ main {
     color:#16a34a;
 }
 
+.nav-item.profile-nav {
+    margin-top:auto;
+}
+
 /* ─── COURSE PLAYER MODAL ────────────────────────── */
 #courseModal { 
     position:fixed;
@@ -770,6 +774,13 @@ select:focus {
     
     .avatar-grid {
         grid-template-columns:repeat(4,1fr);
+    }
+}
+
+/* ─── SUPPORT RESPONSIVE ────────────────────────────── */
+@media(max-width:700px) {
+    .support-cards-grid {
+        grid-template-columns: 1fr !important;
     }
 }
 

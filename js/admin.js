@@ -363,19 +363,26 @@ function loadStudents() {
     onSnapshot(query(collection(db,"users"), where("role","==","Student")), snap => {
         table.innerHTML = "";
         if (snap.empty) {
-            table.innerHTML = `<tr><td colspan="5" class="no-data">No students yet.</td></tr>`;
+            table.innerHTML = `<tr><td colspan="6" class="no-data">No students yet.</td></tr>`;
             return;
         }
         snap.forEach(d => {
             const u = d.data();
             const statusColor = u.isVerified ? '#10b981' : (u.verificationPending ? '#f59e0b' : '#ef4444');
             const statusText = u.isVerified ? '✓ Verified' : (u.verificationPending ? '⏳ Pending' : '❌ Unverified');
+            const driveCell = u.personalDriveLink
+                ? `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <a href="${u.personalDriveLink}" target="_blank" class="action-btn" style="background:#e3f2fd;color:#1976d2;font-size:0.74rem;"><i class="fab fa-google-drive"></i> Open</a>
+                    <button type="button" class="action-btn" style="background:#f0f9ff;color:#0284c7;font-size:0.74rem;" onclick="window.setStudentDriveLink('${d.id}','${(u.personalDriveLink||'').replace(/'/g,"\\'")}')"><i class="fas fa-edit"></i></button>
+                   </div>`
+                : `<button type="button" class="action-btn" style="background:#dcfce7;color:#16a34a;font-size:0.74rem;" onclick="window.setStudentDriveLink('${d.id}','')"><i class="fab fa-google-drive"></i> Add Link</button>`;
             table.innerHTML += `
             <tr>
-                <td>${u.name || 'Anonymous'}</td>
+                <td><strong>${u.name || 'Anonymous'}</strong></td>
                 <td>${u.email}</td>
                 <td>${u.location || '—'}</td>
                 <td><span style="color:${statusColor};font-weight:700;">${statusText}</span></td>
+                <td>${driveCell}</td>
                 <td>
                     ${u.isBlocked ? `<button class="action-btn btn-unblock" onclick="window.toggleBlockUser('${d.id}',false)"><i class="fas fa-lock-open"></i> Unblock</button>` 
                         : `<button class="action-btn btn-block" onclick="window.toggleBlockUser('${d.id}',true)"><i class="fas fa-ban"></i> Block</button>`}
@@ -388,6 +395,51 @@ function loadStudents() {
 window.toggleBlockUser = async (uid, block) => {
     await updateDoc(doc(db,"users",uid), { isBlocked: block });
     showToast(block ? "✓ Student blocked." : "✓ Student unblocked.", 'success');
+};
+
+// ─── STUDENT PERSONAL DRIVE LINK ────────────────────────
+window.setStudentDriveLink = (uid, currentLink) => {
+    const existing = document.getElementById('driveLinkModal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'driveLinkModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:28px;width:460px;max-width:95vw;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 6px;font-weight:800;"><i class="fab fa-google-drive" style="color:#4285F4;"></i> Set Student Drive Link</h3>
+        <p style="color:#888;font-size:0.88rem;margin-bottom:16px;">This personal Google Drive link will be visible only to this student in their Resources section.</p>
+        <label style="font-size:0.82rem;font-weight:700;color:#666;display:block;margin-bottom:6px;">Google Drive URL</label>
+        <input type="url" id="studentDriveLinkInput" value="${currentLink}" placeholder="https://drive.google.com/drive/folders/..."
+            style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;margin-bottom:16px;box-sizing:border-box;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="window.saveStudentDriveLink('${uid}')" class="action-btn btn-approve" style="flex:1;justify-content:center;padding:10px;min-width:120px;">
+                <i class="fas fa-save"></i> Save Link
+            </button>
+            ${currentLink ? `<button onclick="window.removeStudentDriveLink('${uid}')" class="action-btn btn-reject" style="padding:10px 14px;">
+                <i class="fas fa-trash"></i> Remove
+            </button>` : ''}
+            <button onclick="document.getElementById('driveLinkModal').remove()" style="background:#f3f4f6;color:#888;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;">Cancel</button>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.getElementById('studentDriveLinkInput').focus();
+};
+
+window.saveStudentDriveLink = async (uid) => {
+    const link = document.getElementById('studentDriveLinkInput').value.trim();
+    if (!link) return showToast("Enter a Google Drive URL.", 'error');
+    if (!link.startsWith('http')) return showToast("Enter a valid URL starting with http.", 'error');
+    await updateDoc(doc(db,"users",uid), { personalDriveLink: link });
+    document.getElementById('driveLinkModal')?.remove();
+    showToast("✅ Drive link saved! Student can now access it.", 'success');
+};
+
+window.removeStudentDriveLink = async (uid) => {
+    if (!confirm("Remove this student's personal Drive link?")) return;
+    await updateDoc(doc(db,"users",uid), { personalDriveLink: '' });
+    document.getElementById('driveLinkModal')?.remove();
+    showToast("Drive link removed.", 'success');
 };
 
 // ─── VERIFICATIONS ──────────────────────────────────────

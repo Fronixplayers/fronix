@@ -53,12 +53,12 @@ onAuthStateChanged(auth, async (user) => {
 function updateUI() {
     const nameEl = document.getElementById('welcomeName');
     const avatarEl = document.getElementById('headerAvatar');
-    const badgeEl = document.getElementById('verifiedBadge');
+    const statBadge = document.getElementById('statVerifiedBadge');
     const lockBadge = document.getElementById('bbaLockStatus');
 
     if (nameEl) nameEl.innerText = currentUser.name || 'Student';
     if (avatarEl) avatarEl.src = currentUser.avatar;
-    if (badgeEl) badgeEl.innerText = currentUser.isVerified ? "Yes ✓" : "No";
+    if (statBadge) statBadge.innerText = currentUser.isVerified ? "Yes ✓" : "No";
 
     if (lockBadge) {
         if (currentUser.isVerified) {
@@ -74,16 +74,19 @@ function updateUI() {
     const pendingMsg = document.getElementById('pendingMsg');
     const verifiedMsg = document.getElementById('verifiedMsg');
     const rejectedMsg = document.getElementById('rejectedMsg');
+    const idUploadHeader = document.getElementById('idUploadHeader');
 
     if (currentUser.isVerified) {
         if (uploadSection) uploadSection.style.display = 'none';
         if (pendingMsg) pendingMsg.style.display = 'none';
         if (verifiedMsg) verifiedMsg.style.display = 'block';
         if (rejectedMsg) rejectedMsg.style.display = 'none';
+        if (idUploadHeader) idUploadHeader.style.display = 'none';
     } else if (currentUser.verificationRejected) {
         if (uploadSection) uploadSection.style.display = 'block';
         if (pendingMsg) pendingMsg.style.display = 'none';
         if (verifiedMsg) verifiedMsg.style.display = 'none';
+        if (idUploadHeader) idUploadHeader.style.display = 'block';
         if (rejectedMsg) {
             rejectedMsg.style.display = 'block';
             const reasonEl = document.getElementById('rejectionReason');
@@ -94,11 +97,13 @@ function updateUI() {
         if (pendingMsg) pendingMsg.style.display = 'block';
         if (verifiedMsg) verifiedMsg.style.display = 'none';
         if (rejectedMsg) rejectedMsg.style.display = 'none';
+        if (idUploadHeader) idUploadHeader.style.display = 'block';
     } else {
         if (uploadSection) uploadSection.style.display = 'block';
         if (pendingMsg) pendingMsg.style.display = 'none';
         if (verifiedMsg) verifiedMsg.style.display = 'none';
         if (rejectedMsg) rejectedMsg.style.display = 'none';
+        if (idUploadHeader) idUploadHeader.style.display = 'block';
     }
 
     const vStatus = document.getElementById('verificationStatus');
@@ -106,6 +111,21 @@ function updateUI() {
         ? "✓ Verified Student"
         : (currentUser.verificationPending ? "⏳ Pending Verification"
         : (currentUser.verificationRejected ? "❌ Verification Rejected" : "Unverified Student"));
+
+    // Update profile verified badge
+    const profileVerifiedBadge = document.getElementById('profileVerifiedBadge');
+    if (profileVerifiedBadge) {
+        profileVerifiedBadge.innerText = currentUser.isVerified
+            ? "✓ Verified"
+            : (currentUser.verificationPending ? "⏳ Pending"
+            : (currentUser.verificationRejected ? "❌ Rejected" : "Unverified"));
+        profileVerifiedBadge.style.background = currentUser.isVerified ? '#dcfce7' : (currentUser.verificationPending ? '#fff7ed' : '#fee2e2');
+        profileVerifiedBadge.style.color = currentUser.isVerified ? '#16a34a' : (currentUser.verificationPending ? '#c2410c' : '#ef4444');
+    }
+
+    // Stat box verified badge
+    const verifiedBadge = document.getElementById('verifiedBadge');
+    if (verifiedBadge) verifiedBadge.innerText = currentUser.isVerified ? "Yes ✓" : "No";
 }
 
 // ─── NAVIGATION ─────────────────────────────────────────
@@ -178,31 +198,55 @@ function loadCourses() {
 function loadCourseResources() {
     const container = document.getElementById('courseResourcesList');
     if (!container) return;
-    onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
-        container.innerHTML = "";
-        snap.forEach(d => {
-            const c = d.data();
-            if (!c.driveLink) return;
-            const isVerified = currentUser?.isVerified;
-            container.innerHTML += `
-            <div class="resource-card" onclick="${isVerified ? `window.open('${c.driveLink}','_blank')` : `window.showVerifyAlert()`}" style="margin-bottom:14px;">
+    // Show personal drive link if admin assigned one
+    onSnapshot(doc(db, "users", currentUser.uid), (userSnap) => {
+        const userData = userSnap.data() || {};
+        const personalLink = userData.personalDriveLink || '';
+        let personalHtml = '';
+        if (personalLink) {
+            personalHtml = `
+            <div class="resource-card" onclick="window.open('${personalLink}','_blank')" style="margin-bottom:14px;border:2px solid #4285F4;">
                 <div style="display:flex;align-items:center;gap:18px;flex:1;min-width:0;">
-                    <div class="res-icon" style="background:#e8f5e9;color:#10b981;flex-shrink:0;">
+                    <div class="res-icon" style="background:#e3f2fd;color:#4285F4;flex-shrink:0;">
                         <i class="fab fa-google-drive"></i>
                     </div>
                     <div class="res-info" style="min-width:0;">
-                        <h3 style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title} — Notes</h3>
-                        <p>${c.category || 'Course'} • ${isVerified ? 'Click to open Drive' : 'Verified Students Only'}</p>
+                        <h3 style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📂 Your Personal Resources</h3>
+                        <p>Shared by Admin • Click to open your Drive folder</p>
                     </div>
                 </div>
-                <div class="lock-badge ${isVerified ? 'status-unlocked' : 'status-locked'}" style="flex-shrink:0;">
-                    <i class="fas fa-${isVerified ? 'lock-open' : 'lock'}"></i> ${isVerified ? 'Open' : 'Locked'}
+                <div class="lock-badge status-unlocked" style="flex-shrink:0;">
+                    <i class="fas fa-lock-open"></i> Open
                 </div>
             </div>`;
-        });
-        if (!container.innerHTML) {
-            container.innerHTML = `<p style="color:#bbb;text-align:center;padding:30px;font-size:0.9rem;">No course notes added yet by admin.</p>`;
         }
+        onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
+            let coursesHtml = '';
+            snap.forEach(d => {
+                const c = d.data();
+                if (!c.driveLink) return;
+                const isVerified = currentUser?.isVerified;
+                coursesHtml += `
+                <div class="resource-card" onclick="${isVerified ? `window.open('${c.driveLink}','_blank')` : `window.showVerifyAlert()`}" style="margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;gap:18px;flex:1;min-width:0;">
+                        <div class="res-icon" style="background:#e8f5e9;color:#10b981;flex-shrink:0;">
+                            <i class="fab fa-google-drive"></i>
+                        </div>
+                        <div class="res-info" style="min-width:0;">
+                            <h3 style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title} — Notes</h3>
+                            <p>${c.category || 'Course'} • ${isVerified ? 'Click to open Drive' : 'Verified Students Only'}</p>
+                        </div>
+                    </div>
+                    <div class="lock-badge ${isVerified ? 'status-unlocked' : 'status-locked'}" style="flex-shrink:0;">
+                        <i class="fas fa-${isVerified ? 'lock-open' : 'lock'}"></i> ${isVerified ? 'Open' : 'Locked'}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = personalHtml + coursesHtml;
+            if (!container.innerHTML.trim()) {
+                container.innerHTML = `<p style="color:#bbb;text-align:center;padding:30px;font-size:0.9rem;">No course notes added yet by admin.</p>`;
+            }
+        });
     });
 }
 
@@ -218,7 +262,7 @@ let currentCourseTitle = '';
 
 window.openCourse = async (id) => {
     currentCourseId = id;
-    document.getElementById('courseModal').style.display = 'flex';
+    document.getElementById('courseModal').classList.add('active');
     document.body.style.overflow = 'hidden';
     const snap = await getDoc(doc(db, "courses", id));
     if (!snap.exists()) return;
@@ -288,7 +332,7 @@ window.switchTab = (t) => {
 };
 
 window.closeCourseModal = () => {
-    document.getElementById('courseModal').style.display = 'none';
+    document.getElementById('courseModal').classList.remove('active');
     document.getElementById('playerFrame').src = '';
     document.body.style.overflow = '';
 };
@@ -387,7 +431,7 @@ window.createTicket = async (e) => {
 
 // ─── PROFILE ────────────────────────────────────────────
 window.openProfile = () => {
-    document.getElementById('profileModal').style.display = 'flex';
+    document.getElementById('profileModal').classList.add('active');
     document.body.style.overflow = 'hidden';
     window.switchProfileTab('general');
 };
@@ -403,7 +447,7 @@ window.switchProfileTab = (tab) => {
 };
 
 window.closeProfileModal = () => {
-    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('profileModal').classList.remove('active');
     document.body.style.overflow = '';
 };
 
