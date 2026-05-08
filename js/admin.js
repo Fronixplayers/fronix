@@ -1,4 +1,4 @@
-// js/admin.js — FronixLearner Admin Dashboard (ALL FIXES)
+// js/admin.js — FronixLearner Admin Dashboard (UPDATED: Drag Reorder, KYC Reasons, Resource Mgmt)
 
 import {
     auth, db,
@@ -8,7 +8,8 @@ import {
 } from './firebase-config.js';
 
 let tempPlaylist = [];
-let editingCourseId = null; // FIX 4: track editing course
+let editingCourseId = null;
+let draggedIndex = null;
 
 // ─── TOAST ──────────────────────────────────────────────
 function showToast(msg, type = 'info') {
@@ -135,7 +136,7 @@ window.previewLesson = () => {
     else preview.classList.add('hidden');
 };
 
-// ─── FIX 3: PLAYLIST with DRAG-TO-REORDER ───────────────
+// ─── PLAYLIST with DRAG-TO-REORDER ──────────────────────
 window.addLesson = () => {
     const title = document.getElementById('lTitle').value.trim();
     const rawUrl = document.getElementById('lVid').value.trim();
@@ -157,331 +158,276 @@ function renderPlaylist() {
         l.innerHTML = `<p style="color:#aaa;font-size:0.85rem;text-align:center;padding:10px;">No lessons added yet</p>`;
         return;
     }
-    l.innerHTML = tempPlaylist.map((item, i) => `
-        <div class="lesson-list-item" draggable="true" data-idx="${i}"
-             ondragstart="window.dragStart(event,${i})"
-             ondragover="event.preventDefault()"
-             ondrop="window.dragDrop(event,${i})">
-            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
-                <i class="fas fa-grip-vertical" style="color:#aaa;cursor:grab;flex-shrink:0;"></i>
-                <img src="https://img.youtube.com/vi/${item.videoId}/default.jpg"
-                     style="width:40px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0;"
-                     onerror="this.style.display='none'">
-                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i+1}. ${item.title}</span>
+    l.innerHTML = tempPlaylist.map((lesson, idx) => `
+        <div class="lesson-list-item" draggable="true" 
+             ondragstart="window.onDragStart(${idx})" 
+             ondragover="window.onDragOver(event)" 
+             ondrop="window.onDrop(${idx})"
+             style="cursor:grab;user-select:none;opacity:${draggedIndex===idx?0.5:1};">
+            <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+                <i class="fas fa-grip-vertical" style="color:#aaa;font-size:0.9rem;flex-shrink:0;"></i>
+                <div style="min-width:0;">
+                    <div style="font-weight:700;">${idx+1}. ${lesson.title}</div>
+                    <div style="font-size:0.75rem;color:#888;">ID: ${lesson.videoId}</div>
+                </div>
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0;">
-                <button onclick="window.moveLessonUp(${i})" title="Move Up"
-                    style="background:#eef2ff;color:var(--primary);border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:0.8rem;"
-                    ${i===0?'disabled style="opacity:0.3;"':''}><i class="fas fa-chevron-up"></i></button>
-                <button onclick="window.moveLessonDown(${i})" title="Move Down"
-                    style="background:#eef2ff;color:var(--primary);border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:0.8rem;"
-                    ${i===tempPlaylist.length-1?'disabled style="opacity:0.3;"':''}><i class="fas fa-chevron-down"></i></button>
-                <button class="del-btn" onclick="window.remLesson(${i})"><i class="fas fa-times"></i></button>
-            </div>
+            <button type="button" class="del-btn" onclick="window.deleteLesson(${idx})" title="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>`).join('');
 }
 
-let dragSrcIdx = null;
-window.dragStart = (e, idx) => { dragSrcIdx = idx; e.dataTransfer.effectAllowed = 'move'; };
-window.dragDrop = (e, targetIdx) => {
-    e.preventDefault();
-    if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
-    const moved = tempPlaylist.splice(dragSrcIdx, 1)[0];
-    tempPlaylist.splice(targetIdx, 0, moved);
-    dragSrcIdx = null;
+window.onDragStart = (idx) => { draggedIndex = idx; };
+window.onDragOver = (e) => { e.preventDefault(); };
+window.onDrop = (idx) => {
+    if (draggedIndex === null || draggedIndex === idx) return;
+    const [lesson] = tempPlaylist.splice(draggedIndex, 1);
+    tempPlaylist.splice(idx, 0, lesson);
+    draggedIndex = null;
     renderPlaylist();
+    showToast("Lessons reordered! ✅", 'success');
 };
-window.moveLessonUp = (i) => { if (i === 0) return; [tempPlaylist[i-1], tempPlaylist[i]] = [tempPlaylist[i], tempPlaylist[i-1]]; renderPlaylist(); };
-window.moveLessonDown = (i) => { if (i >= tempPlaylist.length-1) return; [tempPlaylist[i], tempPlaylist[i+1]] = [tempPlaylist[i+1], tempPlaylist[i]]; renderPlaylist(); };
-window.remLesson = (i) => { tempPlaylist.splice(i, 1); renderPlaylist(); };
 
-function updatePricingUI() {
-    document.querySelectorAll('.pricing-option').forEach(o => o.classList.remove('selected'));
-    const checked = document.querySelector('input[name="pricing"]:checked');
-    if (checked) checked.closest('.pricing-option')?.classList.add('selected');
-}
-window.updatePricingUI = updatePricingUI;
+window.deleteLesson = (idx) => {
+    tempPlaylist.splice(idx, 1);
+    renderPlaylist();
+    showToast("Lesson removed.", 'success');
+};
 
-// FIX 4: Handle custom thumbnail preview
+// ─── THUMBNAIL PREVIEW ──────────────────────────────────
 window.previewThumbnail = () => {
-    const file = document.getElementById('cThumb')?.files?.[0];
+    const input = document.getElementById('cThumb');
     const preview = document.getElementById('thumbPreview');
-    if (!file || !preview) return;
-    const url = URL.createObjectURL(file);
-    preview.src = url;
-    preview.style.display = 'block';
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
 };
 
-// ─── FIX 4: PUBLISH / UPDATE COURSE ─────────────────────
+window.handleThumbnailUpload = async (file) => {
+    if (!file) return null;
+    const reader = new FileReader();
+    return new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+    });
+};
+
+// ─── PRICING UI ─────────────────────────────────────────
+window.updatePricingUI = () => {
+    const free = document.getElementById('priceFree').checked;
+    document.getElementById('optFree').classList.toggle('selected', free);
+    document.getElementById('optPaid').classList.toggle('selected', !free);
+};
+
+// ─── PUBLISH COURSE ─────────────────────────────────────
 window.publishCourse = async (e) => {
     e.preventDefault();
-    if (tempPlaylist.length === 0) return showToast("Add at least one lesson.", 'error');
-    const isFree = (document.querySelector('input[name="pricing"]:checked')?.value || 'free') === 'free';
-    const btn = e.target.querySelector('button[type="submit"]');
+    const title = document.getElementById('cTitle').value.trim();
+    const instructor = document.getElementById('cInst').value.trim();
+    const description = document.getElementById('cDesc').value.trim();
+    const category = document.getElementById('cCat').value;
+    const driveLink = document.getElementById('cDriveLink').value.trim();
+    const isFree = document.getElementById('priceFree').checked;
+    const thumbFile = document.getElementById('cThumb').files[0];
+
+    if (!title || !instructor || tempPlaylist.length === 0) {
+        return showToast("Fill title, instructor, and add at least 1 lesson.", 'error');
+    }
+
+    const btn = document.querySelector('#courseForm button[type="submit"]');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (editingCourseId ? 'Updating…' : 'Publishing…');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
 
     try {
-        // Handle custom thumbnail
-        let customThumbnail = '';
-        const thumbFile = document.getElementById('cThumb')?.files?.[0];
+        let customThumbnail = null;
         if (thumbFile) {
-            customThumbnail = await new Promise((res, rej) => {
-                if (thumbFile.size > 2 * 1024 * 1024) { rej(new Error('Thumbnail must be under 2MB')); return; }
-                const canvas = document.createElement('canvas');
-                const img = new Image();
-                const url = URL.createObjectURL(thumbFile);
-                img.onload = () => {
-                    URL.revokeObjectURL(url);
-                    canvas.width = 640; canvas.height = 360;
-                    canvas.getContext('2d').drawImage(img, 0, 0, 640, 360);
-                    res(canvas.toDataURL('image/jpeg', 0.85));
-                };
-                img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Invalid image')); };
-                img.src = url;
-            });
+            customThumbnail = await window.handleThumbnailUpload(thumbFile);
         }
 
-        // FIX 7: Drive link per course
-        const driveLink = document.getElementById('cDriveLink')?.value?.trim() || '';
-
         const courseData = {
-            title: document.getElementById('cTitle').value.trim(),
-            instructor: document.getElementById('cInst').value.trim(),
-            category: document.getElementById('cCat').value,
-            description: document.getElementById('cDesc').value.trim(),
-            isFree, playlist: tempPlaylist,
-            driveLink,
-            ...(customThumbnail && { customThumbnail })
+            title, instructor, description, category, driveLink, isFree,
+            playlist: tempPlaylist,
+            customThumbnail,
+            createdAt: serverTimestamp()
         };
 
         if (editingCourseId) {
-            // UPDATE existing course
-            await updateDoc(doc(db,"courses",editingCourseId), courseData);
-            showToast("✅ Course updated successfully!", 'success');
-            editingCourseId = null;
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
-            document.getElementById('formModeLabel').textContent = 'Publish New Course via YouTube';
-            document.getElementById('cancelEditBtn').style.display = 'none';
+            await updateDoc(doc(db, "courses", editingCourseId), courseData);
+            showToast("✅ Course updated!", 'success');
+            window.cancelEdit();
         } else {
-            // ADD new course
-            courseData.createdAt = serverTimestamp();
-            courseData.likes = 0;
-            await addDoc(collection(db,"courses"), courseData);
-            showToast("🎉 Course published successfully!", 'success');
+            await addDoc(collection(db, "courses"), courseData);
+            showToast("🚀 Course published live!", 'success');
         }
 
-        e.target.reset();
+        // Reset form
+        document.getElementById('courseForm').reset();
         tempPlaylist = [];
         renderPlaylist();
-        document.getElementById('priceFree').checked = true;
-        updatePricingUI();
-        const preview = document.getElementById('thumbPreview');
-        if (preview) preview.style.display = 'none';
+        document.getElementById('thumbPreview').style.display = 'none';
     } catch (err) {
-        showToast("Failed: " + err.message, 'error');
+        showToast("Error: " + err.message, 'error');
     } finally {
         btn.disabled = false;
-        if (!editingCourseId) btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
+        btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
     }
 };
 
-// FIX 4: Load course into form for editing
-window.editCourse = async (id) => {
-    const snap = await getDoc(doc(db,"courses",id));
-    if (!snap.exists()) return;
-    const c = snap.data();
-    editingCourseId = id;
-    document.getElementById('cTitle').value = c.title || '';
-    document.getElementById('cInst').value = c.instructor || '';
-    document.getElementById('cDesc').value = c.description || '';
-    document.getElementById('cDriveLink').value = c.driveLink || '';
-
-    // Set category
-    const catSel = document.getElementById('cCat');
-    for (let i = 0; i < catSel.options.length; i++) {
-        if (catSel.options[i].value === c.category) { catSel.selectedIndex = i; break; }
-    }
-
-    // Pricing
-    if (c.isFree === false) {
-        document.getElementById('pricePaid').checked = true;
-    } else {
-        document.getElementById('priceFree').checked = true;
-    }
-    updatePricingUI();
-
-    // Playlist
-    tempPlaylist = c.playlist ? [...c.playlist] : [];
-    renderPlaylist();
-
-    // Thumbnail preview
-    if (c.customThumbnail) {
-        const preview = document.getElementById('thumbPreview');
-        if (preview) { preview.src = c.customThumbnail; preview.style.display = 'block'; }
-    }
-
-    // Update UI
-    const label = document.getElementById('formModeLabel');
-    if (label) label.textContent = `✏️ Editing: ${c.title}`;
-    const btn = document.querySelector('#courseForm button[type="submit"]');
-    if (btn) btn.innerHTML = '<i class="fas fa-save"></i> Update Course';
-    const cancelBtn = document.getElementById('cancelEditBtn');
-    if (cancelBtn) cancelBtn.style.display = 'inline-flex';
-
-    // Scroll to form
-    document.querySelector('#coursesSection .panel').scrollIntoView({ behavior: 'smooth' });
-    window.switchTab('courses', document.querySelector('.nav-item'));
-    showToast("Course loaded for editing. Make changes and click Update.", 'info');
-};
-
-window.cancelEdit = () => {
-    editingCourseId = null;
-    document.getElementById('courseForm')?.reset();
-    tempPlaylist = [];
-    renderPlaylist();
-    document.getElementById('priceFree').checked = true;
-    updatePricingUI();
-    const label = document.getElementById('formModeLabel');
-    if (label) label.textContent = 'Publish New Course via YouTube';
-    const btn = document.querySelector('#courseForm button[type="submit"]');
-    if (btn) btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
-    const cancelBtn = document.getElementById('cancelEditBtn');
-    if (cancelBtn) cancelBtn.style.display = 'none';
-    const preview = document.getElementById('thumbPreview');
-    if (preview) preview.style.display = 'none';
-    showToast("Edit cancelled.", 'info');
-};
-
-// ─── COURSES TABLE ──────────────────────────────────────
+// ─── LOAD COURSES ────────────────────────────────────────
 function loadCourses() {
-    onSnapshot(query(collection(db,"courses"), orderBy("createdAt","desc")), snap => {
-        const tb = document.querySelector('#courseTable tbody');
-        tb.innerHTML = "";
-        if (snap.empty) { tb.innerHTML = '<tr><td colspan="7" class="no-data"><i class="fas fa-inbox"></i>No courses yet.</td></tr>'; return; }
+    const table = document.getElementById('courseTable').querySelector('tbody');
+    onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), snap => {
+        table.innerHTML = "";
+        if (snap.empty) {
+            table.innerHTML = `<tr><td colspan="7" class="no-data">No courses published yet.</td></tr>`;
+            return;
+        }
         snap.forEach(d => {
             const c = d.data();
-            const badge = c.isFree !== false ? '<span class="badge badge-free">FREE</span>' : '<span class="badge badge-paid">PAID</span>';
-            const vid = c.playlist?.length ? c.playlist[0].videoId : '';
-            const thumb = c.customThumbnail || (vid ? `https://img.youtube.com/vi/${vid}/default.jpg` : '');
-            const driveIcon = c.driveLink
-                ? `<a href="${c.driveLink}" target="_blank" title="Drive Link" style="color:#10b981;font-size:0.85rem;"><i class="fab fa-google-drive"></i></a>`
-                : '<span style="color:#ddd;font-size:0.8rem;">—</span>';
-            tb.innerHTML += `
+            const lessons = (c.playlist && c.playlist.length) ? c.playlist.length : 1;
+            const driveBtn = c.driveLink 
+                ? `<a href="${c.driveLink}" target="_blank" class="action-btn" style="background:#e3f2fd;color:#1976d2;"><i class="fab fa-google-drive"></i> Open</a>`
+                : `<span style="color:#aaa;">—</span>`;
+            table.innerHTML += `
             <tr>
-                <td><div style="display:flex;align-items:center;gap:10px;">
-                    ${thumb ? `<img src="${thumb}" style="width:50px;height:35px;border-radius:6px;object-fit:cover;" onerror="this.style.display='none'">` : ''}
-                    <strong>${c.title}</strong></div></td>
+                <td><strong>${c.title}</strong></td>
                 <td>${c.instructor}</td>
-                <td>${c.category||'General'}</td>
-                <td>${badge}</td>
-                <td>${c.playlist?c.playlist.length:1}</td>
-                <td style="text-align:center;">${driveIcon}</td>
+                <td>${c.category || '—'}</td>
+                <td><span class="badge ${c.isFree!==false?'badge-free':'badge-paid'}">${c.isFree!==false?'Free':'Paid'}</span></td>
+                <td>${lessons}</td>
+                <td>${driveBtn}</td>
                 <td>
-                    <div style="display:flex;gap:5px;flex-wrap:wrap;">
-                        <button class="action-btn" style="background:#eef2ff;color:var(--primary);" onclick="window.editCourse('${d.id}')"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="action-btn btn-trash" onclick="window.delCourse('${d.id}')"><i class="fas fa-trash"></i></button>
-                    </div>
+                    <button type="button" class="action-btn" style="background:#f0f9ff;color:#0284c7;" onclick="window.editCourse('${d.id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button type="button" class="action-btn btn-trash" onclick="window.deleteCourse('${d.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             </tr>`;
         });
     });
 }
-window.delCourse = async (id) => {
-    if (confirm("Delete this course?")) {
-        await deleteDoc(doc(db,"courses",id));
-        if (editingCourseId === id) window.cancelEdit();
+
+window.editCourse = async (id) => {
+    const snap = await getDoc(doc(db, "courses", id));
+    if (!snap.exists()) return;
+    const c = snap.data();
+    editingCourseId = id;
+    
+    document.getElementById('cTitle').value = c.title || '';
+    document.getElementById('cInst').value = c.instructor || '';
+    document.getElementById('cDesc').value = c.description || '';
+    document.getElementById('cCat').value = c.category || '';
+    document.getElementById('cDriveLink').value = c.driveLink || '';
+    document.getElementById('priceFree').checked = c.isFree !== false;
+    document.getElementById('pricePaid').checked = c.isFree === false;
+    
+    tempPlaylist = c.playlist || [];
+    renderPlaylist();
+    updatePricingUI();
+    
+    document.getElementById('formModeLabel').innerHTML = '<i class="fas fa-edit" style="color:var(--primary);"></i> Edit Course';
+    document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast("Course loaded for editing.", 'success');
+};
+
+window.cancelEdit = () => {
+    editingCourseId = null;
+    document.getElementById('courseForm').reset();
+    tempPlaylist = [];
+    renderPlaylist();
+    updatePricingUI();
+    document.getElementById('formModeLabel').innerHTML = '<i class="fas fa-plus-circle" style="color:var(--primary);"></i> Publish New Course via YouTube';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+    document.getElementById('thumbPreview').style.display = 'none';
+};
+
+window.deleteCourse = async (id) => {
+    if (confirm("Delete this course? This cannot be undone.")) {
+        await deleteDoc(doc(db, "courses", id));
         showToast("Course deleted.", 'success');
     }
 };
 
 // ─── STUDENTS ───────────────────────────────────────────
 function loadStudents() {
+    const table = document.getElementById('studentTable').querySelector('tbody');
     onSnapshot(query(collection(db,"users"), where("role","==","Student")), snap => {
-        const tb = document.querySelector('#studentTable tbody');
-        tb.innerHTML = "";
-        if (snap.empty) { tb.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-users"></i>No students yet.</td></tr>'; return; }
-        snap.forEach(d => {
-            const u = d.data();
-            const blocked = u.isBlocked === true;
-            tb.innerHTML += `
-            <tr>
-                <td>${u.name||'-'}</td>
-                <td style="font-size:0.85rem;">${u.email||'-'}</td>
-                <td>${u.city||'-'}, ${u.state||'-'}</td>
-                <td><span class="badge ${blocked?'badge-blocked':'badge-active'}">${blocked?'BLOCKED':'ACTIVE'}</span></td>
-                <td style="display:flex;gap:6px;flex-wrap:wrap;">
-                    ${blocked
-                        ? `<button class="action-btn btn-unblock" onclick="window.toggleBlock('${d.id}',false)"><i class="fas fa-check"></i> Unblock</button>`
-                        : `<button class="action-btn btn-block" onclick="window.toggleBlock('${d.id}',true)"><i class="fas fa-ban"></i> Block</button>`}
-                    <button class="action-btn btn-trash" onclick="window.deleteUser('${d.id}')"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>`;
-        });
-    });
-}
-window.toggleBlock = async (id, block) => {
-    if (confirm(`${block?'Block':'Unblock'} this student?`)) {
-        await updateDoc(doc(db,"users",id), { isBlocked: block });
-        showToast(`Student ${block?'blocked':'unblocked'}.`, block?'error':'success');
-    }
-};
-window.deleteUser = async (id) => {
-    if (confirm("Permanently delete this student?")) {
-        await deleteDoc(doc(db,"users",id));
-        showToast("Student deleted.", 'success');
-    }
-};
-
-// ─── FIX: KYC VERIFICATIONS ─────────────────────────────
-function loadVerifications() {
-    onSnapshot(query(collection(db,"users"), where("verificationPending","==",true)), snap => {
-        const tb = document.querySelector('#verificationTable tbody');
-        tb.innerHTML = "";
+        table.innerHTML = "";
         if (snap.empty) {
-            tb.innerHTML = '<tr><td colspan="3" class="no-data"><i class="fas fa-check-double"></i>No pending verifications.</td></tr>';
+            table.innerHTML = `<tr><td colspan="5" class="no-data">No students yet.</td></tr>`;
             return;
         }
         snap.forEach(d => {
             const u = d.data();
-            let idHtml = '<span style="color:#aaa;font-size:0.8rem;">No image submitted</span>';
-            if (u.idProofUrl && u.idProofUrl.startsWith('data:')) {
-                idHtml = `<div style="margin-top:6px;">
-                    <img src="${u.idProofUrl}" style="width:120px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #e5e7eb;cursor:pointer;"
-                         onclick="window.viewKYC('${d.id}')" title="Click to view full size">
-                    <div style="font-size:0.75rem;color:var(--primary);margin-top:3px;cursor:pointer;" onclick="window.viewKYC('${d.id}')">
-                        <i class="fas fa-search-plus"></i> View Full Size
-                    </div></div>`;
-            } else if (u.idProofUrl) {
-                idHtml = `<a href="${u.idProofUrl}" target="_blank" style="color:var(--primary);font-size:0.8rem;"><i class="fas fa-eye"></i> View ID</a>`;
-            }
-            const date = u.submittedAt ? new Date(u.submittedAt.toDate()).toLocaleDateString('en-IN') : 'N/A';
-            tb.innerHTML += `
+            const statusColor = u.isVerified ? '#10b981' : (u.verificationPending ? '#f59e0b' : '#ef4444');
+            const statusText = u.isVerified ? '✓ Verified' : (u.verificationPending ? '⏳ Pending' : '❌ Unverified');
+            table.innerHTML += `
             <tr>
+                <td>${u.name || 'Anonymous'}</td>
+                <td>${u.email}</td>
+                <td>${u.location || '—'}</td>
+                <td><span style="color:${statusColor};font-weight:700;">${statusText}</span></td>
                 <td>
-                    <strong>${u.name||'Unknown'}</strong>
-                    <div style="font-size:0.8rem;color:#888;">${u.email||''}</div>
-                    ${idHtml}
-                </td>
-                <td>${date}</td>
-                <td>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <button class="action-btn btn-approve" onclick="window.verifyUser('${d.id}',true)"><i class="fas fa-check"></i> Approve</button>
-                        <button class="action-btn btn-reject" onclick="window.promptReject('${d.id}')"><i class="fas fa-times"></i> Reject</button>
-                    </div>
+                    ${u.isBlocked ? `<button class="action-btn btn-unblock" onclick="window.toggleBlockUser('${d.id}',false)"><i class="fas fa-lock-open"></i> Unblock</button>` 
+                        : `<button class="action-btn btn-block" onclick="window.toggleBlockUser('${d.id}',true)"><i class="fas fa-ban"></i> Block</button>`}
                 </td>
             </tr>`;
         });
     });
 }
 
-window.viewKYC = async (uid) => {
-    const snap = await getDoc(doc(db,"users",uid));
-    if (!snap.exists()) return;
-    const url = snap.data().idProofUrl;
-    if (!url) return;
+window.toggleBlockUser = async (uid, block) => {
+    await updateDoc(doc(db,"users",uid), { isBlocked: block });
+    showToast(block ? "✓ Student blocked." : "✓ Student unblocked.", 'success');
+};
+
+// ─── VERIFICATIONS ──────────────────────────────────────
+function loadVerifications() {
+    const table = document.getElementById('verificationTable').querySelector('tbody');
+    onSnapshot(query(collection(db,"users"), where("verificationPending","==",true)), snap => {
+        table.innerHTML = "";
+        if (snap.empty) {
+            table.innerHTML = `<tr><td colspan="3" class="no-data">No pending verifications.</td></tr>`;
+            return;
+        }
+        snap.forEach(d => {
+            const u = d.data();
+            const date = u.idUploadedAt ? new Date(u.idUploadedAt.toDate()).toLocaleDateString('en-IN') : '—';
+            table.innerHTML += `
+            <tr>
+                <td>
+                    <strong>${u.name}</strong><br/>
+                    <small style="color:#888;">${u.email}</small>
+                    ${u.idImage ? `<br/><button type="button" class="action-btn" style="background:#eef2ff;color:var(--primary);margin-top:6px;font-size:0.75rem;" onclick="window.viewIDImage('${u.idImage}')">
+                        <i class="fas fa-image"></i> View ID
+                    </button>` : ''}
+                </td>
+                <td>${date}</td>
+                <td>
+                    <button type="button" class="action-btn btn-approve" onclick="window.verifyUser('${d.id}',true)">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button type="button" class="action-btn btn-reject" onclick="window.promptReject('${d.id}')" style="margin-top:4px;">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </td>
+            </tr>`;
+        });
+    });
+}
+
+window.viewIDImage = (url) => {
     const lb = document.createElement('div');
-    lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
     lb.innerHTML = `<div style="position:relative;max-width:90vw;max-height:90vh;">
         <img src="${url}" style="max-width:90vw;max-height:85vh;border-radius:12px;object-fit:contain;">
         <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:-14px;right:-14px;background:white;border:none;border-radius:50%;width:32px;height:32px;font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">×</button>
@@ -500,26 +446,25 @@ window.verifyUser = async (uid, approved) => {
     showToast(approved ? "✅ Student verified!" : "✅ Done.", approved?'success':'success');
 };
 
-// FIX 5: Reject with reason
+// ─── REJECT WITH REASON ─────────────────────────────────
 window.promptReject = (uid) => {
-    // Create inline rejection modal
     const existing = document.getElementById('rejectModal');
     if (existing) existing.remove();
     const modal = document.createElement('div');
     modal.id = 'rejectModal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
     modal.innerHTML = `
     <div style="background:white;border-radius:16px;padding:28px;width:420px;max-width:95vw;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
         <h3 style="margin:0 0 6px;font-weight:800;"><i class="fas fa-times-circle" style="color:#ef4444;"></i> Reject Verification</h3>
         <p style="color:#888;font-size:0.88rem;margin-bottom:16px;">This reason will be shown to the student so they can resubmit.</p>
         <label style="font-size:0.82rem;font-weight:700;color:#666;display:block;margin-bottom:6px;">Rejection Reason *</label>
         <textarea id="rejectReasonInput" rows="3" placeholder="e.g. ID is blurry, please upload a clearer image. Or: ID appears expired. Or: Name on ID doesn't match."
-            style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;resize:vertical;margin-bottom:16px;"></textarea>
-        <div style="display:flex;gap:10px;">
-            <button onclick="window.submitReject('${uid}')" class="action-btn btn-reject" style="flex:1;justify-content:center;padding:10px;">
+            style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;resize:vertical;margin-bottom:16px;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="window.submitReject('${uid}')" class="action-btn btn-reject" style="flex:1;justify-content:center;padding:10px;min-width:120px;">
                 <i class="fas fa-paper-plane"></i> Send Rejection
             </button>
-            <button onclick="document.getElementById('rejectModal').remove()" style="background:#f3f4f6;color:#888;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;">Cancel</button>
+            <button onclick="document.getElementById('rejectModal').remove()" style="background:#f3f4f6;color:#888;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;white-space:nowrap;">Cancel</button>
         </div>
     </div>`;
     document.body.appendChild(modal);

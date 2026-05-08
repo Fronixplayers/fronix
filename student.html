@@ -13,203 +13,242 @@
 <body>
 
 <div id="toast"></div>
-<div class="mobile-menu-btn" onclick="window.toggleSidebar()"><i class="fas fa-bars"></i></div>
+<button class="mobile-menu-btn" onclick="window.toggleSidebar()"><i class="fas fa-bars"></i></button>
 <div class="sidebar-overlay" onclick="window.toggleSidebar()"></div>
 
 <!-- ─── SIDEBAR ─────────────────────────────────────── -->
-<aside id="sidebar">
+<aside id="studentSidebar">
     <div class="sidebar-logo"><i class="fas fa-graduation-cap"></i> FronixLearner</div>
-    <div class="nav-item active" onclick="window.switchView('courses', this)"><i class="fas fa-book-open"></i> Learning</div>
+    <div class="nav-item active" onclick="window.switchView('courses', this)"><i class="fas fa-book-open"></i> My Courses</div>
     <div class="nav-item" onclick="window.switchView('resources', this)"><i class="fas fa-folder-open"></i> Resources</div>
-    <div class="nav-item" onclick="window.openLeaderboard()"><i class="fas fa-trophy"></i> Leaderboard</div>
     <div class="nav-item" onclick="window.switchView('support', this)"><i class="fas fa-headset"></i> Support</div>
-    <div class="nav-item" onclick="window.openProfile()"><i class="fas fa-id-card"></i> Profile &amp; ID</div>
+    <div class="nav-item" onclick="window.openProfile()" style="margin-top:auto;"><i class="fas fa-user-circle"></i> Profile</div>
     <div class="nav-item logout" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
 </aside>
 
 <!-- ─── MAIN ────────────────────────────────────────── -->
 <main>
-    <!-- Header Stats -->
-    <div class="header-stats">
-        <div class="stat-box" onclick="window.openProfile()" title="View Profile">
-            <div class="stat-icon" style="background:#eef2ff;">
-                <img id="headerAvatar" src="" alt="Avatar" style="width:100%;height:100%;border-radius:12px;object-fit:cover;">
+
+    <!-- ═════════ COURSES VIEW ═════════ -->
+    <div id="viewCourses" style="display:block;">
+        <div class="header-stats">
+            <div class="stat-box">
+                <div class="stat-icon" style="background:#eef2ff;color:var(--primary);"><i class="fas fa-book-open"></i></div>
+                <div><h3 id="statCoursesCount">0</h3><p>Courses Available</p></div>
             </div>
-            <div>
-                <h3 style="margin:0;" id="welcomeName">Student</h3>
-                <p style="margin:0;color:#888;font-size:0.8rem;">View Profile</p>
-            </div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-icon" style="background:#dcfce7;color:#10b981;"><i class="fas fa-check-circle"></i></div>
-            <div>
-                <h3 style="margin:0;" id="verifiedBadge">No</h3>
-                <p style="margin:0;color:#888;font-size:0.85rem;">College Verified</p>
+            <div class="stat-box">
+                <div class="stat-icon" style="background:#dcfce7;color:#10b981;"><i class="fas fa-id-card"></i></div>
+                <div><h3 id="verifiedBadge">No</h3><p>Verified Status</p></div>
             </div>
         </div>
+        <h2 style="margin:24px 0 16px;font-weight:800;display:flex;align-items:center;gap:10px;">
+            <i class="fas fa-layer-group" style="color:var(--primary);"></i> My Courses
+        </h2>
+        <div id="courseGrid" class="courses-grid"></div>
     </div>
 
-    <!-- ══ COURSES VIEW ═══════════════════════════════ -->
-    <div id="viewCourses">
-        <h2 style="margin-bottom:20px;font-weight:800;">Your Learning Path 📚</h2>
-        <div class="courses-grid" id="courseGrid">
-            <div style="grid-column:1/-1;text-align:center;padding:60px;color:#999;">
-                <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══ RESOURCES VIEW ════════════════════════════ -->
+    <!-- ═════════ RESOURCES VIEW ════════ -->
     <div id="viewResources" style="display:none;">
-        <h2 style="margin-bottom:8px;font-weight:800;">Student Resource Hub 📁</h2>
-        <p style="color:#888;margin-bottom:24px;font-size:0.9rem;">Verified students get full access to all notes and resources.</p>
-        <div id="resourceList" style="display:flex;flex-direction:column;gap:18px;">
-            <div class="resource-card" onclick="window.accessDrive()">
-                <div style="display:flex;align-items:center;gap:18px;">
-                    <div class="res-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="res-info">
-                        <h3>BBA Notes Collection</h3>
-                        <p>Complete notes for Semester 1-6 • Free for Verified Students</p>
+        <h2 style="margin:0 0 16px;font-weight:800;display:flex;align-items:center;gap:10px;">
+            <i class="fas fa-folder-open" style="color:var(--primary);"></i> Course Resources & Notes
+        </h2>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:20px;">Access Google Drive folders with course materials, notes, and resources. Verified students only.</p>
+        <div id="courseResourcesList" style="display:flex;flex-direction:column;gap:16px;"></div>
+    </div>
+
+    <!-- ═════════ SUPPORT VIEW ════════ -->
+    <div id="viewSupport" style="display:none;">
+        <h2 style="margin:0 0 16px;font-weight:800;display:flex;align-items:center;gap:10px;">
+            <i class="fas fa-headset" style="color:var(--primary);"></i> Support & Help
+        </h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+            <!-- Create Ticket -->
+            <div class="panel" style="background:white;border-radius:16px;padding:22px;">
+                <h3 style="margin:0 0 16px;font-weight:800;">Create Support Ticket</h3>
+                <form onsubmit="window.createTicket(event)" id="ticketForm">
+                    <label class="form-label">Subject *</label>
+                    <input type="text" id="ticketSubject" placeholder="e.g. Issue with course access" required>
+                    
+                    <label class="form-label">Category</label>
+                    <select id="ticketCategory" style="margin-bottom:12px;">
+                        <option value="General">General</option>
+                        <option value="Course">Course Related</option>
+                        <option value="Technical">Technical Issue</option>
+                        <option value="Verification">Verification</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    
+                    <label class="form-label">Message *</label>
+                    <textarea id="ticketMessage" rows="4" placeholder="Describe your issue…" required style="resize:vertical;"></textarea>
+                    
+                    <button type="submit" class="btn btn-fill">
+                        <i class="fas fa-paper-plane"></i> Submit Ticket
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tickets List -->
+            <div class="panel" style="background:white;border-radius:16px;padding:22px;display:flex;flex-direction:column;">
+                <h3 style="margin:0 0 16px;font-weight:800;">My Tickets</h3>
+                <div id="studentTicketList" style="flex:1;overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <!-- Ticket Detail -->
+        <div id="ticketDetailPanel" class="panel" style="background:white;border-radius:16px;padding:22px;display:none;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <i class="fas fa-ticket-alt" style="color:var(--primary);font-size:1.3rem;"></i>
+                <h3 style="margin:0;font-weight:800;">Ticket Details</h3>
+            </div>
+            <div id="ticketDetailContent"></div>
+        </div>
+
+        <!-- Placeholder -->
+        <div id="ticketPlaceholder" style="text-align:center;padding:60px 20px;color:#999;">
+            <i class="fas fa-ticket-alt" style="font-size:3rem;display:block;margin-bottom:16px;"></i>
+            <p style="font-weight:700;">No tickets yet</p>
+            <p style="font-size:0.9rem;">Create a support ticket on the left to get help from our admin team.</p>
+        </div>
+    </div>
+
+</main>
+
+<!-- ═════════ COURSE PLAYER MODAL ════════ -->
+<div id="courseModal" style="display:none;">
+    <div class="modal-container">
+        <!-- Video Section -->
+        <div class="video-section">
+            <iframe id="playerFrame" src="" allowfullscreen></iframe>
+            <div style="padding:12px 16px;background:#222;color:white;font-size:0.9rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <span id="currentLessonTitle" style="font-weight:700;">Loading…</span>
+                <button type="button" onclick="window.closeCourseModal()" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:700;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive Section (Lessons + Resources) -->
+        <div class="interactive-section">
+            <div class="tabs">
+                <div class="tab active" onclick="window.switchTab('lessons')">📚 Lessons</div>
+                <div class="tab" onclick="window.switchTab('drive')">📁 Resources</div>
+            </div>
+
+            <!-- Lessons Tab -->
+            <div id="lessonsTab" class="tab-content active">
+                <div id="playlistContainer"></div>
+            </div>
+
+            <!-- Drive Resources Tab -->
+            <div id="driveTab" class="tab-content">
+                <div id="driveAccessMsg" style="display:flex;align-items:center;justify-content:center;height:100%;padding:20px;">
+                    <div style="text-align:center;">
+                        <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary);"></i>
                     </div>
                 </div>
-                <div id="bbaLockStatus" class="lock-badge status-locked">
-                    <i class="fas fa-lock"></i> Locked
-                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- ══ SUPPORT VIEW ══════════════════════════════ -->
-    <div id="viewSupport" style="display:none;">
-        <h2 style="margin-bottom:8px;font-weight:800;">Customer Support 🎧</h2>
-        <p style="color:#888;margin-bottom:24px;font-size:0.9rem;">Submit a ticket and our team will reply within 24 hours.</p>
-
-        <!-- New Ticket Form -->
-        <div class="support-panel">
-            <h3 style="margin:0 0 16px;font-size:1.05rem;display:flex;align-items:center;gap:8px;">
-                <i class="fas fa-plus-circle" style="color:var(--primary);"></i> New Support Ticket
-            </h3>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                <div>
-                    <label class="form-label-s">Subject *</label>
-                    <input type="text" id="ticketSubject" placeholder="Brief description of your issue…" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;transition:0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e5e7eb'">
-                </div>
-                <div>
-                    <label class="form-label-s">Category</label>
-                    <select id="ticketCategory" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;background:white;cursor:pointer;">
-                        <option value="general">General Query</option>
-                        <option value="courses">Courses & Videos</option>
-                        <option value="verification">ID Verification</option>
-                        <option value="resources">Resources & Notes</option>
-                        <option value="account">Account Issue</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-            <label class="form-label-s">Your Message *</label>
-            <textarea id="ticketMessage" rows="4" placeholder="Describe your issue in detail…"
-                style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;font-size:0.92rem;resize:vertical;margin-bottom:14px;transition:0.2s;"
-                onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
-            <button id="submitTicketBtn" onclick="window.submitTicket()" class="btn btn-fill" style="width:100%;justify-content:center;padding:12px;">
-                <i class="fas fa-paper-plane"></i> Submit Ticket
+<!-- ═════════ PROFILE MODAL ═════════ -->
+<div id="profileModal" style="display:none;">
+    <div class="modal-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="margin:0;font-weight:800;font-size:1.3rem;">Student Profile</h2>
+            <button type="button" onclick="window.closeProfileModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888;">
+                <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <!-- My Tickets -->
-        <div style="margin-top:24px;">
-            <h3 style="margin-bottom:14px;font-size:1rem;font-weight:700;">My Tickets</h3>
-            <div id="myTicketsList">
-                <p style="color:#999;text-align:center;padding:30px;">Loading…</p>
-            </div>
-        </div>
-    </div>
-</main>
-
-<!-- ─── LEADERBOARD MODAL ────────────────────────────── -->
-<div class="modal-overlay" id="leaderboardModal">
-    <div class="modal-box" style="width:480px;max-width:95vw;">
-        <span class="modal-close" onclick="document.getElementById('leaderboardModal').style.display='none'">&times;</span>
-        <h2 style="margin-bottom:4px;"><i class="fas fa-trophy" style="color:#f59e0b;"></i> Top Students</h2>
-        <p style="color:#888;font-size:0.88rem;margin-bottom:20px;">Ranked by XP earned.</p>
-        <div id="lbList">Loading…</div>
-    </div>
-</div>
-
-<!-- ─── PROFILE MODAL ────────────────────────────────── -->
-<div class="modal-overlay" id="profileModal">
-    <div class="modal-box" style="width:520px;max-width:95vw;">
-        <span class="modal-close" onclick="document.getElementById('profileModal').style.display='none'">&times;</span>
-        <div style="text-align:center;margin-bottom:20px;">
-            <img id="profileCurrentAvatar" src="" style="width:80px;height:80px;border-radius:50%;margin-bottom:10px;border:3px solid var(--primary);object-fit:cover;" alt="Avatar">
-            <h2 id="profileNameDisplay" style="margin:0;font-weight:800;">User</h2>
-            <p id="verificationStatus" style="font-size:0.88rem;color:#888;margin-top:4px;">Unverified Student</p>
-        </div>
         <div class="profile-tabs">
-            <div class="p-tab active" onclick="window.switchProfileTab('edit')">Edit Profile</div>
-            <div class="p-tab" onclick="window.switchProfileTab('certs')">Certificates</div>
-            <div class="p-tab" onclick="window.switchProfileTab('id')">ID Verification</div>
+            <div class="p-tab active" data-tab="general" onclick="window.switchProfileTab('general')">General</div>
+            <div class="p-tab" data-tab="id" onclick="window.switchProfileTab('id')">ID Verification</div>
+            <div class="p-tab" data-tab="avatar" onclick="window.switchProfileTab('avatar')">Avatar</div>
+            <div class="p-tab" data-tab="leaderboard" onclick="window.switchProfileTab('leaderboard')">Leaderboard</div>
         </div>
 
-        <div id="tab-edit">
-            <label style="font-weight:700;display:block;margin-bottom:10px;font-size:0.9rem;">Choose Avatar</label>
-            <div class="avatar-grid" id="avatarGrid"></div>
-            <label style="font-weight:700;display:block;margin-bottom:6px;font-size:0.9rem;">Full Name</label>
-            <input type="text" id="settingsName" style="width:100%;padding:10px 14px;margin-bottom:14px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;font-family:inherit;">
-            <label style="font-weight:700;display:block;margin-bottom:6px;font-size:0.9rem;">Bio</label>
-            <textarea id="settingsBio" rows="2" placeholder="Tell us about yourself…" style="width:100%;padding:10px 14px;margin-bottom:16px;border:1.5px solid #e5e7eb;border-radius:10px;outline:none;resize:vertical;font-family:inherit;"></textarea>
-            <button onclick="window.saveProfile()" class="btn btn-fill" style="width:100%;justify-content:center;"><i class="fas fa-save"></i> Save Changes</button>
-        </div>
-
-        <div id="tab-certs" style="display:none;">
-            <div id="walletList"></div>
-        </div>
-
-        <div id="tab-id" style="display:none;">
-            <div style="background:#f8fafc;padding:18px;border-radius:12px;border:1.5px solid #e5e7eb;">
-                <h3 style="margin:0 0 8px;font-size:1.05rem;">College ID Verification</h3>
-                <p style="font-size:0.85rem;color:#666;margin-bottom:14px;">Upload your College ID to unlock BBA Notes and Google Drive resources.</p>
-                <div id="uploadSection">
-                    <label style="display:block;margin-bottom:6px;font-size:0.85rem;font-weight:600;color:#666;">Select ID Image (Max 3MB)</label>
-                    <input type="file" id="idProofInput" accept="image/*" style="margin-bottom:12px;width:100%;padding:8px;border:1.5px dashed #d1d5db;border-radius:8px;">
-                    <button onclick="window.submitVerification()" class="btn btn-fill btn-upload-id" style="width:100%;justify-content:center;"><i class="fas fa-upload"></i> Submit ID</button>
+        <!-- General Tab -->
+        <div id="generalTab" class="profile-tab-content">
+            <div style="background:#f0f9ff;padding:16px;border-radius:12px;margin-bottom:16px;border-left:4px solid var(--primary);">
+                <p style="margin:0;color:var(--primary);font-weight:700;font-size:0.9rem;"><i class="fas fa-user-circle"></i> Profile Information</p>
+            </div>
+            <div style="padding:16px;background:#f8f9fa;border-radius:12px;border:1px solid #e2e8f0;">
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                    <img id="headerAvatar" src="" alt="Avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">
+                    <div>
+                        <h4 style="margin:0 0 4px;font-weight:800;" id="welcomeName">Loading…</h4>
+                        <p style="margin:0;color:#888;font-size:0.85rem;" id="verificationStatus">—</p>
+                    </div>
                 </div>
-                <div id="pendingMsg" style="display:none;color:var(--warning);font-weight:700;text-align:center;padding:12px;background:#fffbeb;border-radius:8px;"><i class="fas fa-clock"></i> Verification Pending Approval</div>
-                <div id="verifiedMsg" style="display:none;color:var(--success);font-weight:700;text-align:center;padding:12px;background:#f0fdf4;border-radius:8px;"><i class="fas fa-check-circle"></i> ID Verified — Access Granted!</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ─── COURSE PLAYER MODAL ──────────────────────────── -->
-<div class="modal-overlay" id="courseModal" style="z-index:2500;display:none;padding:0;">
-    <button onclick="window.closeCourseModal()" style="position:fixed;top:14px;right:14px;z-index:2600;background:rgba(0,0,0,0.5);color:white;border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.2rem;backdrop-filter:blur(4px);">&times;</button>
-    <div class="modal-container">
-        <div class="video-section">
-            <iframe id="playerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border:0;"></iframe>
-            <div class="video-controls">
-                <span style="color:white;font-weight:600;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;" id="currentLessonTitle">Lesson Player</span>
-                <button class="interaction-btn" onclick="window.toggleLike()"><i class="fas fa-thumbs-up"></i> <span id="likeCount">0</span></button>
-            </div>
-        </div>
-        <div class="interactive-section">
-            <div class="tabs">
-                <div class="tab active" onclick="window.switchTab('lessons')">Lessons</div>
-                <div class="tab" onclick="window.switchTab('drive')">Resources</div>
-                <div class="tab" onclick="window.switchTab('chat')">Discuss</div>
-            </div>
-            <div id="lessonsTab" class="tab-content active" style="overflow-y:auto;">
-                <div id="playlistContainer"></div>
-            </div>
-            <div id="driveTab" class="tab-content">
-                <div id="driveAccessMsg" style="padding:20px;"></div>
-            </div>
-            <div id="chatTab" class="tab-content" style="display:flex;flex-direction:column;height:calc(100% - 50px);">
-                <div class="chat-messages" id="chatList"></div>
-                <div class="chat-input-row">
-                    <input type="text" id="interactionInput" placeholder="Ask a question…">
-                    <button class="chat-send-btn" onclick="window.handleSend()"><i class="fas fa-paper-plane"></i></button>
+                <div style="background:white;padding:12px;border-radius:10px;border:1px solid #e2e8f0;font-size:0.85rem;">
+                    <p style="margin:0;"><strong>Verification Status:</strong> <span id="verifiedBadge" style="background:#eef2ff;color:var(--primary);padding:2px 8px;border-radius:6px;">Checking…</span></p>
                 </div>
             </div>
+        </div>
+
+        <!-- ID Verification Tab -->
+        <div id="idTab" class="profile-tab-content" style="display:none;">
+            <div style="background:#fff7ed;padding:16px;border-radius:12px;margin-bottom:16px;border-left:4px solid #f59e0b;">
+                <p style="margin:0;color:#c2410c;font-weight:700;font-size:0.9rem;"><i class="fas fa-id-card"></i> Upload Your College ID</p>
+            </div>
+
+            <div id="uploadSection" style="background:#f8f9fa;padding:16px;border-radius:12px;border:2px dashed #e2e8f0;">
+                <label class="form-label" style="margin-bottom:12px;">College ID Image *</label>
+                <input type="file" id="idFileInput" accept="image/*" style="margin-bottom:12px;">
+                <button type="button" onclick="window.uploadID()" class="btn btn-fill">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload ID
+                </button>
+            </div>
+
+            <div id="pendingMsg" style="background:#fff7ed;padding:16px;border-radius:12px;border:1px solid #fed7aa;display:none;text-align:center;">
+                <i class="fas fa-hourglass-half" style="font-size:2rem;color:#f59e0b;margin-bottom:8px;display:block;"></i>
+                <strong style="color:#c2410c;">Verification Pending</strong>
+                <p style="color:#888;margin-top:4px;font-size:0.9rem;">Your ID is under review. Check back soon!</p>
+            </div>
+
+            <div id="verifiedMsg" style="background:#dcfce7;padding:16px;border-radius:12px;border:1px solid #bbf7d0;display:none;text-align:center;">
+                <i class="fas fa-check-circle" style="font-size:2rem;color:#10b981;margin-bottom:8px;display:block;"></i>
+                <strong style="color:#10b981;">✓ Verified</strong>
+                <p style="color:#888;margin-top:4px;font-size:0.9rem;">Your ID has been verified. You now have full access!</p>
+            </div>
+
+            <div id="rejectedMsg" style="background:#fee2e2;padding:16px;border-radius:12px;border:1px solid #fecaca;display:none;">
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <i class="fas fa-times-circle" style="font-size:1.5rem;color:#ef4444;flex-shrink:0;margin-top:2px;"></i>
+                    <div style="flex:1;">
+                        <strong style="color:#ef4444;display:block;margin-bottom:6px;">Verification Rejected</strong>
+                        <p style="color:#333;margin:0 0 8px;font-size:0.85rem;line-height:1.5;"><strong>Reason:</strong></p>
+                        <div style="background:white;padding:10px;border-radius:8px;border-left:3px solid #ef4444;font-size:0.85rem;color:#555;" id="rejectionReason"></div>
+                        <p style="color:#888;margin:8px 0 0;font-size:0.8rem;">Please upload a clearer image and try again.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Tab -->
+        <div id="avatarTab" class="profile-tab-content" style="display:none;">
+            <p style="color:#888;font-size:0.9rem;margin-bottom:16px;">Choose an avatar for your profile</p>
+            <div class="avatar-grid">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" onclick="window.selectAvatar('Felix')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" onclick="window.selectAvatar('Aneka')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Mittens" onclick="window.selectAvatar('Mittens')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bubba" onclick="window.selectAvatar('Bubba')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sorelle" onclick="window.selectAvatar('Sorelle')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Destiny" onclick="window.selectAvatar('Destiny')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Shadow" onclick="window.selectAvatar('Shadow')" alt="Avatar">
+                <img class="avatar-option" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Max" onclick="window.selectAvatar('Max')" alt="Avatar">
+            </div>
+            <button type="button" onclick="window.saveAvatar()" class="btn btn-fill">
+                <i class="fas fa-save"></i> Save Avatar
+            </button>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div id="leaderboardTab" class="profile-tab-content" style="display:none;">
+            <h3 style="margin:0 0 16px;font-weight:800;">Top 20 Students</h3>
+            <div id="leaderboardContent" style="max-height:400px;overflow-y:auto;"></div>
         </div>
     </div>
 </div>
@@ -217,20 +256,8 @@
 <script type="module" src="js/student.js"></script>
 
 <style>
-/* ── Support Panel ── */
-.support-panel { background:white;border-radius:16px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,0.04);border:1.5px solid #f1f5f9; }
-.form-label-s { font-size:0.82rem;font-weight:700;display:block;margin-bottom:6px;color:#6B7280; }
-.ticket-card { background:white;border-radius:14px;padding:18px;margin-bottom:14px;border:1.5px solid #e5e7eb;transition:0.2s; }
-.ticket-card:hover { border-color:#c7d2fe;box-shadow:0 4px 14px rgba(79,70,229,0.08); }
-.ticket-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px; }
-.ticket-cat-badge { background:#eef2ff;color:var(--primary);padding:2px 10px;border-radius:12px;font-size:0.75rem;font-weight:700; }
-.admin-reply-box { background:#eef2ff;border-radius:10px;padding:12px 14px;margin-top:10px;border-left:3px solid var(--primary); }
-
-/* ── Sidebar overlay mobile ── */
-.sidebar-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:49; }
-@media(max-width:900px){
-    .sidebar-overlay.active { display:block; }
-}
+    .profile-tab-content { display:none; }
+    .profile-tab-content.active { display:block; }
 </style>
 </body>
 </html>
