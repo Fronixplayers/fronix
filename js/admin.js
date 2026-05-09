@@ -1,108 +1,100 @@
-// js/admin.js — FronixLearner Admin Dashboard Logic (FIXED)
+// js/admin.js — FronixLearner Admin (Drive Links Manager + all fixes)
 
 import {
     auth, db,
     onAuthStateChanged, signOut,
-    collection, addDoc, getDoc, getDocs, doc, onSnapshot,
-    query, updateDoc, where, orderBy, deleteDoc, serverTimestamp, setDoc
+    collection, addDoc, getDoc, doc, onSnapshot,
+    query, updateDoc, where, orderBy, deleteDoc, serverTimestamp
 } from './firebase-config.js';
 
-let tempPlaylist = [];
-let chatListenerUnsub = null;
-let selectedStudentId = null;
+let tempPlaylist   = [];
+let editingCourseId = null;
+let draggedIndex   = null;
 
-// ─── TOAST ───────────────────────────────────────────
+// ─── TOAST ──────────────────────────────────────────────
 function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
-    t.innerHTML = `<div class="toast-inner ${type}"><i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i><span>${msg}</span></div>`;
+    const icon = type === 'error' ? 'exclamation-circle'
+               : type === 'success' ? 'check-circle'
+               : 'info-circle';
+    t.innerHTML = `<div class="toast-inner ${type}">
+        <i class="fas fa-${icon}"></i><span>${msg}</span></div>`;
     t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 4000);
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.display = 'none'; }, 4500);
 }
 
-// ─── AUTH GUARD ───────────────────────────────────────
+// ─── AUTH ────────────────────────────────────────────────
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists() && snap.data().role === 'Admin') {
-            initAdmin();
-        } else {
-            showToast("Admin access only.", 'error');
-            setTimeout(() => window.location.href = 'index.html', 1500);
-        }
+    if (!user) { window.location.href = 'index.html'; return; }
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists() && snap.data().role === 'Admin') {
+        initAdmin();
     } else {
-        window.location.href = 'index.html';
+        showToast('Admin access only.', 'error');
+        setTimeout(() => window.location.href = 'index.html', 1500);
     }
 });
 
-// ─── INIT ─────────────────────────────────────────────
 function initAdmin() {
     loadStats();
     loadCategories();
     loadCourses();
+    loadDriveLinks();   // NEW
     loadStudents();
     loadVerifications();
-    loadChatbotMessages();
-    renderPlaylist();       // called once here safely
-    updatePricingUI();      // called once here safely
-
-    // Pricing radio listeners
-    document.querySelectorAll('input[name="pricing"]').forEach(r => {
-        r.addEventListener('change', updatePricingUI);
-    });
-
-    document.getElementById('adminReplyInput')?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') window.sendAdminReply();
-    });
+    loadSupportTickets();
+    renderPlaylist();
+    updatePricingUI();
 }
 
-// ─── NAVIGATION ───────────────────────────────────────
+// ─── NAV ─────────────────────────────────────────────────
 window.switchTab = (tab, el) => {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    el.classList.add('active');
+    if (el) el.classList.add('active');
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(tab + 'Section').classList.add('active');
-    if (window.innerWidth <= 900) document.querySelector('aside').classList.remove('active');
+    const sec = document.getElementById(tab + 'Section');
+    if (sec) sec.classList.add('active');
+    if (window.innerWidth <= 900) {
+        document.querySelector('aside')?.classList.remove('active');
+        document.querySelector('.sidebar-overlay')?.classList.remove('active');
+    }
 };
-window.toggleSidebar = () => document.querySelector('aside').classList.toggle('active');
+
+window.toggleSidebar = () => {
+    document.querySelector('aside')?.classList.toggle('active');
+    document.querySelector('.sidebar-overlay')?.classList.toggle('active');
+};
+
 window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
 
-// ─── STATS (real-time) ────────────────────────────────
+// ─── STATS ───────────────────────────────────────────────
 function loadStats() {
-    // Total students
-    onSnapshot(query(collection(db, "users"), where("role", "==", "Student")), (snap) => {
+    onSnapshot(query(collection(db, 'users'), where('role', '==', 'Student')), snap => {
         document.getElementById('statStudents').innerText = snap.size;
     });
-
-    // Active courses
-    onSnapshot(collection(db, "courses"), (snap) => {
+    onSnapshot(collection(db, 'courses'), snap => {
         document.getElementById('statCourses').innerText = snap.size;
     });
-
-    // Unread chats — badge in sidebar + stat card
-    onSnapshot(collection(db, "chatbot_messages"), (snap) => {
-        const unread = snap.docs.filter(d => d.data().type === 'student_msg' && !d.data().seen).length;
-        document.getElementById('statChats').innerText = unread;
-
+    onSnapshot(query(collection(db, 'support_tickets'), where('status', '==', 'open')), snap => {
+        document.getElementById('statChats').innerText = snap.size;
         const badge = document.getElementById('chatUnreadBadge');
         if (badge) {
-            if (unread > 0) {
-                badge.style.display = 'inline';
-                badge.innerText = unread;
-            } else {
-                badge.style.display = 'none';
-            }
+            badge.style.display = snap.size > 0 ? 'inline' : 'none';
+            badge.innerText = snap.size;
         }
     });
 }
 
-// ─── CATEGORIES ───────────────────────────────────────
+// ─── CATEGORIES ──────────────────────────────────────────
 async function loadCategories() {
-    const catRef = collection(db, "categories");
-    onSnapshot(query(catRef, orderBy("name")), async (snap) => {
+    const catRef = collection(db, 'categories');
+    onSnapshot(query(catRef, orderBy('name')), async snap => {
         const sel = document.getElementById('cCat');
-        sel.innerHTML = "";
+        if (!sel) return;
+        sel.innerHTML = '';
         if (snap.empty) {
-            const defaults = ["Web Development", "Python & Data", "Design", "Marketing", "Business"];
+            const defaults = ['Web Development','Python & Data','Design','Marketing','Business','BBA'];
             for (const name of defaults) await addDoc(catRef, { name });
             return;
         }
@@ -118,10 +110,10 @@ async function loadCategories() {
 
 window.addCategory = async () => {
     const name = document.getElementById('newCatInput').value.trim();
-    if (!name) return showToast("Enter a category name.", 'error');
-    await addDoc(collection(db, "categories"), { name });
-    document.getElementById('newCatInput').value = "";
-    showToast("Category added!", 'success');
+    if (!name) { showToast('Enter a category name.', 'error'); return; }
+    await addDoc(collection(db, 'categories'), { name });
+    document.getElementById('newCatInput').value = '';
+    showToast('Category added!', 'success');
 };
 
 window.deleteCategory = async () => {
@@ -129,13 +121,14 @@ window.deleteCategory = async () => {
     const opt = sel.options[sel.selectedIndex];
     if (!opt) return;
     if (confirm(`Delete category "${opt.value}"?`)) {
-        await deleteDoc(doc(db, "categories", opt.getAttribute('data-id')));
-        showToast("Category deleted.", 'success');
+        await deleteDoc(doc(db, 'categories', opt.getAttribute('data-id')));
+        showToast('Category deleted.', 'success');
     }
 };
 
-// ─── YOUTUBE LINK PARSER ──────────────────────────────
+// ─── YOUTUBE PARSER ──────────────────────────────────────
 function extractVideoId(url) {
+    url = url.trim();
     const patterns = [
         /youtu\.be\/([a-zA-Z0-9_-]{11})/,
         /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
@@ -143,135 +136,207 @@ function extractVideoId(url) {
         /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
         /^([a-zA-Z0-9_-]{11})$/
     ];
-    for (const p of patterns) {
-        const m = url.match(p);
-        if (m) return m[1];
-    }
+    for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
     return null;
 }
 
 window.previewLesson = () => {
-    const url = document.getElementById('lVid').value.trim();
-    const vid = extractVideoId(url);
+    const url     = document.getElementById('lVid').value.trim();
+    const vid     = extractVideoId(url);
     const preview = document.getElementById('ytPreview');
+    if (!preview) return;
     if (vid) {
         preview.src = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
-        preview.classList.remove('hidden');
+        preview.style.display = 'block';
     } else {
-        preview.classList.add('hidden');
+        preview.style.display = 'none';
     }
 };
 
-// ─── COURSE PLAYLIST ──────────────────────────────────
+// ─── PLAYLIST (DRAG TO REORDER) ──────────────────────────
 window.addLesson = () => {
-    const title = document.getElementById('lTitle').value.trim();
+    const title  = document.getElementById('lTitle').value.trim();
     const rawUrl = document.getElementById('lVid').value.trim();
     const videoId = extractVideoId(rawUrl);
-    if (!title || !rawUrl) return showToast("Fill lesson title and YouTube link.", 'error');
-    if (!videoId) return showToast("Invalid YouTube link. Please enter a valid YouTube URL or video ID.", 'error');
+    if (!title || !rawUrl) { showToast('Fill lesson title and YouTube link.', 'error'); return; }
+    if (!videoId)           { showToast('Invalid YouTube link.', 'error'); return; }
     tempPlaylist.push({ title, videoId });
     renderPlaylist();
-    document.getElementById('lTitle').value = "";
-    document.getElementById('lVid').value = "";
-    document.getElementById('ytPreview').classList.add('hidden');
-    showToast(`Lesson "${title}" added!`, 'success');
+    document.getElementById('lTitle').value = '';
+    document.getElementById('lVid').value   = '';
+    const p = document.getElementById('ytPreview');
+    if (p) p.style.display = 'none';
+    showToast(`Lesson "${title}" added! ✅`, 'success');
 };
 
-// ─── FIX: Single definition of renderPlaylist ─────────
 function renderPlaylist() {
     const l = document.getElementById('lessonList');
     if (!l) return;
-    l.innerHTML = tempPlaylist.length === 0
-        ? `<p style="color:#aaa; font-size:0.85rem; text-align:center; padding:10px;">No lessons added yet</p>`
-        : tempPlaylist.map((item, i) => `
-        <div class="lesson-list-item">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <img src="https://img.youtube.com/vi/${item.videoId}/default.jpg"
-                     style="width:40px; height:28px; border-radius:4px; object-fit:cover;"
-                     onerror="this.style.display='none'">
-                <span>${i + 1}. ${item.title}</span>
+    if (tempPlaylist.length === 0) {
+        l.innerHTML = `<p style="color:#aaa;font-size:0.83rem;text-align:center;padding:10px;">
+            No lessons added yet</p>`;
+        return;
+    }
+    l.innerHTML = tempPlaylist.map((lesson, idx) => `
+        <div class="lesson-list-item" draggable="true"
+             ondragstart="window.onDragStart(${idx})"
+             ondragover="window.onDragOver(event)"
+             ondrop="window.onDrop(${idx})"
+             style="cursor:grab;user-select:none;opacity:${draggedIndex === idx ? 0.4 : 1};">
+            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <i class="fas fa-grip-vertical" style="color:#ccc;flex-shrink:0;"></i>
+                <div style="min-width:0;">
+                    <div style="font-weight:700;font-size:0.87rem;">${idx+1}. ${lesson.title}</div>
+                    <div style="font-size:0.74rem;color:#aaa;">ID: ${lesson.videoId}</div>
+                </div>
             </div>
-            <button class="del-btn" onclick="window.remLesson(${i})"><i class="fas fa-times"></i></button>
+            <button type="button" class="del-btn" onclick="window.deleteLesson(${idx})"
+                    title="Remove">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>`).join('');
 }
-window.remLesson = (i) => { tempPlaylist.splice(i, 1); renderPlaylist(); };
 
-// ─── PRICING TOGGLE ───────────────────────────────────
-// FIX: Single definition of updatePricingUI
-function updatePricingUI() {
-    const opts = document.querySelectorAll('.pricing-option');
-    const checked = document.querySelector('input[name="pricing"]:checked');
-    opts.forEach(o => o.classList.remove('selected'));
-    if (checked) checked.closest('.pricing-option')?.classList.add('selected');
+window.onDragStart = (idx) => { draggedIndex = idx; };
+window.onDragOver  = (e)   => { e.preventDefault(); };
+window.onDrop      = (idx) => {
+    if (draggedIndex === null || draggedIndex === idx) return;
+    const [lesson] = tempPlaylist.splice(draggedIndex, 1);
+    tempPlaylist.splice(idx, 0, lesson);
+    draggedIndex = null;
+    renderPlaylist();
+    showToast('Lessons reordered! ✅', 'success');
+};
+
+window.deleteLesson = (idx) => {
+    tempPlaylist.splice(idx, 1);
+    renderPlaylist();
+};
+
+// ─── THUMBNAIL ───────────────────────────────────────────
+window.previewThumbnail = () => {
+    const input   = document.getElementById('cThumb');
+    const preview = document.getElementById('thumbPreview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(input.files[0]);
+    }
+};
+
+async function readFileAsBase64(file) {
+    return new Promise(resolve => {
+        const r = new FileReader();
+        r.onload = e => resolve(e.target.result);
+        r.readAsDataURL(file);
+    });
 }
-window.updatePricingUI = updatePricingUI;
 
-// ─── PUBLISH COURSE ───────────────────────────────────
+// ─── PRICING ─────────────────────────────────────────────
+window.updatePricingUI = () => {
+    const free = document.getElementById('priceFree').checked;
+    document.getElementById('optFree').classList.toggle('selected',  free);
+    document.getElementById('optPaid').classList.toggle('selected', !free);
+};
+
+// ─── PUBLISH / EDIT COURSE ───────────────────────────────
 window.publishCourse = async (e) => {
     e.preventDefault();
-    if (tempPlaylist.length === 0) return showToast("Add at least one lesson with a YouTube link.", 'error');
+    const title       = document.getElementById('cTitle').value.trim();
+    const instructor  = document.getElementById('cInst').value.trim();
+    const description = document.getElementById('cDesc').value.trim();
+    const category    = document.getElementById('cCat').value;
+    const driveLink   = document.getElementById('cDriveLink').value.trim();
+    const isFree      = document.getElementById('priceFree').checked;
+    const thumbFile   = document.getElementById('cThumb').files[0];
 
-    const pricingEl = document.querySelector('input[name="pricing"]:checked');
-    const isFree = pricingEl ? pricingEl.value === 'free' : true;
+    if (!title || !instructor || tempPlaylist.length === 0) {
+        showToast('Fill title, instructor and add at least 1 lesson.', 'error'); return;
+    }
 
-    const btn = e.target.querySelector('button[type="submit"]');
+    const btn = document.querySelector('#courseForm button[type="submit"]');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
 
     try {
-        await addDoc(collection(db, "courses"), {
-            title: document.getElementById('cTitle').value.trim(),
-            instructor: document.getElementById('cInst').value.trim(),
-            category: document.getElementById('cCat').value,
-            description: document.getElementById('cDesc').value.trim(),
-            isFree: isFree,
+        const customThumbnail = thumbFile ? await readFileAsBase64(thumbFile) : null;
+        const data = {
+            title, instructor, description, category, driveLink, isFree,
             playlist: tempPlaylist,
-            createdAt: serverTimestamp(),
-            likes: 0
-        });
-        showToast("🎉 Course published successfully!", 'success');
-        e.target.reset();
+            ...(customThumbnail && { customThumbnail })
+        };
+
+        if (editingCourseId) {
+            await updateDoc(doc(db, 'courses', editingCourseId), data);
+            showToast('✅ Course updated!', 'success');
+            window.cancelEdit();
+        } else {
+            data.createdAt = serverTimestamp();
+            await addDoc(collection(db, 'courses'), data);
+            showToast('🚀 Course published live!', 'success');
+        }
+
+        document.getElementById('courseForm').reset();
         tempPlaylist = [];
         renderPlaylist();
-        document.getElementById('priceFree').checked = true;
+        document.getElementById('thumbPreview').style.display = 'none';
         updatePricingUI();
     } catch (err) {
-        showToast("Failed to publish: " + err.message, 'error');
+        showToast('Error: ' + err.message, 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-rocket"></i> Publish Course — Goes Live Immediately';
     }
 };
 
-// ─── LOAD COURSES (real-time) ─────────────────────────
+window.cancelEdit = () => {
+    editingCourseId = null;
+    document.getElementById('courseForm').reset();
+    tempPlaylist = [];
+    renderPlaylist();
+    updatePricingUI();
+    document.getElementById('formModeLabel').innerHTML =
+        '<i class="fas fa-plus-circle" style="color:var(--primary);"></i> Publish New Course via YouTube';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+    document.getElementById('thumbPreview').style.display = 'none';
+};
+
+// ─── LOAD COURSES (table) ────────────────────────────────
 function loadCourses() {
-    onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
-        const tb = document.querySelector('#courseTable tbody');
-        tb.innerHTML = "";
+    const tbody = document.getElementById('courseTable').querySelector('tbody');
+    onSnapshot(query(collection(db, 'courses'), orderBy('createdAt', 'desc')), snap => {
+        tbody.innerHTML = '';
         if (snap.empty) {
-            tb.innerHTML = '<tr><td colspan="6" class="no-data"><i class="fas fa-inbox"></i>No courses yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="no-data">No courses yet.</td></tr>';
             return;
         }
         snap.forEach(d => {
             const c = d.data();
-            const badge = c.isFree !== false
-                ? '<span class="badge badge-free">FREE</span>'
-                : '<span class="badge badge-paid">PAID</span>';
-            const vidId = c.playlist && c.playlist.length ? c.playlist[0].videoId : '';
-            tb.innerHTML += `
+            const n = c.playlist?.length || 1;
+            const driveBtn = c.driveLink
+                ? `<a href="${c.driveLink}" target="_blank" class="action-btn"
+                      style="background:#e3f2fd;color:#1976d2;">
+                      <i class="fab fa-google-drive"></i> Open</a>`
+                : '<span style="color:#ccc;">—</span>';
+
+            tbody.innerHTML += `
             <tr>
-                <td>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        ${vidId ? `<img src="https://img.youtube.com/vi/${vidId}/default.jpg" style="width:50px; height:35px; border-radius:6px; object-fit:cover;" onerror="this.style.display='none'">` : ''}
-                        <strong>${c.title}</strong>
-                    </div>
-                </td>
+                <td><strong>${c.title}</strong></td>
                 <td>${c.instructor}</td>
-                <td>${c.category || 'General'}</td>
-                <td>${badge}</td>
-                <td>${c.playlist ? c.playlist.length : 1}</td>
+                <td>${c.category || '—'}</td>
                 <td>
-                    <button class="action-btn btn-trash" onclick="window.delCourse('${d.id}')">
+                    <span class="badge ${c.isFree !== false ? 'badge-free' : 'badge-paid'}">
+                        ${c.isFree !== false ? 'Free' : 'Paid'}
+                    </span>
+                </td>
+                <td>${n}</td>
+                <td>${driveBtn}</td>
+                <td style="white-space:nowrap;">
+                    <button class="action-btn" style="background:#f0f9ff;color:#0284c7;"
+                            onclick="window.editCourse('${d.id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn btn-trash" onclick="window.deleteCourse('${d.id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -280,230 +345,378 @@ function loadCourses() {
     });
 }
 
-window.delCourse = async (id) => {
-    if (confirm("Delete this course? This cannot be undone.")) {
-        await deleteDoc(doc(db, "courses", id));
-        showToast("Course deleted.", 'success');
+window.editCourse = async (id) => {
+    const snap = await getDoc(doc(db, 'courses', id));
+    if (!snap.exists()) return;
+    const c = snap.data();
+    editingCourseId = id;
+    document.getElementById('cTitle').value     = c.title       || '';
+    document.getElementById('cInst').value      = c.instructor  || '';
+    document.getElementById('cDesc').value      = c.description || '';
+    document.getElementById('cCat').value       = c.category    || '';
+    document.getElementById('cDriveLink').value = c.driveLink   || '';
+    document.getElementById('priceFree').checked = c.isFree !== false;
+    document.getElementById('pricePaid').checked = c.isFree === false;
+    tempPlaylist = c.playlist || [];
+    renderPlaylist();
+    updatePricingUI();
+    document.getElementById('formModeLabel').innerHTML =
+        '<i class="fas fa-edit" style="color:var(--primary);"></i> Edit Course';
+    document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Course loaded for editing.', 'success');
+
+    // Switch to courses section
+    window.switchTab('courses', document.querySelector('.nav-item'));
+};
+
+window.deleteCourse = async (id) => {
+    if (confirm('Delete this course? This cannot be undone.')) {
+        await deleteDoc(doc(db, 'courses', id));
+        showToast('Course deleted.', 'success');
     }
 };
 
-// ─── STUDENTS (real-time) ─────────────────────────────
+// ─── DRIVE LINKS MANAGER (NEW) ───────────────────────────
+// Loads all courses and lets admin set/update driveLink independently
+function loadDriveLinks() {
+    const container = document.getElementById('driveLinksList');
+    if (!container) return;
+
+    onSnapshot(query(collection(db, 'courses'), orderBy('createdAt', 'desc')), snap => {
+        container.innerHTML = '';
+        if (snap.empty) {
+            container.innerHTML = `<p style="color:#bbb;padding:20px;text-align:center;">
+                No courses yet. Publish a course first.</p>`;
+            return;
+        }
+        snap.forEach(d => {
+            const c = d.data();
+            const inputId  = `dl_${d.id}`;
+            const statusId = `dls_${d.id}`;
+            container.innerHTML += `
+            <div class="drive-link-row">
+                <div class="course-name">
+                    <i class="fas fa-book" style="color:var(--primary);margin-right:6px;"></i>
+                    ${c.title}
+                    <div style="font-size:0.78rem;color:#aaa;font-weight:400;margin-top:2px;">
+                        ${c.category || '—'} • ${c.playlist?.length || 1} lessons
+                    </div>
+                </div>
+                <input type="url" id="${inputId}" placeholder="https://drive.google.com/drive/folders/..."
+                       value="${c.driveLink || ''}"
+                       style="flex:2;min-width:200px;margin-bottom:0;">
+                <button class="save-btn" onclick="window.saveDriveLink('${d.id}','${inputId}','${statusId}')">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                ${c.driveLink
+                    ? `<a href="${c.driveLink}" target="_blank" class="open-btn">
+                           <i class="fab fa-google-drive"></i> Open
+                       </a>`
+                    : ''}
+                <span id="${statusId}" style="font-size:0.78rem;font-weight:700;"></span>
+            </div>`;
+        });
+    });
+}
+
+window.saveDriveLink = async (courseId, inputId, statusId) => {
+    const link   = document.getElementById(inputId)?.value.trim() || '';
+    const status = document.getElementById(statusId);
+    try {
+        await updateDoc(doc(db, 'courses', courseId), { driveLink: link });
+        if (status) { status.innerText = '✓ Saved'; status.style.color = '#10b981'; }
+        showToast('Drive link saved!', 'success');
+        // Reload drive links so "Open" button appears/disappears
+        loadDriveLinks();
+    } catch (err) {
+        if (status) { status.innerText = '✗ Failed'; status.style.color = '#ef4444'; }
+        showToast('Save failed: ' + err.message, 'error');
+    }
+};
+
+// ─── STUDENTS ────────────────────────────────────────────
 function loadStudents() {
-    onSnapshot(query(collection(db, "users"), where("role", "==", "Student")), (snap) => {
-        const tb = document.querySelector('#studentTable tbody');
-        tb.innerHTML = "";
+    const tbody = document.getElementById('studentTable').querySelector('tbody');
+    onSnapshot(query(collection(db, 'users'), where('role', '==', 'Student')), snap => {
+        tbody.innerHTML = '';
         if (snap.empty) {
-            tb.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-users"></i>No students yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="no-data">No students yet.</td></tr>';
             return;
         }
         snap.forEach(d => {
             const u = d.data();
-            const blocked = u.isBlocked === true;
-            tb.innerHTML += `
+            const sc   = u.isVerified ? '#10b981' : u.verificationPending ? '#f59e0b' : '#ef4444';
+            const stxt = u.isVerified ? '✓ Verified' : u.verificationPending ? '⏳ Pending' : '❌ Unverified';
+            tbody.innerHTML += `
             <tr>
-                <td>${u.name || '-'}</td>
-                <td>${u.email || '-'}</td>
-                <td>${u.city || '-'}, ${u.state || '-'}</td>
+                <td>${u.name || '—'}</td>
+                <td>${u.email}</td>
+                <td>${u.location || '—'}</td>
+                <td><span style="color:${sc};font-weight:700;">${stxt}</span></td>
                 <td>
-                    <span class="badge ${blocked ? 'badge-blocked' : 'badge-active'}">
-                        ${blocked ? 'BLOCKED' : 'ACTIVE'}
-                    </span>
-                </td>
-                <td style="display:flex; gap:6px; flex-wrap:wrap;">
-                    ${blocked
-                        ? `<button class="action-btn btn-unblock" onclick="window.toggleBlock('${d.id}',false)"><i class="fas fa-check"></i> Unblock</button>`
-                        : `<button class="action-btn btn-block" onclick="window.toggleBlock('${d.id}',true)"><i class="fas fa-ban"></i> Block</button>`
-                    }
-                    <button class="action-btn btn-trash" onclick="window.deleteUser('${d.id}')"><i class="fas fa-trash"></i></button>
+                    ${u.isBlocked
+                        ? `<button class="action-btn btn-unblock"
+                               onclick="window.toggleBlockUser('${d.id}',false)">
+                               <i class="fas fa-lock-open"></i> Unblock</button>`
+                        : `<button class="action-btn btn-block"
+                               onclick="window.toggleBlockUser('${d.id}',true)">
+                               <i class="fas fa-ban"></i> Block</button>`}
                 </td>
             </tr>`;
         });
     });
 }
 
-window.toggleBlock = async (id, block) => {
-    if (confirm(`${block ? 'Block' : 'Unblock'} this student?`)) {
-        await updateDoc(doc(db, "users", id), { isBlocked: block });
-        showToast(`Student ${block ? 'blocked' : 'unblocked'}.`, block ? 'error' : 'success');
-    }
-};
-window.deleteUser = async (id) => {
-    if (confirm("Permanently delete this student? This cannot be undone.")) {
-        await deleteDoc(doc(db, "users", id));
-        showToast("Student deleted.", 'success');
-    }
+window.toggleBlockUser = async (uid, block) => {
+    await updateDoc(doc(db, 'users', uid), { isBlocked: block });
+    showToast(block ? '✓ Student blocked.' : '✓ Student unblocked.', 'success');
 };
 
-// ─── VERIFICATIONS (real-time) ────────────────────────
+// ─── VERIFICATIONS ───────────────────────────────────────
 function loadVerifications() {
-    onSnapshot(query(collection(db, "users"), where("verificationPending", "==", true)), (snap) => {
-        const tb = document.querySelector('#verificationTable tbody');
-        tb.innerHTML = "";
+    const tbody = document.getElementById('verificationTable').querySelector('tbody');
+    onSnapshot(query(collection(db, 'users'), where('verificationPending', '==', true)), snap => {
+        tbody.innerHTML = '';
         if (snap.empty) {
-            tb.innerHTML = '<tr><td colspan="3" class="no-data"><i class="fas fa-check-double"></i>No pending verifications.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="no-data">No pending verifications.</td></tr>';
             return;
         }
         snap.forEach(d => {
-            const u = d.data();
-            const idLink = u.idProofUrl && u.idProofUrl !== "https://via.placeholder.com/150"
-                ? `<a href="${u.idProofUrl}" target="_blank" style="color:var(--primary); font-size:0.8rem;"><i class="fas fa-eye"></i> View ID Image</a>`
-                : `<span style="color:#aaa; font-size:0.8rem;"><i class="fas fa-image"></i> No image (Base64 stored)</span>`;
-            tb.innerHTML += `
+            const u    = d.data();
+            const date = u.idUploadedAt
+                ? new Date(u.idUploadedAt.toDate()).toLocaleDateString('en-IN') : '—';
+            tbody.innerHTML += `
             <tr>
                 <td>
-                    <strong>${u.name || 'Unknown'}</strong><br>
-                    ${idLink}
+                    <strong>${u.name}</strong><br>
+                    <small style="color:#888;">${u.email}</small>
+                    ${u.idImage
+                        ? `<br><button type="button" class="action-btn"
+                                style="background:#eef2ff;color:var(--primary);margin-top:6px;font-size:0.74rem;"
+                                onclick="window.viewIDImage('${u.idImage}')">
+                                <i class="fas fa-image"></i> View ID</button>`
+                        : ''}
                 </td>
-                <td>${u.submittedAt ? new Date(u.submittedAt.toDate()).toLocaleDateString('en-IN') : 'N/A'}</td>
-                <td style="display:flex; gap:8px;">
-                    <button class="action-btn btn-approve" onclick="window.verifyUser('${d.id}',true)"><i class="fas fa-check"></i> Approve</button>
-                    <button class="action-btn btn-reject" onclick="window.verifyUser('${d.id}',false)"><i class="fas fa-times"></i> Reject</button>
+                <td>${date}</td>
+                <td style="white-space:nowrap;">
+                    <button type="button" class="action-btn btn-approve"
+                            onclick="window.verifyUser('${d.id}',true)">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button type="button" class="action-btn btn-reject"
+                            onclick="window.promptReject('${d.id}')" style="margin-top:4px;">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
                 </td>
             </tr>`;
         });
     });
 }
+
+window.viewIDImage = (url) => {
+    const lb = document.createElement('div');
+    lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;' +
+                       'align-items:center;justify-content:center;z-index:10000;';
+    lb.innerHTML = `<div style="position:relative;max-width:90vw;max-height:90vh;">
+        <img src="${url}" style="max-width:90vw;max-height:85vh;border-radius:12px;object-fit:contain;">
+        <button onclick="this.closest('div').parentElement.remove()"
+                style="position:absolute;top:-14px;right:-14px;background:white;border:none;
+                       border-radius:50%;width:32px;height:32px;font-size:1rem;cursor:pointer;
+                       box-shadow:0 2px 8px rgba(0,0,0,0.3);">×</button>
+    </div>`;
+    lb.addEventListener('click', e => { if (e.target === lb) lb.remove(); });
+    document.body.appendChild(lb);
+};
 
 window.verifyUser = async (uid, approved) => {
-    await updateDoc(doc(db, "users", uid), {
-        isVerified: approved,
-        verificationPending: false
+    await updateDoc(doc(db, 'users', uid), {
+        isVerified:          approved,
+        verificationPending: false,
+        verificationRejected: false,
+        rejectionReason:     ''
     });
-    showToast(approved ? "✅ Student verified!" : "❌ Verification rejected.", approved ? 'success' : 'error');
+    showToast(approved ? '✅ Student verified!' : '✅ Done.', 'success');
 };
 
-// ─── CHATBOT ADMIN PANEL (real-time) ──────────────────
-function loadChatbotMessages() {
-    const container = document.getElementById('chatStudentList');
+// ─── REJECT WITH REASON ──────────────────────────────────
+window.promptReject = (uid) => {
+    document.getElementById('rejectModal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'rejectModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;' +
+                          'display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:28px;width:420px;max-width:95vw;
+                box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 6px;font-weight:800;">
+            <i class="fas fa-times-circle" style="color:#ef4444;"></i> Reject Verification
+        </h3>
+        <p style="color:#888;font-size:0.87rem;margin-bottom:14px;">
+            This reason will be shown to the student so they know how to fix it.
+        </p>
+        <label style="font-size:0.8rem;font-weight:700;color:#666;display:block;margin-bottom:6px;">
+            Rejection Reason *
+        </label>
+        <textarea id="rejectReasonInput" rows="3"
+            placeholder="e.g. ID is blurry — please upload a clearer photo. Or: Name on ID doesn't match."
+            style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:10px;
+                   outline:none;font-family:inherit;font-size:0.9rem;resize:vertical;
+                   margin-bottom:14px;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="window.submitReject('${uid}')"
+                    class="action-btn btn-reject"
+                    style="flex:1;justify-content:center;padding:10px;min-width:120px;">
+                <i class="fas fa-paper-plane"></i> Send Rejection
+            </button>
+            <button onclick="document.getElementById('rejectModal').remove()"
+                    style="background:#f3f4f6;color:#888;border:none;border-radius:8px;
+                           padding:10px 18px;cursor:pointer;font-weight:700;font-family:inherit;">
+                Cancel
+            </button>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+    document.getElementById('rejectReasonInput').focus();
+};
 
-    // FIX: Use a simpler query that doesn't require a composite index
-    // Just filter by type in JS after fetching
-    const q = query(
-        collection(db, "chatbot_messages"),
-        where("type", "==", "student_msg"),
-        orderBy("createdAt", "desc")
-    );
+window.submitReject = async (uid) => {
+    const reason = document.getElementById('rejectReasonInput').value.trim();
+    if (!reason) { showToast('Please provide a reason.', 'error'); return; }
+    await updateDoc(doc(db, 'users', uid), {
+        isVerified:           false,
+        verificationPending:  false,
+        verificationRejected: true,
+        rejectionReason:      reason
+    });
+    document.getElementById('rejectModal')?.remove();
+    showToast('❌ Rejected — reason sent to student.', 'success');
+};
 
-    onSnapshot(q, (snap) => {
-        const students = new Map();
-        snap.forEach(d => {
-            const m = d.data();
-            if (!m.studentId) return;
-            if (!students.has(m.studentId)) {
-                students.set(m.studentId, {
-                    name: m.studentName || 'Unknown',
-                    id: m.studentId,
-                    unread: 0,
-                    lastMsg: m.text || ''
-                });
-            }
-            if (!m.seen) students.get(m.studentId).unread++;
-        });
-
-        container.innerHTML = "";
-        if (students.size === 0) {
-            container.innerHTML = '<p class="no-data"><i class="fas fa-inbox"></i>No messages yet.</p>';
+// ─── SUPPORT TICKETS ─────────────────────────────────────
+function loadSupportTickets() {
+    const container = document.getElementById('ticketStudentList');
+    if (!container) return;
+    onSnapshot(query(collection(db, 'support_tickets'), orderBy('createdAt', 'desc')), snap => {
+        container.innerHTML = '';
+        if (snap.empty) {
+            container.innerHTML = `<p style="color:#bbb;text-align:center;padding:30px;font-size:0.88rem;">
+                No support tickets yet.</p>`;
             return;
         }
-
-        students.forEach((s) => {
-            const isActive = selectedStudentId === s.id;
+        snap.forEach(d => {
+            const t  = d.data();
+            const sc = t.status === 'resolved'    ? '#10b981'
+                     : t.status === 'in-progress' ? '#f59e0b' : '#6366f1';
+            const date = t.createdAt
+                ? new Date(t.createdAt.toDate()).toLocaleDateString('en-IN') : '';
             const div = document.createElement('div');
+            div.className = 'ticket-admin-card';
             div.innerHTML = `
-            <div onclick="window.openStudentChat('${s.id}', '${s.name.replace(/'/g, "\\'")}')"
-                 style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #e5e7eb;
-                        border-radius:10px; cursor:pointer; margin-bottom:8px;
-                        background:${isActive ? '#eef2ff' : 'white'}; transition:0.2s;">
-                <div style="width:40px; height:40px; border-radius:50%; background:#eef2ff; color:var(--primary);
-                            display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">
-                    ${(s.name[0] || '?').toUpperCase()}
+            <div style="background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;
+                        border:1.5px solid #e5e7eb;cursor:pointer;transition:0.15s;
+                        border-left:4px solid ${sc};"
+                 onclick="window.openTicket('${d.id}')">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap;">
+                            <span style="background:#eef2ff;color:var(--primary);padding:2px 9px;
+                                         border-radius:10px;font-size:0.74rem;font-weight:700;">
+                                ${t.category || 'General'}
+                            </span>
+                            <span style="color:${sc};font-size:0.76rem;font-weight:700;">
+                                ${t.status.toUpperCase()}
+                            </span>
+                        </div>
+                        <strong style="font-size:0.92rem;">${t.subject}</strong>
+                        <div style="color:#aaa;font-size:0.78rem;margin-top:2px;">
+                            ${t.studentName} • ${date}
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color:#ccc;flex-shrink:0;margin-top:4px;"></i>
                 </div>
-                <div style="flex:1; min-width:0;">
-                    <strong>${s.name}</strong>
-                    ${s.unread > 0 ? `<span style="background:var(--danger); color:white; border-radius:10px; padding:2px 8px; font-size:0.75rem; margin-left:6px;">${s.unread} new</span>` : ''}
-                    <div style="font-size:0.78rem; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.lastMsg}</div>
-                </div>
-                <i class="fas fa-chevron-right" style="color:#aaa; font-size:0.8rem; flex-shrink:0;"></i>
+                <p style="color:#666;font-size:0.83rem;margin:8px 0 0;line-height:1.5;
+                           overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;
+                           -webkit-box-orient:vertical;">${t.message}</p>
             </div>`;
             container.appendChild(div);
         });
-    }, (err) => {
-        console.error("Chatbot listener error:", err);
-        // If index error, show helpful message
-        if (err.code === 'failed-precondition') {
-            container.innerHTML = `<p class="no-data" style="color:orange;">
-                <i class="fas fa-exclamation-triangle"></i>
-                Firestore index required.<br>
-                <small>Go to Firebase Console → Firestore → Indexes and create a composite index for <strong>chatbot_messages</strong>: type (ASC) + createdAt (DESC)</small>
-            </p>`;
-        }
     });
 }
 
-window.openStudentChat = (studentId, studentName) => {
-    selectedStudentId = studentId;
-    document.getElementById('chatStudentName').innerText = studentName;
+window.openTicket = async (ticketId) => {
+    const snap = await getDoc(doc(db, 'support_tickets', ticketId));
+    if (!snap.exists()) return;
+    const t    = snap.data();
+    const date = t.createdAt ? new Date(t.createdAt.toDate()).toLocaleString('en-IN') : '';
 
-    // Show conversation area, hide placeholder
-    const placeholder = document.getElementById('chatPlaceholder');
-    const convoArea = document.getElementById('chatConvoArea');
-    if (placeholder) placeholder.style.display = 'none';
-    if (convoArea) convoArea.style.display = 'flex';
+    document.getElementById('ticketPlaceholder').style.display = 'none';
+    const panel = document.getElementById('ticketDetailPanel');
+    panel.style.display = 'flex';
 
-    if (chatListenerUnsub) chatListenerUnsub();
+    document.getElementById('ticketDetailContent').innerHTML = `
+    <div style="background:#f8fafc;border-radius:12px;padding:18px;margin-bottom:14px;
+                border:1.5px solid #e5e7eb;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;
+                    flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+            <div>
+                <span style="background:#eef2ff;color:var(--primary);padding:3px 12px;
+                             border-radius:12px;font-size:0.77rem;font-weight:700;">
+                    ${t.category || 'General'}
+                </span>
+                <h3 style="margin:8px 0 4px;font-size:1rem;">${t.subject}</h3>
+                <p style="color:#aaa;font-size:0.8rem;margin:0;">
+                    By ${t.studentName} (${t.studentEmail || ''}) • ${date}
+                </p>
+            </div>
+            <select onchange="window.updateTicketStatus('${ticketId}', this.value)"
+                    style="padding:6px 12px;border-radius:8px;border:1.5px solid #e5e7eb;
+                           font-weight:700;font-size:0.84rem;cursor:pointer;font-family:inherit;">
+                <option value="open"        ${t.status==='open'        ?'selected':''}>🔵 Open</option>
+                <option value="in-progress" ${t.status==='in-progress' ?'selected':''}>🟡 In Progress</option>
+                <option value="resolved"    ${t.status==='resolved'    ?'selected':''}>🟢 Resolved</option>
+            </select>
+        </div>
+        <div style="background:white;padding:14px;border-radius:8px;border:1px solid #eee;">
+            <p style="margin:0;font-size:0.9rem;line-height:1.6;color:#374151;">${t.message}</p>
+        </div>
+    </div>
+    ${t.adminReply ? `
+    <div style="background:#eef2ff;border-radius:12px;padding:14px;margin-bottom:14px;
+                border-left:4px solid var(--primary);">
+        <p style="color:var(--primary);font-weight:700;font-size:0.82rem;margin:0 0 6px;">
+            <i class="fas fa-shield-alt"></i> Your Previous Reply
+        </p>
+        <p style="margin:0;font-size:0.88rem;line-height:1.5;">${t.adminReply}</p>
+    </div>` : ''}`;
 
-    const q = query(
-        collection(db, "chatbot_messages"),
-        where("studentId", "==", studentId),
-        orderBy("createdAt", "asc")
-    );
-
-    chatListenerUnsub = onSnapshot(q, (snap) => {
-        const area = document.getElementById('adminChatMessages');
-        area.innerHTML = "";
-        snap.forEach(d => {
-            const m = d.data();
-            const isAdmin = m.type === 'admin_reply';
-            const div = document.createElement('div');
-            div.className = `admin-chat-msg ${isAdmin ? 'admin-reply' : 'student'}`;
-            div.innerHTML = `
-                <div class="msg-sender">${isAdmin ? '🛡️ Admin' : '👤 ' + (m.studentName || 'Student')}</div>
-                <div class="msg-text">${m.text}</div>`;
-            area.appendChild(div);
-            // Mark student messages as seen
-            if (!isAdmin && !m.seen) updateDoc(d.ref, { seen: true });
-        });
-        area.scrollTop = area.scrollHeight;
-
-        // Refresh the student list so unread counts update
-        loadChatbotMessages();
-    }, (err) => {
-        console.error("Chat conversation error:", err);
-    });
+    document.getElementById('adminTicketReplyInput').value = t.adminReply || '';
+    document.getElementById('adminTicketReplyInput').dataset.ticketId = ticketId;
 };
 
-window.sendAdminReply = async () => {
-    const input = document.getElementById('adminReplyInput');
-    const text = input.value.trim();
-    if (!text) return showToast("Type a message first.", 'error');
-    if (!selectedStudentId) return showToast("Select a student first.", 'error');
+window.updateTicketStatus = async (ticketId, status) => {
+    await updateDoc(doc(db, 'support_tickets', ticketId), { status, updatedAt: serverTimestamp() });
+    showToast('Status updated!', 'success');
+};
 
-    input.value = "";
-    input.disabled = true;
+window.sendTicketReply = async () => {
+    const input    = document.getElementById('adminTicketReplyInput');
+    const reply    = input.value.trim();
+    const ticketId = input.dataset.ticketId;
+    if (!reply || !ticketId) { showToast('Type a reply first.', 'error'); return; }
 
+    const btn = document.getElementById('sendTicketReplyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
     try {
-        await addDoc(collection(db, "chatbot_messages"), {
-            studentId: selectedStudentId,
-            studentName: "Admin",
-            text: text,
-            type: 'admin_reply',
-            seen: false,
-            createdAt: serverTimestamp()
+        await updateDoc(doc(db, 'support_tickets', ticketId), {
+            adminReply: reply, status: 'resolved', updatedAt: serverTimestamp()
         });
+        showToast('✅ Reply sent and ticket resolved!', 'success');
     } catch (err) {
-        showToast("Failed to send: " + err.message, 'error');
+        showToast('Failed: ' + err.message, 'error');
     } finally {
-        input.disabled = false;
-        input.focus();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reply';
     }
 };
