@@ -381,10 +381,10 @@ function loadMyTickets() {
     const container = document.getElementById('studentTicketList');
     if (!container || !currentUser) return;
 
+    // FIX: Use only where clause, then sort in JavaScript to avoid needing composite index
     onSnapshot(
         query(collection(db, 'support_tickets'),
-              where('studentUid', '==', currentUser.uid),
-              orderBy('createdAt', 'desc')),
+              where('studentUid', '==', currentUser.uid)),
         snap => {
             container.innerHTML = '';
             if (snap.empty) {
@@ -392,25 +392,40 @@ function loadMyTickets() {
                     No tickets yet. Create one above.</p>`;
                 return;
             }
+            
+            // Sort tickets by createdAt in JavaScript
+            const tickets = [];
             snap.forEach(d => {
                 const t = d.data();
-                const date = t.createdAt
-                    ? new Date(t.createdAt.toDate()).toLocaleDateString('en-IN') : '';
-                const sc = t.status === 'resolved'    ? '#10b981'
-                         : t.status === 'in-progress' ? '#f59e0b' : '#6366f1';
+                tickets.push({ id: d.id, ...t });
+            });
+            
+            // Sort by createdAt descending (newest first)
+            tickets.sort((a, b) => {
+                if (!a.createdAt) return 1;
+                if (!b.createdAt) return -1;
+                return b.createdAt.toMillis() - a.createdAt.toMillis();
+            });
+            
+            // Render sorted tickets
+            tickets.forEach(ticket => {
+                const date = ticket.createdAt
+                    ? new Date(ticket.createdAt.toDate()).toLocaleDateString('en-IN') : '';
+                const sc = ticket.status === 'resolved'    ? '#10b981'
+                         : ticket.status === 'in-progress' ? '#f59e0b' : '#6366f1';
                 container.innerHTML += `
                 <div style="background:#f8fafc;border-radius:10px;padding:13px 14px;margin-bottom:8px;
                             border:1.5px solid #e5e7eb;cursor:pointer;border-left:4px solid ${sc};"
-                     onclick="window.openTicketDetail('${d.id}')">
+                     onclick="window.openTicketDetail('${ticket.id}')">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                         <div style="flex:1;min-width:0;">
-                            <strong style="font-size:0.9rem;">${t.subject}</strong>
+                            <strong style="font-size:0.9rem;">${ticket.subject}</strong>
                             <p style="color:#999;font-size:0.8rem;margin:3px 0 0;">
-                                ${t.category || 'General'} • ${date}
+                                ${ticket.category || 'General'} • ${date}
                             </p>
                         </div>
                         <span style="color:${sc};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">
-                            ${t.status.toUpperCase()}
+                            ${ticket.status.toUpperCase()}
                         </span>
                     </div>
                 </div>`;

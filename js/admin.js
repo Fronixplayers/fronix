@@ -597,47 +597,64 @@ window.submitReject = async (uid) => {
 function loadSupportTickets() {
     const container = document.getElementById('ticketStudentList');
     if (!container) return;
-    onSnapshot(query(collection(db, 'support_tickets'), orderBy('createdAt', 'desc')), snap => {
+    
+    // FIX: Load all tickets, then sort in JavaScript to avoid index issues
+    onSnapshot(collection(db, 'support_tickets'), snap => {
         container.innerHTML = '';
         if (snap.empty) {
             container.innerHTML = `<p style="color:#bbb;text-align:center;padding:30px;font-size:0.88rem;">
                 No support tickets yet.</p>`;
             return;
         }
+        
+        // Collect and sort tickets
+        const tickets = [];
         snap.forEach(d => {
-            const t  = d.data();
-            const sc = t.status === 'resolved'    ? '#10b981'
-                     : t.status === 'in-progress' ? '#f59e0b' : '#6366f1';
-            const date = t.createdAt
-                ? new Date(t.createdAt.toDate()).toLocaleDateString('en-IN') : '';
+            const t = d.data();
+            tickets.push({ id: d.id, ...t });
+        });
+        
+        // Sort by createdAt descending (newest first)
+        tickets.sort((a, b) => {
+            if (!a.createdAt) return 1;
+            if (!b.createdAt) return -1;
+            return b.createdAt.toMillis() - a.createdAt.toMillis();
+        });
+        
+        // Render sorted tickets
+        tickets.forEach(ticket => {
+            const sc = ticket.status === 'resolved'    ? '#10b981'
+                     : ticket.status === 'in-progress' ? '#f59e0b' : '#6366f1';
+            const date = ticket.createdAt
+                ? new Date(ticket.createdAt.toDate()).toLocaleDateString('en-IN') : '';
             const div = document.createElement('div');
             div.className = 'ticket-admin-card';
             div.innerHTML = `
             <div style="background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;
                         border:1.5px solid #e5e7eb;cursor:pointer;transition:0.15s;
                         border-left:4px solid ${sc};"
-                 onclick="window.openTicket('${d.id}')">
+                 onclick="window.openTicket('${ticket.id}')">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                     <div style="flex:1;min-width:0;">
                         <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap;">
                             <span style="background:#eef2ff;color:var(--primary);padding:2px 9px;
                                          border-radius:10px;font-size:0.74rem;font-weight:700;">
-                                ${t.category || 'General'}
+                                ${ticket.category || 'General'}
                             </span>
                             <span style="color:${sc};font-size:0.76rem;font-weight:700;">
-                                ${t.status.toUpperCase()}
+                                ${ticket.status.toUpperCase()}
                             </span>
                         </div>
-                        <strong style="font-size:0.92rem;">${t.subject}</strong>
+                        <strong style="font-size:0.92rem;">${ticket.subject}</strong>
                         <div style="color:#aaa;font-size:0.78rem;margin-top:2px;">
-                            ${t.studentName} • ${date}
+                            ${ticket.studentName} • ${date}
                         </div>
                     </div>
                     <i class="fas fa-chevron-right" style="color:#ccc;flex-shrink:0;margin-top:4px;"></i>
                 </div>
                 <p style="color:#666;font-size:0.83rem;margin:8px 0 0;line-height:1.5;
                            overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;
-                           -webkit-box-orient:vertical;">${t.message}</p>
+                           -webkit-box-orient:vertical;">${ticket.message}</p>
             </div>`;
             container.appendChild(div);
         });
