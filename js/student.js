@@ -1,374 +1,247 @@
-// js/student.js — FronixLearner (FIXED: dashboard badge, ID tab logic, avatar, support)
+// js/student.js — FronixLearner Student Dashboard Logic (FIXED)
 
 import {
-    auth, db,
+    auth, db, storage,
     onAuthStateChanged, signOut,
-    collection, addDoc, getDoc, doc, onSnapshot,
-    query, orderBy, serverTimestamp, updateDoc,
-    where, limit
+    collection, addDoc, getDoc, getDocs, doc, onSnapshot,
+    query, orderBy, serverTimestamp, updateDoc, increment,
+    where, limit, setDoc,
+    ref, uploadBytesResumable, getDownloadURL
 } from './firebase-config.js';
 
+// ─── STATE ───────────────────────────────────────────
 let currentUser   = null;
-let currentCourseId = null;
-let currentPlaylist = [];
-let currentCourseDriveLink = '';
-let currentCourseTitle = '';
-let selectedAvatar = '';
+let currentCourseId  = null;
+let currentPlaylist  = [];
+let selectedAvatar   = "";
+const avatarSeeds    = ['Felix','Aneka','Mittens','Bubba','Sorelle','Destiny','Shadow','Max'];
+const BBA_DRIVE_LINK = "https://drive.google.com/drive/folders/1DNaT7uUiVoHKQkj8LejyUmKASot2gQz1";
 
-// ─── TOAST ──────────────────────────────────────────────
+// ─── TOAST ───────────────────────────────────────────
 function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
-    const icon = type === 'error' ? 'exclamation-circle'
-               : type === 'success' ? 'check-circle'
-               : 'info-circle';
-    t.innerHTML = `<div class="toast-inner ${type}"><i class="fas fa-${icon}"></i><span>${msg}</span></div>`;
+    t.innerHTML = `<div class="toast-inner ${type}">
+        <i class="fas fa-${type==='error'?'exclamation-circle':type==='success'?'check-circle':'info-circle'}"></i>
+        <span>${msg}</span></div>`;
     t.style.display = 'block';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.style.display = 'none'; }, 5000);
+    setTimeout(() => t.style.display = 'none', 4500);
 }
 
-// ─── AUTH ────────────────────────────────────────────────
-onAuthStateChanged(auth, (user) => {
-    if (!user) { window.location.href = 'index.html'; return; }
+// ─── SINGLE TAB ENFORCEMENT ───────────────────────────
+const channel = new BroadcastChannel('fronix_active_session');
+channel.postMessage('new-tab-opened');
+channel.onmessage = (e) => {
+    if (e.data === 'new-tab-opened') channel.postMessage('tab-already-exists');
+    else if (e.data === 'tab-already-exists') {
+        alert("FronixLearner is already open in another tab.");
+        window.location.href = 'index.html';
+    }
+};
 
-    // Real-time listener so UI updates immediately when admin changes data
-    onSnapshot(doc(db, 'users', user.uid), (snap) => {
-        if (!snap.exists()) { signOut(auth).then(() => window.location.href = 'index.html'); return; }
-
-        const data = snap.data();
-        if (data.isBlocked) {
-            showToast('🚫 Your account has been blocked. Contact support.', 'error');
-            setTimeout(() => signOut(auth).then(() => window.location.href = 'index.html'), 3000);
-            return;
-        }
-
-        currentUser = { ...data, uid: user.uid };
-        if (!currentUser.avatar)
-            currentUser.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`;
-
-        updateUI();
-        loadCourses();
-        loadCourseResources();
-    });
+// ─── AUTH GUARD ───────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        onSnapshot(doc(db, "users", user.uid), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.isBlocked) {
+                    alert("Your account has been blocked by admin.");
+                    signOut(auth).then(() => window.location.href = 'index.html');
+                    return;
+                }
+                currentUser = { ...data, uid: user.uid };
+                if (!currentUser.avatar)
+                    currentUser.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`;
+                updateUI();
+                loadCourses();
+            } else {
+                signOut(auth).then(() => window.location.href = 'index.html');
+            }
+        });
+    } else {
+        window.location.href = 'index.html';
+    }
 });
 
-// ─── UPDATE UI ───────────────────────────────────────────
+// ─── UPDATE UI ────────────────────────────────────────
 function updateUI() {
-    const u = currentUser;
+    document.getElementById('welcomeName').innerText = currentUser.name || 'Student';
+    document.getElementById('headerAvatar').src      = currentUser.avatar;
+    document.getElementById('verifiedBadge').innerText = currentUser.isVerified ? "Yes ✓" : "No";
 
-    // General profile elements
-    const nameEl   = document.getElementById('welcomeName');
-    const avatarEl = document.getElementById('headerAvatar');
-    const vStatus  = document.getElementById('verificationStatus');
-
-    if (nameEl)   nameEl.innerText  = u.name   || 'Student';
-    if (avatarEl) avatarEl.src      = u.avatar;
-
-    // ── Build status text ──
-    let statusText, statusColor, dashText;
-    if (u.isVerified) {
-        statusText = '✓ Verified Student';
-        statusColor = '#10b981';
-        dashText = '✓ Verified';
-    } else if (u.verificationPending) {
-        statusText = '⏳ Pending Verification';
-        statusColor = '#f59e0b';
-        dashText = 'Pending';
-    } else if (u.verificationRejected) {
-        statusText = '❌ Verification Rejected';
-        statusColor = '#ef4444';
-        dashText = 'Rejected';
+    const lockBadge = document.getElementById('bbaLockStatus');
+    if (currentUser.isVerified) {
+        lockBadge.className = 'lock-badge status-unlocked';
+        lockBadge.innerHTML = '<i class="fas fa-lock-open"></i> Access';
     } else {
-        statusText = 'Unverified';
-        statusColor = '#ef4444';
-        dashText = 'Not Verified';
+        lockBadge.className = 'lock-badge status-locked';
+        lockBadge.innerHTML = '<i class="fas fa-lock"></i> Locked';
     }
 
-    if (vStatus) { vStatus.innerText = statusText; vStatus.style.color = statusColor; }
-
-    // FIX: update dashboard stat badge (separate element from profile badge)
-    const dashBadge = document.getElementById('dashVerifiedBadge');
-    if (dashBadge) {
-        dashBadge.innerText = dashText;
-        dashBadge.style.color = statusColor;
-        dashBadge.style.fontSize = '0.9rem';
-    }
-
-    // Profile → General tab badge
-    const profileBadge = document.getElementById('verifiedBadge');
-    if (profileBadge) {
-        profileBadge.innerText = statusText;
-        profileBadge.style.color = statusColor;
-    }
-
-    // ── ID Verification tab logic ──
     const uploadSection = document.getElementById('uploadSection');
     const pendingMsg    = document.getElementById('pendingMsg');
     const verifiedMsg   = document.getElementById('verifiedMsg');
-    const rejectedMsg   = document.getElementById('rejectedMsg');
-    const idHeader      = document.getElementById('idVerifyHeader');
 
-    // Hide all first
-    [uploadSection, pendingMsg, verifiedMsg, rejectedMsg].forEach(el => {
-        if (el) el.style.display = 'none';
-    });
-
-    if (u.isVerified) {
-        // FIX: when verified — show ONLY verified message, hide "Upload your ID" heading
-        if (verifiedMsg) verifiedMsg.style.display = 'block';
-        if (idHeader)    idHeader.style.display     = 'none';
-
-    } else if (u.verificationRejected) {
-        if (idHeader)      idHeader.style.display    = 'block';
-        if (uploadSection) uploadSection.style.display = 'block';
-        if (rejectedMsg) {
-            rejectedMsg.style.display = 'block';
-            const r = document.getElementById('rejectionReason');
-            if (r) r.innerText = u.rejectionReason || 'No specific reason given.';
-        }
-
-    } else if (u.verificationPending) {
-        if (idHeader)   idHeader.style.display   = 'block';
-        if (pendingMsg) pendingMsg.style.display  = 'block';
-
+    if (currentUser.isVerified) {
+        uploadSection.style.display = 'none';
+        pendingMsg.style.display    = 'none';
+        verifiedMsg.style.display   = 'block';
+    } else if (currentUser.verificationPending) {
+        uploadSection.style.display = 'none';
+        pendingMsg.style.display    = 'block';
+        verifiedMsg.style.display   = 'none';
     } else {
-        // Not submitted yet
-        if (idHeader)      idHeader.style.display      = 'block';
-        if (uploadSection) uploadSection.style.display = 'block';
+        uploadSection.style.display = 'block';
+        pendingMsg.style.display    = 'none';
+        verifiedMsg.style.display   = 'none';
     }
+
+    document.getElementById('verificationStatus').innerText = currentUser.isVerified
+        ? "✓ Verified Student"
+        : (currentUser.verificationPending ? "⏳ Pending Verification" : "Unverified");
 }
 
-// ─── NAVIGATION ──────────────────────────────────────────
-window.switchView = (view, el) => {
-    ['viewCourses', 'viewResources', 'viewSupport'].forEach(id => {
-        const e = document.getElementById(id);
-        if (e) e.style.display = 'none';
-    });
-
-    const target = document.getElementById('view' + view.charAt(0).toUpperCase() + view.slice(1));
-    if (target) target.style.display = 'block';
-
+// ─── NAVIGATION ───────────────────────────────────────
+window.switchView = (view) => {
+    document.getElementById('viewCourses').style.display   = view === 'courses'   ? 'block' : 'none';
+    document.getElementById('viewResources').style.display = view === 'resources' ? 'block' : 'none';
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    if (el) el.classList.add('active');
-
-    if (view === 'support') loadMyTickets();
-
-    // Close sidebar on mobile
-    if (window.innerWidth <= 900) {
-        document.querySelector('aside')?.classList.remove('open');
-        document.querySelector('.sidebar-overlay')?.classList.remove('active');
-    }
+    event.currentTarget.classList.add('active');
+    if (window.innerWidth <= 900) document.querySelector('aside').classList.remove('open');
 };
-
-window.toggleSidebar = () => {
-    document.querySelector('aside')?.classList.toggle('open');
-    document.querySelector('.sidebar-overlay')?.classList.toggle('active');
-};
-
+window.toggleSidebar = () => document.querySelector('aside').classList.toggle('open');
 window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
 
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 900) {
-        document.querySelector('aside')?.classList.remove('open');
-        document.querySelector('.sidebar-overlay')?.classList.remove('active');
-    }
-});
-
-// ─── COURSES ─────────────────────────────────────────────
+// ─── COURSES (real-time) ──────────────────────────────
 function loadCourses() {
-    onSnapshot(query(collection(db, 'courses'), orderBy('createdAt', 'desc')), (snap) => {
+    onSnapshot(query(collection(db, "courses"), orderBy("createdAt", "desc")), (snap) => {
         const g = document.getElementById('courseGrid');
-        const countEl = document.getElementById('statCoursesCount');
-        if (countEl) countEl.innerText = snap.size;
-
-        g.innerHTML = '';
+        g.innerHTML = "";
         if (snap.empty) {
-            g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#999;">
-                <i class="fas fa-book-open" style="font-size:3rem;display:block;margin-bottom:12px;"></i>
-                No courses published yet.</div>`;
+            g.innerHTML = `<p style="color:#999;grid-column:1/-1;text-align:center;padding:40px;">No courses yet.</p>`;
             return;
         }
-
         snap.forEach(d => {
             const c = d.data();
-            const firstVid = c.playlist?.length ? c.playlist[0].videoId : (c.videoId || '');
-            const thumb = c.customThumbnail
-                || (firstVid ? `https://img.youtube.com/vi/${firstVid}/hqdefault.jpg`
-                    : `https://placehold.co/400x220/4F46E5/white?text=${encodeURIComponent(c.title||'Course')}`);
-            const price = c.isFree !== false
-                ? `<span class="badge badge-free"><i class="fas fa-lock-open"></i> Free</span>`
-                : `<span class="badge badge-paid"><i class="fas fa-lock"></i> Paid</span>`;
-            const lessons = c.playlist?.length || 1;
-
+            const v = (c.playlist && c.playlist.length) ? c.playlist[0].videoId : c.videoId || '';
+            const priceBadge = c.isFree !== false
+                ? `<span class="badge badge-free" style="font-size:0.72rem;"><i class="fas fa-lock-open"></i> Free</span>`
+                : `<span class="badge badge-paid" style="font-size:0.72rem;"><i class="fas fa-lock"></i> Paid</span>`;
             g.innerHTML += `
             <div class="course-card" onclick="window.openCourse('${d.id}')">
-                <div style="position:relative;">
-                    <img class="course-thumbnail" src="${thumb}" alt="${c.title}"
-                         onerror="this.src='https://placehold.co/400x220/4F46E5/white?text=Course'">
-                    <div class="play-hover" style="position:absolute;inset:0;background:rgba(0,0,0,0.28);
-                         display:flex;align-items:center;justify-content:center;opacity:0;transition:0.3s;">
-                        <i class="fas fa-play-circle" style="font-size:3rem;color:white;"></i>
-                    </div>
-                </div>
-                <div class="course-badge">${price}</div>
+                <img class="course-thumbnail"
+                     src="https://img.youtube.com/vi/${v}/hqdefault.jpg"
+                     alt="${c.title}"
+                     onerror="this.src='https://placehold.co/400x220/6366f1/white?text=Course'">
+                <div class="course-badge">${priceBadge}</div>
                 <div class="course-info">
                     <h4>${c.title}</h4>
-                    <p>${c.instructor || ''} • ${lessons} lesson${lessons !== 1 ? 's' : ''}</p>
+                    <p>${c.instructor || ''} • ${c.playlist ? c.playlist.length : 1} lessons</p>
                 </div>
             </div>`;
-        });
-
-        // Hover effect
-        document.querySelectorAll('.course-card').forEach(card => {
-            const h = card.querySelector('.play-hover');
-            card.addEventListener('mouseenter', () => { if (h) h.style.opacity = '1'; });
-            card.addEventListener('mouseleave', () => { if (h) h.style.opacity = '0'; });
         });
     });
 }
 
-// ─── RESOURCES HUB ───────────────────────────────────────
-function loadCourseResources() {
-    const container = document.getElementById('courseResourcesList');
-    if (!container) return;
-
-    onSnapshot(query(collection(db, 'courses'), orderBy('createdAt', 'desc')), (snap) => {
-        container.innerHTML = '';
-        let found = 0;
-
-        snap.forEach(d => {
-            const c = d.data();
-            if (!c.driveLink) return;
-            found++;
-            const isVer = currentUser?.isVerified;
-            const onclick = isVer
-                ? `window.open('${c.driveLink}','_blank')`
-                : `window.showVerifyAlert()`;
-
-            container.innerHTML += `
-            <div class="resource-card" onclick="${onclick}">
-                <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
-                    <div class="res-icon" style="background:#e8f5e9;color:#10b981;">
-                        <i class="fab fa-google-drive"></i>
-                    </div>
-                    <div class="res-info" style="min-width:0;">
-                        <h3 style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.title} — Notes</h3>
-                        <p>${c.category || 'Course'} • ${isVer ? 'Click to open Drive' : 'Verified Students Only'}</p>
-                    </div>
-                </div>
-                <div class="lock-badge ${isVer ? 'status-unlocked' : 'status-locked'}">
-                    <i class="fas fa-${isVer ? 'lock-open' : 'lock'}"></i>
-                    ${isVer ? 'Open' : 'Locked'}
-                </div>
-            </div>`;
-        });
-
-        if (!found) {
-            container.innerHTML = `<p style="color:#bbb;text-align:center;padding:40px;font-size:0.9rem;">
-                No course notes have been added by admin yet.</p>`;
-        }
-    });
-}
-
-window.showVerifyAlert = () => {
-    showToast('🔒 Verify your College ID to access course notes!', 'error');
-    window.openProfile();
-    window.switchProfileTab('id');
-};
-
-// ─── COURSE PLAYER ───────────────────────────────────────
+// ─── COURSE PLAYER ────────────────────────────────────
 window.openCourse = async (id) => {
     currentCourseId = id;
-    // FIX: show modal using flex
-    const modal = document.getElementById('courseModal');
-    modal.style.display = 'flex';
+    document.getElementById('courseModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
-
-    const snap = await getDoc(doc(db, 'courses', id));
-    if (!snap.exists()) return;
+    const snap = await getDoc(doc(db, "courses", id));
     const c = snap.data();
-    currentCourseTitle     = c.title || '';
-    currentCourseDriveLink = c.driveLink || '';
-    currentPlaylist = c.playlist?.length
-        ? c.playlist
-        : (c.videoId ? [{ title: c.title || 'Lesson 1', videoId: c.videoId }] : []);
-
+    currentPlaylist = c.playlist || [{ title: "Lesson 1", videoId: c.videoId || '' }];
+    document.getElementById('likeCount').innerText = c.likes || 0;
     window.loadVideo(0);
-    window.switchTab('lessons');
+    switchCourseTab('lessons');
 };
 
 window.loadVideo = (idx) => {
-    if (!currentPlaylist[idx]) return;
     const lesson = currentPlaylist[idx];
-
-    // Clean embed — no related videos, no share, no branding
-    const embedUrl = `https://www.youtube-nocookie.com/embed/${lesson.videoId}` +
-        `?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&fs=1&controls=1`;
-
-    document.getElementById('playerFrame').src = embedUrl;
-
-    const titleEl = document.getElementById('currentLessonTitle');
-    if (titleEl) titleEl.innerText = lesson.title || `Lesson ${idx + 1}`;
-
-    // Render playlist
+    document.getElementById('playerFrame').src =
+        `https://www.youtube.com/embed/${lesson.videoId}?autoplay=1`;
+    document.getElementById('currentLessonTitle').innerText = lesson.title || `Lesson ${idx + 1}`;
     const container = document.getElementById('playlistContainer');
-    if (container) {
-        container.innerHTML = currentPlaylist.map((l, i) => `
-            <div class="lesson-item ${i === idx ? 'active' : ''}" onclick="window.loadVideo(${i})">
-                <div class="lesson-num">${i + 1}</div>
-                <div style="flex:1;min-width:0;line-height:1.3;">${l.title || 'Lesson ' + (i+1)}</div>
-                ${i === idx ? '<i class="fas fa-play" style="color:var(--primary);font-size:0.72rem;flex-shrink:0;"></i>' : ''}
-            </div>`).join('');
-    }
+    container.innerHTML = currentPlaylist.map((l, i) => `
+        <div class="lesson-item ${i === idx ? 'active' : ''}" onclick="window.loadVideo(${i})">
+            <div class="lesson-num">${i + 1}</div>
+            <span>${l.title || 'Lesson ' + (i + 1)}</span>
+        </div>`).join('');
 };
 
-window.switchTab = (t) => {
-    document.querySelectorAll('#courseModal .tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('#courseModal .tab').forEach(el => el.classList.remove('active'));
-
+window.switchTab = (t) => switchCourseTab(t);
+function switchCourseTab(t) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     const tabEl = document.getElementById(t + 'Tab');
     if (tabEl) tabEl.classList.add('active');
-
-    const tabBtns = document.querySelectorAll('#courseModal .tab');
-    const map = { lessons: 0, drive: 1 };
-    if (tabBtns[map[t]]) tabBtns[map[t]].classList.add('active');
+    const map = { lessons: 0, drive: 1, chat: 2 };
+    const tabEls = document.querySelectorAll('.tab');
+    if (tabEls[map[t]]) tabEls[map[t]].classList.add('active');
 
     if (t === 'drive') {
         const div = document.getElementById('driveAccessMsg');
-        if (!div) return;
-        const isVer  = currentUser?.isVerified;
-        const link   = currentCourseDriveLink;
-
-        if (isVer && link) {
-            div.innerHTML = `
-            <div style="text-align:center;padding:30px;cursor:pointer;" onclick="window.open('${link}','_blank')">
-                <i class="fab fa-google-drive" style="font-size:3rem;color:#4285F4;display:block;margin-bottom:12px;"></i>
-                <strong style="font-size:1rem;">Open ${currentCourseTitle} Notes</strong>
-                <p style="color:#888;margin-top:8px;font-size:0.85rem;">Verified Access ✓ — Click to open Google Drive</p>
-            </div>`;
-        } else if (isVer) {
-            div.innerHTML = `
-            <div style="text-align:center;padding:30px;">
-                <i class="fas fa-file-alt" style="font-size:3rem;color:#ccc;display:block;margin-bottom:12px;"></i>
-                <strong>No Notes Added Yet</strong>
-                <p style="color:#888;margin-top:8px;font-size:0.85rem;">Admin hasn't added resources for this course.</p>
-            </div>`;
-        } else {
-            div.innerHTML = `
-            <div style="text-align:center;padding:30px;">
-                <i class="fas fa-lock" style="font-size:3rem;color:#ef4444;display:block;margin-bottom:12px;"></i>
-                <strong>Verification Required</strong>
-                <p style="color:#888;margin-top:8px;font-size:0.85rem;">Upload your College ID in Profile → ID Verify.</p>
-                <button onclick="document.getElementById('courseModal').style.display='none';
-                                 document.body.style.overflow='';
-                                 window.openProfile();window.switchProfileTab('id');"
-                    class="btn" style="margin-top:14px;padding:9px 20px;">
-                    <i class="fas fa-id-card"></i> Verify Now
-                </button>
-            </div>`;
-        }
+        div.innerHTML = currentUser?.isVerified
+            ? `<div class="drive-unlocked" onclick="window.open('${BBA_DRIVE_LINK}','_blank')" style="text-align:center;padding:30px;cursor:pointer;">
+                   <i class="fab fa-google-drive" style="font-size:3rem;color:#4285f4;"></i><br><br>
+                   <strong>Click to Open Resources</strong><br>
+                   <small>Verified Access Granted</small>
+               </div>`
+            : `<div class="drive-locked" style="text-align:center;padding:30px;">
+                   <i class="fas fa-lock" style="font-size:2.5rem;color:#ef4444;"></i><br><br>
+                   <strong>Verification Required</strong><br>
+                   <small>Upload your College ID in Profile → ID Verification tab.</small>
+               </div>`;
+    } else if (t === 'chat') {
+        loadCourseComments();
     }
+}
+
+window.toggleLike = async () => {
+    if (!currentCourseId) return;
+    await updateDoc(doc(db, "courses", currentCourseId), { likes: increment(1) });
+    document.getElementById('likeCount').innerText =
+        parseInt(document.getElementById('likeCount').innerText) + 1;
 };
+
+function loadCourseComments() {
+    onSnapshot(
+        query(collection(db, "comments"),
+              where("courseId", "==", currentCourseId),
+              orderBy("createdAt", "asc")),
+        (snap) => {
+            const l = document.getElementById('chatList');
+            l.innerHTML = "";
+            snap.forEach(d => {
+                const m = d.data();
+                const isMe = m.userId === currentUser?.uid;
+                l.innerHTML += `
+                <div class="chat-msg ${isMe ? 'mine' : 'other'}">
+                    ${!isMe ? `<div class="sender">${m.userName}</div>` : ''}
+                    <div>${m.text}</div>
+                </div>`;
+            });
+            l.scrollTop = l.scrollHeight;
+        }
+    );
+}
+
+window.handleSend = async () => {
+    const txt = document.getElementById('interactionInput').value.trim();
+    if (!txt || !currentUser) return;
+    await addDoc(collection(db, "comments"), {
+        courseId: currentCourseId,
+        text: txt,
+        userName: currentUser.name,
+        userId: currentUser.uid,
+        createdAt: serverTimestamp()
+    });
+    document.getElementById('interactionInput').value = "";
+};
+
+document.getElementById('interactionInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') window.handleSend();
+});
 
 window.closeCourseModal = () => {
     document.getElementById('courseModal').style.display = 'none';
@@ -376,220 +249,332 @@ window.closeCourseModal = () => {
     document.body.style.overflow = '';
 };
 
-// ─── SUPPORT TICKETS ─────────────────────────────────────
-function loadMyTickets() {
-    const container = document.getElementById('studentTicketList');
-    if (!container || !currentUser) return;
-
-    // FIX: Use only where clause, then sort in JavaScript to avoid needing composite index
-    onSnapshot(
-        query(collection(db, 'support_tickets'),
-              where('studentUid', '==', currentUser.uid)),
-        snap => {
-            container.innerHTML = '';
-            if (snap.empty) {
-                container.innerHTML = `<p style="color:#bbb;text-align:center;padding:20px;font-size:0.9rem;">
-                    No tickets yet. Create one above.</p>`;
-                return;
-            }
-            
-            // Sort tickets by createdAt in JavaScript
-            const tickets = [];
-            snap.forEach(d => {
-                const t = d.data();
-                tickets.push({ id: d.id, ...t });
-            });
-            
-            // Sort by createdAt descending (newest first)
-            tickets.sort((a, b) => {
-                if (!a.createdAt) return 1;
-                if (!b.createdAt) return -1;
-                return b.createdAt.toMillis() - a.createdAt.toMillis();
-            });
-            
-            // Render sorted tickets
-            tickets.forEach(ticket => {
-                const date = ticket.createdAt
-                    ? new Date(ticket.createdAt.toDate()).toLocaleDateString('en-IN') : '';
-                const sc = ticket.status === 'resolved'    ? '#10b981'
-                         : ticket.status === 'in-progress' ? '#f59e0b' : '#6366f1';
-                container.innerHTML += `
-                <div style="background:#f8fafc;border-radius:10px;padding:13px 14px;margin-bottom:8px;
-                            border:1.5px solid #e5e7eb;cursor:pointer;border-left:4px solid ${sc};"
-                     onclick="window.openTicketDetail('${ticket.id}')">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                        <div style="flex:1;min-width:0;">
-                            <strong style="font-size:0.9rem;">${ticket.subject}</strong>
-                            <p style="color:#999;font-size:0.8rem;margin:3px 0 0;">
-                                ${ticket.category || 'General'} • ${date}
-                            </p>
-                        </div>
-                        <span style="color:${sc};font-size:0.72rem;font-weight:700;white-space:nowrap;flex-shrink:0;">
-                            ${ticket.status.toUpperCase()}
-                        </span>
-                    </div>
-                </div>`;
-            });
-        }
-    );
-}
-
-window.openTicketDetail = async (ticketId) => {
-    const snap = await getDoc(doc(db, 'support_tickets', ticketId));
-    if (!snap.exists()) return;
-    const t = snap.data();
-    const date = t.createdAt ? new Date(t.createdAt.toDate()).toLocaleString('en-IN') : '';
-
-    document.getElementById('ticketDetailContent').innerHTML = `
-    <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:12px;border:1.5px solid #e5e7eb;">
-        <span style="background:#eef2ff;color:var(--primary);padding:2px 10px;border-radius:10px;
-                     font-size:0.76rem;font-weight:700;">${t.category || 'General'}</span>
-        <h3 style="margin:8px 0 4px;font-size:0.97rem;">${t.subject}</h3>
-        <p style="color:#999;font-size:0.8rem;margin:0 0 10px;">${date}</p>
-        <div style="background:white;padding:12px;border-radius:8px;border:1px solid #eee;">
-            <p style="margin:0;font-size:0.9rem;line-height:1.6;color:#374151;">${t.message}</p>
-        </div>
-    </div>
-    ${t.adminReply ? `
-    <div style="background:#e8f5e9;border-radius:10px;padding:14px;border-left:4px solid #10b981;">
-        <p style="color:#10b981;font-weight:700;font-size:0.82rem;margin:0 0 6px;">
-            <i class="fas fa-user-shield"></i> Admin Response
-        </p>
-        <p style="margin:0;font-size:0.9rem;line-height:1.5;color:#333;">${t.adminReply}</p>
-    </div>` : `
-    <p style="color:#bbb;font-size:0.85rem;text-align:center;padding:12px 0;">
-        No admin reply yet. Check back later.
-    </p>`}`;
-
-    document.getElementById('ticketDetailPanel').style.display = 'block';
-};
-
-window.createTicket = async (e) => {
-    e.preventDefault();
-    const subject  = document.getElementById('ticketSubject').value.trim();
-    const category = document.getElementById('ticketCategory').value;
-    const message  = document.getElementById('ticketMessage').value.trim();
-
-    if (!subject || !message) { showToast('Please fill all fields.', 'error'); return; }
-
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-
-    try {
-        await addDoc(collection(db, 'support_tickets'), {
-            studentUid:   currentUser.uid,
-            studentName:  currentUser.name,
-            studentEmail: currentUser.email,
-            subject, category, message,
-            status:    'open',
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-        });
-        showToast('✅ Ticket submitted! Admin will reply soon.', 'success');
-        document.getElementById('ticketForm').reset();
-        loadMyTickets();
-    } catch (err) {
-        showToast('Error: ' + err.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Ticket';
+// ─── RESOURCES ────────────────────────────────────────
+window.accessDrive = () => {
+    if (currentUser?.isVerified) window.open(BBA_DRIVE_LINK, '_blank');
+    else {
+        showToast("🔒 Verify your College ID first!", 'error');
+        window.openProfile();
+        window.switchProfileTab('id');
     }
 };
 
-// ─── PROFILE ─────────────────────────────────────────────
+// ─── LEADERBOARD ─────────────────────────────────────
+window.openLeaderboard = () => {
+    document.getElementById('leaderboardModal').style.display = 'flex';
+    const list = document.getElementById('lbList');
+    list.innerHTML = "Loading…";
+    const q = query(collection(db, "users"),
+                    where("role", "==", "Student"),
+                    orderBy("xp", "desc"),
+                    limit(10));
+    onSnapshot(q, (snap) => {
+        list.innerHTML = "";
+        let r = 1;
+        snap.forEach(d => {
+            const u = d.data();
+            const rankClass = r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '';
+            list.innerHTML += `
+            <div class="lb-item">
+                <div class="lb-rank ${rankClass}">#${r++}</div>
+                <div class="lb-user">
+                    <img class="lb-avatar"
+                         src="${u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.name}`}"
+                         alt="${u.name}">
+                    <span>${u.name}</span>
+                </div>
+                <div style="font-weight:800;color:#f59e0b;">${u.xp || 0} XP</div>
+            </div>`;
+        });
+        if (snap.empty)
+            list.innerHTML = '<p style="text-align:center;color:#999;">No rankings yet.</p>';
+    }, () => {
+        list.innerHTML = '<p style="text-align:center;color:#999;">No rankings yet.</p>';
+    });
+};
+
+// ─── PROFILE ──────────────────────────────────────────
 window.openProfile = () => {
     document.getElementById('profileModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    window.switchProfileTab('general');
+    document.getElementById('profileNameDisplay').innerText  = currentUser?.name || '';
+    document.getElementById('profileCurrentAvatar').src      = currentUser?.avatar || '';
+    document.getElementById('settingsName').value            = currentUser?.name || '';
+    document.getElementById('settingsBio').value             = currentUser?.bio  || '';
+    document.getElementById('verificationStatus').innerText  = currentUser?.isVerified
+        ? "✓ Verified Student"
+        : (currentUser?.verificationPending ? "⏳ Pending Verification" : "Unverified Student");
+
+    const grid = document.getElementById('avatarGrid');
+    grid.innerHTML = "";
+    avatarSeeds.forEach(seed => {
+        const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+        grid.innerHTML += `<img src="${url}" class="avatar-option ${currentUser?.avatar === url ? 'selected' : ''}"
+                               onclick="window.selectAvatar(this,'${url}')">`;
+    });
+
+    switchProfileTabInternal('edit');
+    loadCertWallet();
 };
 
-window.closeProfileModal = () => {
-    document.getElementById('profileModal').style.display = 'none';
-    document.body.style.overflow = '';
-};
-
-window.switchProfileTab = (tab) => {
+window.switchProfileTab = (tab) => switchProfileTabInternal(tab);
+function switchProfileTabInternal(tab) {
     document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.profile-tab-content').forEach(c => c.style.display = 'none');
-
-    const btn = document.querySelector(`[data-tab="${tab}"]`);
-    if (btn) btn.classList.add('active');
-
-    const el = document.getElementById(tab + 'Tab');
-    if (el) el.style.display = 'block';
-
-    // Load leaderboard when tab opened
-    if (tab === 'leaderboard') loadLeaderboard();
-};
-
-// ─── ID UPLOAD ───────────────────────────────────────────
-window.uploadID = async () => {
-    const file = document.getElementById('idFileInput').files[0];
-    if (!file) { showToast('Please select an image file.', 'error'); return; }
-
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-        try {
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                idImage:            ev.target.result,
-                verificationPending: true,
-                verificationRejected: false,
-                idUploadedAt:       serverTimestamp()
-            });
-            showToast('✅ ID uploaded! Admin will review soon.', 'success');
-            document.getElementById('idFileInput').value = '';
-        } catch (err) {
-            showToast('Upload failed: ' + err.message, 'error');
-        }
-    };
-    reader.readAsDataURL(file);
-};
-
-// ─── AVATAR ──────────────────────────────────────────────
-// FIX: accept imgEl directly, no reliance on event.target
-window.selectAvatar = (seed, imgEl) => {
-    selectedAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-    document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
-    if (imgEl) imgEl.classList.add('selected');
-};
-
-window.saveAvatar = async () => {
-    if (!selectedAvatar) { showToast('Please select an avatar first.', 'error'); return; }
-    await updateDoc(doc(db, 'users', currentUser.uid), { avatar: selectedAvatar });
-    currentUser.avatar = selectedAvatar;
-    const el = document.getElementById('headerAvatar');
-    if (el) el.src = selectedAvatar;
-    showToast('✅ Avatar saved!', 'success');
-};
-
-// ─── LEADERBOARD ─────────────────────────────────────────
-function loadLeaderboard() {
-    const container = document.getElementById('leaderboardContent');
-    if (!container) return;
-
-    onSnapshot(
-        query(collection(db, 'users'),
-              where('role', '==', 'Student'),
-              orderBy('points', 'desc'),
-              limit(20)),
-        snap => {
-            container.innerHTML = '';
-            snap.forEach((d, idx) => {
-                const u = d.data();
-                const medals = ['🥇', '🥈', '🥉'];
-                const rank = idx < 3 ? medals[idx] : `${idx + 1}.`;
-                container.innerHTML += `
-                <div class="lb-item">
-                    <div class="lb-rank">${rank}</div>
-                    <img class="lb-avatar" src="${u.avatar || 'https://placehold.co/34'}" alt="">
-                    <div class="lb-user">
-                        <strong style="font-size:0.88rem;">${u.name}</strong>
-                        <div style="color:#aaa;font-size:0.76rem;">${u.email}</div>
-                    </div>
-                    <strong style="color:var(--primary);font-size:0.95rem;">${u.points || 0} pts</strong>
-                </div>`;
-            });
-        }
-    );
+    ['tab-edit','tab-certs','tab-id'].forEach(id => document.getElementById(id).style.display = 'none');
+    const map = { edit: ['tab-edit', 0], certs: ['tab-certs', 1], id: ['tab-id', 2] };
+    document.getElementById(map[tab][0]).style.display = 'block';
+    document.querySelectorAll('.p-tab')[map[tab][1]]?.classList.add('active');
 }
+
+window.selectAvatar = (el, url) => {
+    document.querySelectorAll('.avatar-option').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAvatar = url;
+};
+
+window.saveProfile = async () => {
+    const newName = document.getElementById('settingsName').value.trim();
+    const newBio  = document.getElementById('settingsBio').value.trim();
+    if (!newName) return showToast("Name cannot be empty.", 'error');
+    await updateDoc(doc(db, "users", currentUser.uid), {
+        name: newName,
+        bio: newBio,
+        avatar: selectedAvatar || currentUser.avatar
+    });
+    showToast("Profile updated!", 'success');
+    document.getElementById('profileModal').style.display = 'none';
+};
+
+async function loadCertWallet() {
+    const list = document.getElementById('walletList');
+    list.innerHTML = "";
+    const ids = currentUser.completedCourses || [];
+    if (!ids.length) {
+        list.innerHTML = "<p style='color:#999;text-align:center;padding:20px;'>No certificates yet.</p>";
+        return;
+    }
+    for (const id of ids) {
+        const cSnap = await getDoc(doc(db, "courses", id));
+        if (cSnap.exists()) {
+            list.innerHTML += `
+            <div style="padding:12px;border:1px solid #eee;margin-bottom:8px;
+                        border-radius:8px;display:flex;align-items:center;gap:10px;">
+                <i class="fas fa-certificate" style="color:#fbbf24;font-size:1.4rem;"></i>
+                <strong>${cSnap.data().title}</strong>
+            </div>`;
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// ─── ID VERIFICATION — FIXED (Firebase Storage Upload)
+//     Supports images up to 10MB
+//     Shows real upload progress bar
+// ══════════════════════════════════════════════════════
+window.submitVerification = async () => {
+    const fileInput = document.getElementById('idProofInput');
+    const file      = fileInput.files[0];
+
+    // ── Validation ────────────────────────────────────
+    if (!file) {
+        showToast("Please select an image file.", 'error');
+        return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/heic'];
+    if (!allowedTypes.includes(file.type)) {
+        showToast("Only image files allowed (JPG, PNG, WEBP).", 'error');
+        return;
+    }
+
+    const MAX_SIZE_MB = 10;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        showToast(`File too large. Max allowed size is ${MAX_SIZE_MB}MB.`, 'error');
+        return;
+    }
+
+    // ── UI: Show progress bar, disable button ─────────
+    const btn         = document.getElementById('idSubmitBtn');
+    const progressBox = document.getElementById('uploadProgressBox');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressTxt = document.getElementById('uploadProgressTxt');
+
+    btn.disabled       = true;
+    btn.innerHTML      = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+    progressBox.style.display = 'block';
+    progressBar.style.width   = '0%';
+    progressTxt.innerText     = 'Starting upload…';
+
+    try {
+        // ── Upload to Firebase Storage ─────────────────
+        const ext       = file.name.split('.').pop();
+        const filePath  = `id_proofs/${currentUser.uid}_${Date.now()}.${ext}`;
+        const storageRef = ref(storage, filePath);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        const downloadURL = await new Promise((resolve, reject) => {
+            uploadTask.on(
+                'state_changed',
+                // Progress
+                (snapshot) => {
+                    const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressTxt.innerText   = `Uploading… ${pct}%`;
+                },
+                // Error
+                (err) => reject(err),
+                // Complete
+                async () => {
+                    const url = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve(url);
+                }
+            );
+        });
+
+        // ── Save URL to Firestore ──────────────────────
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            verificationPending: true,
+            idProofUrl:          downloadURL,      // real Firebase Storage URL
+            submittedAt:         serverTimestamp()
+        });
+
+        // ── Success UI ────────────────────────────────
+        progressBar.style.width = '100%';
+        progressTxt.innerText   = 'Upload complete!';
+        showToast("✅ ID submitted! Admin will review shortly.", 'success');
+
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('pendingMsg').style.display    = 'block';
+
+    } catch (err) {
+        console.error("Upload error:", err);
+        let msg = err.message;
+        if (err.code === 'storage/unauthorized')
+            msg = "Upload not allowed. Check Firebase Storage rules.";
+        else if (err.code === 'storage/canceled')
+            msg = "Upload was cancelled.";
+        showToast("Upload failed: " + msg, 'error');
+
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="fas fa-upload"></i> Submit ID';
+        progressBox.style.display = 'none';
+    }
+};
+
+// ─── CHATBOT ──────────────────────────────────────────
+let chatbotOpen       = false;
+let chatListenerUnsub = null;
+let chatInitialized   = false;
+
+window.toggleChatbot = () => {
+    chatbotOpen = !chatbotOpen;
+    const win = document.getElementById('chatbotWindow');
+    const fab = document.getElementById('chatbotFab');
+    if (chatbotOpen) {
+        win.classList.add('open');
+        fab.querySelector('i').className = 'fas fa-times';
+        initChatbot();
+    } else {
+        win.classList.remove('open');
+        fab.querySelector('i').className = 'fas fa-comment-dots';
+        if (chatListenerUnsub) { chatListenerUnsub(); chatListenerUnsub = null; }
+        chatInitialized = false;
+    }
+};
+
+window.closeChatbot = () => {
+    chatbotOpen = false;
+    document.getElementById('chatbotWindow').classList.remove('open');
+    document.getElementById('chatbotFab').querySelector('i').className = 'fas fa-comment-dots';
+    if (chatListenerUnsub) { chatListenerUnsub(); chatListenerUnsub = null; }
+    chatInitialized = false;
+};
+
+function initChatbot() {
+    if (chatInitialized) return;
+    chatInitialized = true;
+    const msgs = document.getElementById('chatbotMsgs');
+    if (!msgs.hasChildNodes())
+        appendBotMsg("👋 Hi " + (currentUser?.name?.split(' ')[0] || 'there') + "! How can I help you today?");
+    if (!currentUser) return;
+
+    const q = query(
+        collection(db, "chatbot_messages"),
+        where("studentId", "==", currentUser.uid),
+        where("type", "==", "admin_reply"),
+        orderBy("createdAt", "asc")
+    );
+    chatListenerUnsub = onSnapshot(q, (snap) => {
+        snap.docChanges().forEach(change => {
+            if (change.type === 'added' && !change.doc.data().seen) {
+                appendBotMsg("🛡️ <strong>Admin:</strong> " + change.doc.data().text);
+                updateDoc(change.doc.ref, { seen: true });
+            }
+        });
+    }, (err) => console.error("Chatbot listener:", err));
+}
+
+function appendBotMsg(text) {
+    const msgs = document.getElementById('chatbotMsgs');
+    const div  = document.createElement('div');
+    div.className   = 'bot-msg';
+    div.innerHTML   = text;
+    msgs.appendChild(div);
+    msgs.scrollTop  = msgs.scrollHeight;
+}
+function appendUserMsg(text) {
+    const msgs = document.getElementById('chatbotMsgs');
+    const div  = document.createElement('div');
+    div.className  = 'user-msg';
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+}
+
+window.sendChatbotMsg = async () => {
+    const input = document.getElementById('chatbotInput');
+    const text  = input.value.trim();
+    if (!text || !currentUser) return;
+    input.value = "";
+    appendUserMsg(text);
+
+    const msgs   = document.getElementById('chatbotMsgs');
+    const typing = document.createElement('div');
+    typing.className = 'bot-msg typing-indicator';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    try {
+        await addDoc(collection(db, "chatbot_messages"), {
+            studentId:   currentUser.uid,
+            studentName: currentUser.name,
+            text, type: 'student_msg',
+            seen: false, createdAt: serverTimestamp()
+        });
+    } catch (err) { console.error("Save msg failed:", err); }
+
+    setTimeout(() => {
+        typing.remove();
+        appendBotMsg(getAutoReply(text.toLowerCase()));
+    }, 1200);
+};
+
+function getAutoReply(text) {
+    if (text.includes('course') || text.includes('video'))
+        return "📚 Browse all courses in the <strong>Learning</strong> section!";
+    if (text.includes('certificate') || text.includes('cert'))
+        return "🏆 Certificates appear in <strong>Profile → Certificates</strong> after completing a course.";
+    if (text.includes('verify') || text.includes('id') || text.includes('bba') || text.includes('note'))
+        return "📝 Upload your College ID in <strong>Profile → ID Verification</strong> to unlock resources.";
+    if (text.includes('password') || text.includes('forgot'))
+        return "🔑 Logout and click <strong>Forgot Password</strong> on the login page.";
+    if (text.includes('hello') || text.includes('hi') || text.includes('hey'))
+        return "👋 Hello! Ask me about courses, certificates, or resources!";
+    if (text.includes('thank'))
+        return "😊 You're welcome! Feel free to ask anything else.";
+    return "📨 Message forwarded to our admin team. They'll reply here shortly!";
+}
+
+document.getElementById('chatbotInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') window.sendChatbotMsg();
+});
