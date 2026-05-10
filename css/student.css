@@ -1,11 +1,11 @@
-/* css/student.css — FronixLearner Glassy Student Dashboard */
+/* css/student.css — FronixLearner Student Dashboard Fronixplayers Theme */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
 
 body { 
     display:flex;
     min-height:100vh;
     overflow-x:hidden;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
     position: relative;
 }
 
@@ -14,7 +14,7 @@ body::before {
     position: fixed;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
@@ -45,13 +45,10 @@ aside::before {
     pointer-events: none;
 }
 
+/* Fronixplayers Logo Style */
 .sidebar-logo { 
     font-size:1.35rem;
     font-weight:800;
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     margin-bottom:32px;
     display:flex;
     align-items:center;
@@ -60,11 +57,26 @@ aside::before {
     z-index: 1;
 }
 
+.sidebar-logo i {
+    font-size: 1.9rem;
+    background: linear-gradient(135deg, #6366f1 0%, #10b981 50%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-logo span {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 .nav-item { 
     padding:13px 16px;
     margin-bottom:6px;
     cursor:pointer;
-    color:#8f9bba;
+    color:#64748b;
     border-radius:14px;
     font-weight:600;
     display:flex;
@@ -81,7 +93,7 @@ aside::before {
     backdrop-filter: blur(10px);
     color:var(--primary);
     transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.15);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.15);
 }
 
 .nav-item.logout { 
@@ -126,7 +138,7 @@ main {
 
 .mobile-menu-btn:hover {
     transform: scale(1.05);
-    box-shadow:0 8px 24px rgba(79,70,229,0.25);
+    box-shadow:0 8px 24px rgba(99,102,241,0.25);
 }
 
 /* ─── GLASSY HEADER STATS ────────────────────────────── */
@@ -167,7 +179,7 @@ main {
 
 .stat-box:hover { 
     transform:translateY(-4px);
-    box-shadow:0 12px 32px rgba(79,70,229,0.2);
+    box-shadow:0 12px 32px rgba(99,102,241,0.2);
 }
 
 .stat-icon { 
@@ -213,8 +225,8 @@ main {
 
 .course-card:hover { 
     transform:translateY(-6px);
-    border-color: rgba(79,70,229,0.4);
-    box-shadow:0 16px 40px rgba(79,70,229,0.2);
+    border-color: rgba(99,102,241,0.4);
+    box-shadow:0 16px 40px rgba(99,102,241,0.2);
 }
 
 .course-thumbnail { 
@@ -283,9 +295,9 @@ main {
 }
 
 .resource-card:hover { 
-    border-color: rgba(79,70,229,0.4);
+    border-color: rgba(99,102,241,0.4);
     transform:translateY(-4px);
-    box-shadow:0 12px 36px rgba(79,70,229,0.2);
+    box-shadow:0 12px 36px rgba(99,102,241,0.2);
 }
 
 .res-icon { 
@@ -302,7 +314,7 @@ main {
     flex-shrink:0;
     position: relative;
     z-index: 1;
-    border: 1px solid rgba(79,70,229,0.2);
+    border: 1px solid rgba(99,102,241,0.2);
 }
 
 .res-info h3 { 
@@ -315,7 +327,7 @@ main {
 
 .res-info p { 
     margin:0;
-    color:#888;
+    color:#64748b;
     font-size:0.84rem;
     position: relative;
     z-index: 1;
@@ -345,6 +357,164 @@ main {
     background: rgba(220, 252, 231, 0.8);
     color:#16a34a;
     border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+/* ─── GLASSY SUPPORT SECTION (FIXED) ────────────────────────────── */
+.support-container {
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius:20px;
+    padding:28px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.06);
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.support-container h3 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.support-form {
+    margin-bottom: 2rem;
+}
+
+.support-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.support-form input,
+.support-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid rgba(229, 231, 235, 0.6);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: 0.3s;
+    font-family: inherit;
+    font-size: 0.93rem;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+}
+
+.support-form input:focus,
+.support-form textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+    background: rgba(255,255,255,0.9);
+}
+
+.support-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.support-tickets {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ticket-card {
+    background: rgba(248, 250, 252, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    padding: 18px;
+    border: 1.5px solid rgba(229, 231, 235, 0.6);
+    transition: var(--transition);
+}
+
+.ticket-card:hover {
+    border-color: rgba(99,102,241,0.3);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.15);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ticket-subject {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.ticket-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+}
+
+.ticket-status.open {
+    background: rgba(254, 243, 199, 0.8);
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.ticket-status.closed {
+    background: rgba(220, 252, 231, 0.8);
+    color: #16a34a;
+    border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.ticket-message {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+}
+
+.ticket-replies {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.ticket-reply {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    border-left: 3px solid var(--primary);
+}
+
+.reply-sender {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.4rem;
+}
+
+.reply-message {
+    font-size: 0.88rem;
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+.reply-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
 }
 
 /* ─── GLASSY COURSE PLAYER MODAL ─────────────────── */
@@ -407,7 +577,7 @@ main {
 .interaction-btn:hover { 
     background:var(--primary);
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.4);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.4);
 }
 
 .interactive-section { 
@@ -434,7 +604,7 @@ main {
     text-align:center;
     cursor:pointer;
     font-weight:700;
-    color:#888;
+    color:#64748b;
     background: rgba(248, 250, 252, 0.8);
     backdrop-filter: blur(10px);
     transition:0.3s;
@@ -445,7 +615,7 @@ main {
     background:white;
     color:var(--primary);
     border-bottom:3px solid var(--primary);
-    box-shadow: 0 -2px 8px rgba(79,70,229,0.1);
+    box-shadow: 0 -2px 8px rgba(99,102,241,0.1);
 }
 
 .tab-content { 
@@ -528,11 +698,11 @@ main {
 }
 
 .chat-msg.mine { 
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color:white;
     align-self:flex-end;
     border-bottom-right-radius:4px;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
 }
 
 .chat-msg.other { 
@@ -574,13 +744,13 @@ main {
 
 .chat-input-row input:focus { 
     border-color:var(--primary);
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
 }
 
 .chat-send-btn { 
     width:42px;
     height:42px;
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color:white;
     border:none;
     border-radius:50%;
@@ -590,12 +760,12 @@ main {
     justify-content:center;
     flex-shrink:0;
     transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
 }
 
 .chat-send-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(79,70,229,0.4);
+    box-shadow: 0 6px 16px rgba(99,102,241,0.4);
 }
 
 /* ─── GLASSY PROFILE MODAL ──────────────────────── */
@@ -611,7 +781,7 @@ main {
     padding:10px 15px;
     cursor:pointer;
     font-weight:700;
-    color:#888;
+    color:#64748b;
     border-bottom:2px solid transparent;
     margin-bottom:-2px;
     transition:0.3s;
@@ -649,7 +819,7 @@ main {
 
 .avatar-option.selected,.avatar-option:hover { 
     border-color:var(--primary);
-    box-shadow:0 0 0 4px rgba(79,70,229,0.2);
+    box-shadow:0 0 0 4px rgba(99,102,241,0.2);
     transform: scale(1.05);
 }
 
@@ -725,13 +895,27 @@ main {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     border-radius: 10px;
     border: 2px solid rgba(255,255,255,0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+}
+
+/* ─── SIDEBAR OVERLAY ───────────────────────────────────── */
+.sidebar-overlay { 
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    z-index:99;
+    backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.active { 
+    display:block; 
 }
 
 /* ─── RESPONSIVE ────────────────────────────────── */
@@ -819,6 +1003,11 @@ main {
         grid-template-columns:1fr; 
     }
     
+    .stat-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    
     .stat-box h3 { 
         font-size:1.3rem; 
     }
@@ -849,5 +1038,38 @@ main {
     .interactive-section { 
         height:auto;
         flex:1; 
+    }
+    
+    .support-container {
+        padding: 20px;
+    }
+    
+    .support-form input,
+    .support-form textarea {
+        font-size: 0.88rem;
+        padding: 10px 14px;
+    }
+}
+
+@media(max-width:480px){
+    .sidebar-logo {
+        font-size: 1.2rem;
+    }
+    
+    .sidebar-logo i {
+        font-size: 1.7rem;
+    }
+    
+    .nav-item {
+        font-size: 0.88rem;
+        padding: 11px 14px;
+    }
+    
+    .ticket-card {
+        padding: 14px;
+    }
+    
+    .ticket-subject {
+        font-size: 0.92rem;
     }
 }
