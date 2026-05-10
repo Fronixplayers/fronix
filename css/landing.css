@@ -1,4 +1,4 @@
-/* css/landing.css — FronixLearner Glassy Landing Page */
+/* css/landing.css — FronixLearner Fronixplayers Landing Page */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 /* --- GLASSY NAVBAR --- */
@@ -28,13 +28,10 @@ nav::before {
     pointer-events: none;
 }
 
+/* Fronixplayers Logo Style */
 .logo { 
     font-size: 1.6rem; 
-    font-weight: 800; 
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 800;
     display: flex; 
     align-items: center; 
     gap: 10px;
@@ -43,8 +40,19 @@ nav::before {
 }
 
 .logo i { 
-    color: var(--accent);
-    filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.3));
+    font-size: 2rem;
+    background: linear-gradient(135deg, #6366f1 0%, #10b981 50%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+}
+
+.logo span {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nav-links { 
@@ -67,7 +75,7 @@ nav::before {
 
 .nav-links a:hover { 
     color: var(--primary);
-    background: rgba(79, 70, 229, 0.1);
+    background: rgba(99, 102, 241, 0.1);
     transform: translateY(-2px);
 }
 
@@ -99,7 +107,7 @@ nav::before {
 }
 
 .hamburger:hover {
-    background: rgba(79, 70, 229, 0.1);
+    background: rgba(99, 102, 241, 0.1);
 }
 
 /* --- GLASSY HERO --- */
@@ -109,7 +117,7 @@ nav::before {
     justify-content: space-between;
     padding: 9rem 5% 5rem; 
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
     position: relative; 
     overflow: hidden; 
     gap: 3rem;
@@ -122,7 +130,7 @@ nav::before {
     right: -10%;
     width: 80%;
     height: 150%;
-    background: radial-gradient(circle, rgba(79,70,229,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);
     animation: float 20s ease-in-out infinite;
 }
 
@@ -151,7 +159,7 @@ nav::before {
 }
 
 .hero-text span { 
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -177,7 +185,7 @@ nav::before {
     position: relative;
     border-radius: 32px; 
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(79,70,229,0.25);
+    box-shadow: 0 30px 80px rgba(99,102,241,0.25);
     transform: perspective(1200px) rotateY(-6deg);
     transition: var(--transition); 
     animation: fadeIn 1.5s ease-out;
@@ -188,7 +196,7 @@ nav::before {
 
 .hero-slider-container:hover { 
     transform: perspective(1200px) rotateY(0deg) scale(1.02);
-    box-shadow: 0 40px 100px rgba(79,70,229,0.35);
+    box-shadow: 0 40px 100px rgba(99,102,241,0.35);
 }
 
 .hero-slider-container::before {
@@ -264,7 +272,8 @@ nav::before {
 .stats-row { 
     display: flex; 
     gap: 3rem; 
-    margin-top: 2.5rem; 
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
 }
 
 .stat {
@@ -275,16 +284,17 @@ nav::before {
     border: 1px solid rgba(255,255,255,0.5);
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     transition: var(--transition);
+    min-width: 140px;
 }
 
 .stat:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(79,70,229,0.2);
+    box-shadow: 0 12px 32px rgba(99,102,241,0.2);
 }
 
 .stat h3 { 
     font-size: 2.4rem; 
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -299,7 +309,7 @@ nav::before {
 /* --- GLASSY COURSES --- */
 #courses { 
     padding: 6rem 5%; 
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
     position: relative;
 }
 
@@ -324,7 +334,7 @@ nav::before {
 
 .search-input:focus { 
     border-color: var(--primary); 
-    box-shadow: 0 8px 32px rgba(79,70,229,0.25);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.25);
     background: rgba(255,255,255,0.9);
 }
 
@@ -339,7 +349,7 @@ nav::before {
 
 .course-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
     gap: 2.5rem; 
     max-width: 1200px; 
     margin: 0 auto; 
@@ -359,8 +369,8 @@ nav::before {
 
 .course-card:hover { 
     transform: translateY(-10px); 
-    box-shadow: 0 20px 60px rgba(79,70,229,0.25);
-    border-color: rgba(79,70,229,0.3);
+    box-shadow: 0 20px 60px rgba(99,102,241,0.25);
+    border-color: rgba(99,102,241,0.3);
 }
 
 .thumb-container { 
@@ -383,7 +393,7 @@ nav::before {
 .play-overlay { 
     position: absolute; 
     inset: 0; 
-    background: rgba(79,70,229,0.7); 
+    background: rgba(99,102,241,0.7); 
     backdrop-filter: blur(4px);
     display: flex; 
     justify-content: center; 
@@ -425,7 +435,7 @@ nav::before {
     font-weight: 700; 
     align-self: flex-start; 
     margin-bottom: 12px;
-    border: 1px solid rgba(79,70,229,0.2);
+    border: 1px solid rgba(99,102,241,0.2);
 }
 
 .course-title { 
@@ -479,8 +489,8 @@ nav::before {
 
 .team-card:hover { 
     transform: translateY(-8px); 
-    box-shadow: 0 20px 60px rgba(79,70,229,0.2);
-    border-color: rgba(79,70,229,0.3);
+    box-shadow: 0 20px 60px rgba(99,102,241,0.2);
+    border-color: rgba(99,102,241,0.3);
 }
 
 .team-img { 
@@ -557,7 +567,7 @@ nav::before {
 
 .review-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 60px rgba(79,70,229,0.2);
+    box-shadow: 0 20px 60px rgba(99,102,241,0.2);
 }
 
 .review-text { 
@@ -593,7 +603,7 @@ nav::before {
 
 .blog-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
     gap: 2.5rem; 
     max-width: 1200px; 
     margin: 0 auto; 
@@ -612,8 +622,8 @@ nav::before {
 
 .blog-card:hover { 
     transform: translateY(-8px); 
-    box-shadow: 0 20px 60px rgba(79,70,229,0.2);
-    border-color: rgba(79,70,229,0.3);
+    box-shadow: 0 20px 60px rgba(99,102,241,0.2);
+    border-color: rgba(99,102,241,0.3);
 }
 
 .blog-content { 
@@ -703,9 +713,9 @@ nav::before {
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    box-shadow: 0 6px 16px rgba(79,70,229,0.2); 
+    box-shadow: 0 6px 16px rgba(99,102,241,0.2); 
     flex-shrink: 0;
-    border: 1px solid rgba(79,70,229,0.2);
+    border: 1px solid rgba(99,102,241,0.2);
     transition: var(--transition);
 }
 
@@ -730,15 +740,15 @@ nav::before {
 
 .contact-form input:focus, .contact-form textarea:focus { 
     border-color: var(--primary); 
-    box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
     background: rgba(255,255,255,0.9);
 }
 
-/* --- GLASSY FOOTER --- */
+/* --- FRONIXPLAYERS FOOTER (Reference Style) --- */
 footer { 
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
     color: white; 
-    padding: 5rem 5% 2.5rem;
+    padding: 4rem 5% 1.5rem;
     position: relative;
 }
 
@@ -747,85 +757,109 @@ footer::before {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 80%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
     pointer-events: none;
 }
 
-.footer-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-    gap: 3.5rem; 
-    max-width: 1200px; 
+.footer-top {
+    max-width: 1200px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     position: relative;
     z-index: 1;
 }
 
-.footer-col h3 { 
-    font-size: 1.15rem; 
-    margin-bottom: 1.8rem; 
-    color: white; 
-    font-weight: 700; 
+.footer-brand {
+    max-width: 350px;
 }
 
-.footer-col p { 
-    color: #9ca3af; 
-    line-height: 1.8; 
-    margin-bottom: 1.2rem; 
-    font-size: 0.95rem; 
+.footer-brand .logo {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: white;
 }
 
-.footer-links li { 
-    margin-bottom: 0.9rem; 
+.footer-brand .logo i {
+    font-size: 2.2rem;
 }
 
-.footer-links a { 
-    color: #d1d5db; 
-    transition: 0.3s; 
+.footer-brand p {
+    color: #94a3b8;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.footer-brand .social-icons {
+    display: flex;
+    gap: 12px;
+}
+
+.footer-brand .social-icons a {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.footer-brand .social-icons a:hover {
+    background: var(--primary);
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 8px 20px rgba(99,102,241,0.4);
+}
+
+.footer-col h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: white;
+    font-weight: 700;
+}
+
+.footer-links li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+    color: #d1d5db;
+    transition: 0.3s;
     font-size: 0.95rem;
     display: inline-block;
 }
 
-.footer-links a:hover { 
-    color: var(--primary); 
-    padding-left: 8px; 
+.footer-links a:hover {
+    color: var(--primary);
+    padding-left: 8px;
 }
 
-.social-icons { 
-    display: flex; 
-    gap: 14px; 
-    margin-top: 1.8rem; 
-}
-
-.social-icons a { 
-    width: 42px; 
-    height: 42px; 
-    background: rgba(255,255,255,0.1); 
-    backdrop-filter: blur(10px);
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    border-radius: 50%; 
-    transition: 0.3s;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.social-icons a:hover { 
-    background: var(--primary); 
-    transform: translateY(-4px) scale(1.1);
-    box-shadow: 0 8px 20px rgba(79,70,229,0.4);
-}
-
-.footer-bottom { 
-    border-top: 1px solid rgba(255,255,255,0.1); 
-    margin-top: 3.5rem; 
-    padding-top: 2.5rem; 
-    text-align: center; 
-    color: #6b7280; 
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    text-align: center;
+    color: #6b7280;
     font-size: 0.9rem;
     position: relative;
     z-index: 1;
+}
+
+.footer-bottom a {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.footer-bottom a:hover {
+    text-decoration: underline;
 }
 
 /* --- GLASSY AUTH MODAL --- */
@@ -865,7 +899,7 @@ footer::before {
 .auth-visual h2 { 
     font-size: 1.8rem; 
     font-weight: 800; 
-    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -908,7 +942,7 @@ footer::before {
 .toggle-btn.active { 
     background: white; 
     color: var(--primary); 
-    box-shadow: 0 4px 12px rgba(79,70,229,0.15);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.15);
 }
 
 .custom-input { 
@@ -926,7 +960,7 @@ footer::before {
 
 .custom-input:focus { 
     border-color: var(--primary); 
-    box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
     background: rgba(255,255,255,0.9);
 }
 
@@ -1000,6 +1034,17 @@ footer::before {
 }
 
 /* --- MOBILE RESPONSIVE --- */
+@media (max-width: 1200px) {
+    .footer-top {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+    }
+    
+    .footer-brand {
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 900px) {
     .nav-links { 
         position: absolute; 
@@ -1095,6 +1140,26 @@ footer::before {
     .input-row { 
         grid-template-columns: 1fr; 
     }
+    
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .course-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat {
+        min-width: 200px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1103,10 +1168,18 @@ footer::before {
     }
     
     .section-header h2 { 
-        font-size: 2rem; 
+        font-size: 1.9rem; 
     }
     
     .course-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .blog-grid {
         grid-template-columns: 1fr;
     }
 }
