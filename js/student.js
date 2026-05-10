@@ -525,9 +525,8 @@ window.switchProfileTab = (tab) => {
 
 // ─── ID UPLOAD ───────────────────────────────────────────
 window.uploadID = async () => {
-const file = document.getElementById('idFileInput').files[0];
-if (!file) { showToast('Please select an image file.', 'error'); return; }
-
+    const file = document.getElementById('idFileInput').files[0];
+    if (!file) { showToast('Please select an image file.', 'error'); return; }
 
     const reader = new FileReader();
     reader.onload = async (ev) => {
