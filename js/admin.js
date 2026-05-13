@@ -441,19 +441,37 @@ function loadStudents() {
     onSnapshot(query(collection(db, 'users'), where('role', '==', 'Student')), snap => {
         tbody.innerHTML = '';
         if (snap.empty) {
-            tbody.innerHTML = '<tr><td colspan="5" class="no-data">No students yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="no-data">No students yet.</td></tr>';
             return;
         }
         snap.forEach(d => {
             const u = d.data();
             const sc   = u.isVerified ? '#10b981' : u.verificationPending ? '#f59e0b' : '#ef4444';
             const stxt = u.isVerified ? '✓ Verified' : u.verificationPending ? '⏳ Pending' : '❌ Unverified';
+
+            // Format last login
+            let lastLoginTxt = '<span style="color:#ccc;">—</span>';
+            if (u.lastLogin) {
+                const d2  = u.lastLogin.toDate();
+                const now  = new Date();
+                const diff = Math.floor((now - d2) / 1000); // seconds
+                let ago;
+                if (diff < 60)              ago = 'Just now';
+                else if (diff < 3600)       ago = `${Math.floor(diff/60)}m ago`;
+                else if (diff < 86400)      ago = `${Math.floor(diff/3600)}h ago`;
+                else if (diff < 86400 * 7)  ago = `${Math.floor(diff/86400)}d ago`;
+                else                        ago = d2.toLocaleDateString('en-IN');
+                const fullDate = d2.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+                lastLoginTxt = `<span title="${fullDate}" style="font-size:0.82rem;color:#555;cursor:default;">${ago}</span>`;
+            }
+
             tbody.innerHTML += `
             <tr>
                 <td>${u.name || '—'}</td>
                 <td>${u.email}</td>
                 <td>${u.location || '—'}</td>
                 <td><span style="color:${sc};font-weight:700;">${stxt}</span></td>
+                <td>${lastLoginTxt}</td>
                 <td>
                     ${u.isBlocked
                         ? `<button class="action-btn btn-unblock"

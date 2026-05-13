@@ -31,6 +31,11 @@ function showToast(msg, type = 'info') {
 onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = 'index.html'; return; }
 
+    // Save last login time every session
+    updateDoc(doc(db, 'users', user.uid), {
+        lastLogin: serverTimestamp()
+    }).catch(() => {}); // silent fail if user doc not ready yet
+
     // Real-time listener so UI updates immediately when admin changes data
     onSnapshot(doc(db, 'users', user.uid), (snap) => {
         if (!snap.exists()) { signOut(auth).then(() => window.location.href = 'index.html'); return; }
@@ -523,28 +528,83 @@ window.switchProfileTab = (tab) => {
     if (tab === 'leaderboard') loadLeaderboard();
 };
 
-// ─── ID UPLOAD ───────────────────────────────────────────
+// ─── ID UPLOAD (with compression — supports 3–5 MB images) ──────────────────
 window.uploadID = async () => {
     const file = document.getElementById('idFileInput').files[0];
     if (!file) { showToast('Please select an image file.', 'error'); return; }
 
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-        try {
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                idImage:            ev.target.result,
-                verificationPending: true,
-                verificationRejected: false,
-                idUploadedAt:       serverTimestamp()
-            });
-            showToast('✅ ID uploaded! Admin will review soon.', 'success');
-            document.getElementById('idFileInput').value = '';
-        } catch (err) {
-            showToast('Upload failed: ' + err.message, 'error');
-        }
-    };
-    reader.readAsDataURL(file);
+    // Validate: only images, max 5 MB original size
+    if (!file.type.startsWith('image/')) {
+        showToast('Only image files are allowed (JPG, PNG, etc.)', 'error'); return;
+    }
+    const MAX_MB = 5;
+    if (file.size > MAX_MB * 1024 * 1024) {
+        showToast(`File too large. Maximum allowed size is ${MAX_MB} MB.`, 'error'); return;
+    }
+
+    const btn = document.querySelector('#uploadSection button[type="button"]');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Compressing & Uploading…'; }
+
+    try {
+        // Compress image in-browser → keep Firestore doc under ~900 KB
+        const compressedBase64 = await compressImageToBase64(file, 900);
+
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+            idImage:              compressedBase64,
+            verificationPending:  true,
+            verificationRejected: false,
+            idUploadedAt:         serverTimestamp()
+        });
+        showToast('✅ ID uploaded! Admin will review soon.', 'success');
+        document.getElementById('idFileInput').value = '';
+    } catch (err) {
+        showToast('Upload failed: ' + err.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload ID'; }
+    }
 };
+
+/**
+ * Compress an image File to a base64 JPEG string whose decoded size
+ * stays under `targetKB` kilobytes. Shrinks dimensions if > 1600 px
+ * and tries quality steps 0.85 → 0.1 until the target is met.
+ */
+function compressImageToBase64(file, targetKB = 900) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Could not read file.'));
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Could not load image.'));
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let { width, height } = img;
+
+                // Scale down if largest dimension > 1600 px
+                const MAX_PX = 1600;
+                if (width > MAX_PX || height > MAX_PX) {
+                    if (width >= height) { height = Math.round(height * MAX_PX / width); width = MAX_PX; }
+                    else                  { width  = Math.round(width  * MAX_PX / height); height = MAX_PX; }
+                }
+                canvas.width  = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                // Try decreasing JPEG quality until decoded size ≤ targetKB
+                const qualities = [0.85, 0.75, 0.65, 0.5, 0.35, 0.2, 0.1];
+                let result = canvas.toDataURL('image/jpeg', 0.85);
+                for (const q of qualities) {
+                    result = canvas.toDataURL('image/jpeg', q);
+                    // base64 length → approx byte size: (len * 3/4)
+                    if ((result.length * 3 / 4) <= targetKB * 1024) break;
+                }
+                resolve(result);
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
 // ─── AVATAR ──────────────────────────────────────────────
 // FIX: accept imgEl directly, no reliance on event.target
