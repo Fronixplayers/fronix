@@ -5,7 +5,7 @@ import {
     onAuthStateChanged, signOut,
     collection, addDoc, getDoc, doc, onSnapshot,
     query, orderBy, serverTimestamp, updateDoc,
-    where, limit
+    where, limit, increment
 } from './firebase-config.js';
 
 let currentUser   = null;
@@ -170,7 +170,28 @@ window.toggleSidebar = () => {
     document.querySelector('.sidebar-overlay')?.classList.toggle('active');
 };
 
-window.logout = () => signOut(auth).then(() => window.location.href = 'index.html');
+// ─── SESSION TIME TRACKER ────────────────────────────────
+let _sessionStart = Date.now();
+
+async function saveSessionTime() {
+    if (!currentUser?.uid) return;
+    const elapsed = Math.floor((Date.now() - _sessionStart) / 1000); // seconds
+    if (elapsed < 5) return; // ignore tiny bounces
+    try {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+            totalTimeSpent: increment(elapsed)
+        });
+    } catch (e) { /* silent */ }
+}
+
+// Save on tab close / navigation away
+window.addEventListener('beforeunload', saveSessionTime);
+// Also save on manual logout
+window.logout = () => {
+    saveSessionTime().finally(() =>
+        signOut(auth).then(() => window.location.href = 'index.html')
+    );
+};
 
 window.addEventListener('resize', () => {
     if (window.innerWidth > 900) {

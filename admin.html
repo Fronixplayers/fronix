@@ -226,21 +226,20 @@
     <!-- ══════════════════ STUDENTS SECTION ════════════════ -->
     <div id="studentsSection" class="section">
         <div class="panel">
-            <h2>
-                <i class="fas fa-users" style="color:var(--primary);"></i>
-                Student Roster
-            </h2>
-            <div class="table-container">
-                <table id="studentTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th><th>Email</th><th>Location</th>
-                            <th>Status</th><th>Last Login</th><th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+                <h2 style="margin:0;">
+                    <i class="fas fa-users" style="color:var(--primary);"></i>
+                    Student Roster
+                    <span id="studentCountBadge" style="font-size:0.78rem;background:#eef2ff;color:var(--primary);padding:3px 10px;border-radius:20px;font-weight:700;margin-left:8px;vertical-align:middle;">0</span>
+                </h2>
+                <div style="position:relative;">
+                    <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#bbb;font-size:0.85rem;"></i>
+                    <input type="text" id="studentSearch" placeholder="Search by name or email..."
+                           oninput="window.filterStudents(this.value)"
+                           style="padding:9px 14px 9px 34px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:0.87rem;outline:none;font-family:inherit;width:230px;">
+                </div>
             </div>
+            <div id="studentCardGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;"></div>
         </div>
     </div>
 
@@ -386,6 +385,34 @@
     font-size:0.87rem;
     font-family:inherit;
     flex-shrink:0;
+}
+
+/* ── Student Cards ─────────────────────────────────────── */
+.student-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    border: 1.5px solid #e5e7eb;
+    transition: box-shadow 0.18s, border-color 0.18s;
+}
+.student-card:hover {
+    box-shadow: 0 6px 24px rgba(79,70,229,0.10);
+    border-color: #c7d2fe;
+}
+.sinfo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    font-size: 0.82rem;
+    padding: 3px 0;
+}
+.sinfo-row i {
+    width: 14px;
+    text-align: center;
+    color: var(--primary);
+    flex-shrink: 0;
+    font-size: 0.78rem;
 }
 </style>
 </body>
