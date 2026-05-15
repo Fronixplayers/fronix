@@ -255,3 +255,174 @@ if (contactForm) {
 
 // ─── INIT ─────────────────────────────────────────────
 loadCourses();
+loadWebsiteContent();
+loadReviews();
+loadTeam();
+loadBlog();
+// ─── WEBSITE CONTENT LOADER ──────────────────────────────
+async function loadWebsiteContent() {
+    try {
+        const snap = await getDoc(doc(db, 'website', 'content'));
+        if (!snap.exists()) return;
+        const d = snap.data();
+
+        // Hero
+        if (d.hero) {
+            const h = d.hero;
+            if (h.title) {
+                const el = document.getElementById('heroTitle');
+                if (el) el.innerHTML = h.title;
+            }
+            if (h.sub) {
+                const el = document.getElementById('heroSub');
+                if (el) el.innerText = h.sub;
+            }
+            // Slides
+            const slides = document.querySelectorAll('.slide');
+            const urls = [h.slide1, h.slide2, h.slide3].filter(Boolean);
+            if (urls.length && slides.length) {
+                urls.forEach((url, i) => { if (slides[i]) slides[i].style.backgroundImage = `url('${url}')`; });
+            }
+        }
+
+        // About
+        if (d.about) {
+            const a = d.about;
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerText = val; };
+            if (a.title) { const el = document.getElementById('aboutTitle'); if (el) el.innerText = a.title; }
+            setTxt('aboutP1', a.p1); setTxt('aboutP2', a.p2);
+            if (a.img) { const el = document.getElementById('aboutImg'); if (el) el.src = a.img; }
+            setTxt('stat1Num', a.stat1Num); setTxt('stat1Label', a.stat1Label);
+            setTxt('stat2Num', a.stat2Num); setTxt('stat2Label', a.stat2Label);
+            setTxt('stat3Num', a.stat3Num); setTxt('stat3Label', a.stat3Label);
+        }
+
+        // Contact
+        if (d.contact) {
+            const c = d.contact;
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerText = val; };
+            setTxt('contactAddr', c.address); setTxt('contactEmail', c.email); setTxt('contactPhone', c.phone);
+            setTxt('footerTag', c.footerTag);
+            const setHref = (id, val) => { const el = document.getElementById(id); if (el && val) el.href = val; };
+            setHref('socFb', c.fb); setHref('socInsta', c.insta); setHref('socYt', c.yt);
+        }
+
+        // Popup
+        if (d.popup && d.popup.active && d.popup.msg) {
+            const popup = document.getElementById('announcementPopup');
+            const msgEl = document.getElementById('popupMsg');
+            const btnWrap = document.getElementById('popupBtnWrap');
+            if (popup && msgEl) {
+                msgEl.innerText = d.popup.msg;
+                if (d.popup.btn && d.popup.link && btnWrap) {
+                    btnWrap.innerHTML = `<a href="${d.popup.link}" class="btn btn-fill" style="display:inline-flex;justify-content:center;">
+                        ${d.popup.btn} <i class="fas fa-arrow-right"></i></a>`;
+                }
+                setTimeout(() => popup.classList.add('active'), 1200);
+            }
+        }
+    } catch(e) { console.warn('loadWebsiteContent:', e); }
+}
+
+// ─── REVIEWS LOADER ───────────────────────────────────────
+async function loadReviews() {
+    const grid = document.getElementById('reviewGallery');
+    if (!grid) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_reviews'), orderBy('createdAt', 'desc')));
+        if (snap.empty) {
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#bbb;">No reviews yet.</p>';
+            return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(d => {
+            const r = d.data();
+            grid.innerHTML += `
+            <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.07);
+                        border:1px solid #f1f5f9;transition:0.25s;" 
+                 onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'"
+                 onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(0,0,0,0.07)'">
+                <img src="${r.image}" alt="${r.name}" loading="lazy"
+                     style="width:100%;display:block;object-fit:cover;border-bottom:1px solid #f1f5f9;">
+                <div style="padding:14px 16px;">
+                    <div style="font-weight:700;font-size:0.95rem;">${r.name}</div>
+                    <div style="color:#888;font-size:0.82rem;">${r.role || 'Student'}</div>
+                </div>
+            </div>`;
+        });
+    } catch(e) { console.warn('loadReviews:', e); }
+}
+
+// ─── TEAM LOADER ──────────────────────────────────────────
+async function loadTeam() {
+    const grid = document.getElementById('teamGrid');
+    if (!grid) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_team'), orderBy('createdAt', 'asc')));
+        if (snap.empty) {
+            // Fallback to hardcoded if no firebase data
+            grid.innerHTML = `
+            <div class="team-card">
+                <img src="images/diljeet-singh-sran.jpg" class="team-img" alt="Diljeet"
+                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Diljeet'">
+                <h3 class="team-name">Diljeet Singh Sran</h3>
+                <p class="team-role">Founder</p>
+                <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a></div>
+            </div>
+            <div class="team-card">
+                <img src="images/rishabh.jpeg" class="team-img" alt="Rishabh"
+                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Rishabh'">
+                <h3 class="team-name">Rishabh</h3>
+                <p class="team-role">CEO</p>
+                <div class="team-social"><a href="#"><i class="fab fa-linkedin"></i></a></div>
+            </div>`;
+            return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(d => {
+            const t = d.data();
+            const li = t.linkedin ? `<a href="${t.linkedin}" target="_blank"><i class="fab fa-linkedin"></i></a>` : '';
+            const ig = t.insta    ? `<a href="${t.insta}"    target="_blank"><i class="fab fa-instagram"></i></a>` : '';
+            grid.innerHTML += `
+            <div class="team-card">
+                <img src="${t.photo || 'https://api.dicebear.com/7.x/avataaars/svg?seed='+t.name}"
+                     class="team-img" alt="${t.name}"
+                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${t.name}'">
+                <h3 class="team-name">${t.name}</h3>
+                <p class="team-role">${t.role}</p>
+                <div class="team-social">${li}${ig}</div>
+            </div>`;
+        });
+    } catch(e) { console.warn('loadTeam:', e); }
+}
+
+// ─── BLOG LOADER ──────────────────────────────────────────
+async function loadBlog() {
+    const grid = document.getElementById('blogGrid');
+    if (!grid) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_blog'), orderBy('createdAt', 'desc')));
+        if (snap.empty) {
+            // Fallback hardcoded
+            grid.innerHTML = `
+            <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">We run Foundations</h3><p class="blog-desc">Building a foundation for lifelong learning across India.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>
+            <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">E-learning Platform</h3><p class="blog-desc">Providing world-class education for free to everyone.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>
+            <div class="blog-card"><div class="blog-content"><span class="blog-date">09 Dec 2022</span><h3 class="blog-title">Social Media Agency</h3><p class="blog-desc">Helping brands grow with expert marketing strategies.</p><a href="#" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a></div></div>`;
+            return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(d => {
+            const b = d.data();
+            grid.innerHTML += `
+            <div class="blog-card">
+                <div class="blog-content">
+                    <span class="blog-date">${b.date || ''}</span>
+                    <h3 class="blog-title">${b.title}</h3>
+                    <p class="blog-desc">${b.desc || ''}</p>
+                    ${b.link ? `<a href="${b.link}" target="_blank" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a>` : ''}
+                </div>
+            </div>`;
+        });
+    } catch(e) { console.warn('loadBlog:', e); }
+}
+

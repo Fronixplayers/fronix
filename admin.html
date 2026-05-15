@@ -36,6 +36,9 @@
         <span id="chatUnreadBadge" style="background:var(--danger);color:white;border-radius:10px;
               padding:2px 7px;font-size:0.72rem;margin-left:auto;display:none;"></span>
     </div>
+    <div class="nav-item" onclick="window.switchTab('website',this)">
+        <i class="fas fa-globe"></i> Website
+    </div>
     <div class="nav-item logout" onclick="window.logout()">
         <i class="fas fa-sign-out-alt"></i> Logout
     </div>
@@ -321,6 +324,197 @@
             </div>
         </div>
     </div>
+
+
+    <!-- ══════════════════ WEBSITE EDITOR SECTION ══════════════════ -->
+    <div id="websiteSection" class="section">
+
+        <!-- ── HERO ── -->
+        <div class="panel">
+            <h2><i class="fas fa-home" style="color:var(--primary);"></i> Hero Section</h2>
+            <div class="form-grid">
+                <div>
+                    <label class="form-label">Headline</label>
+                    <input type="text" id="wHeroTitle" placeholder="Main heading text…">
+                    <label class="form-label">Sub Text</label>
+                    <textarea id="wHeroSub" rows="3" placeholder="Hero paragraph…"></textarea>
+                    <label class="form-label">Button 1 Text</label>
+                    <input type="text" id="wHeroBtn1" placeholder="e.g. Start Learning">
+                    <label class="form-label">Button 2 Text</label>
+                    <input type="text" id="wHeroBtn2" placeholder="e.g. Explore Courses">
+                </div>
+                <div>
+                    <label class="form-label">Slide 1 Image URL</label>
+                    <input type="url" id="wSlide1" placeholder="https://…">
+                    <label class="form-label">Slide 2 Image URL</label>
+                    <input type="url" id="wSlide2" placeholder="https://…">
+                    <label class="form-label">Slide 3 Image URL</label>
+                    <input type="url" id="wSlide3" placeholder="https://…">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="window.saveWebsiteSection('hero')">
+                <i class="fas fa-save"></i> Save Hero
+            </button>
+        </div>
+
+        <!-- ── ABOUT ── -->
+        <div class="panel">
+            <h2><i class="fas fa-info-circle" style="color:var(--primary);"></i> About Section</h2>
+            <div class="form-grid">
+                <div>
+                    <label class="form-label">Heading</label>
+                    <input type="text" id="wAboutTitle" placeholder="e.g. 3 Years of Excellence 🏆">
+                    <label class="form-label">Paragraph 1</label>
+                    <textarea id="wAboutP1" rows="3"></textarea>
+                    <label class="form-label">Paragraph 2</label>
+                    <textarea id="wAboutP2" rows="3"></textarea>
+                    <label class="form-label">About Image URL</label>
+                    <input type="url" id="wAboutImg" placeholder="https://…">
+                </div>
+                <div>
+                    <label class="form-label">Stat 1 — Number</label>
+                    <input type="text" id="wStat1Num" placeholder="e.g. 1k+">
+                    <label class="form-label">Stat 1 — Label</label>
+                    <input type="text" id="wStat1Label" placeholder="e.g. Students">
+                    <label class="form-label">Stat 2 — Number</label>
+                    <input type="text" id="wStat2Num" placeholder="e.g. 100%">
+                    <label class="form-label">Stat 2 — Label</label>
+                    <input type="text" id="wStat2Label" placeholder="e.g. Free Access">
+                    <label class="form-label">Stat 3 — Number</label>
+                    <input type="text" id="wStat3Num" placeholder="e.g. 10+">
+                    <label class="form-label">Stat 3 — Label</label>
+                    <input type="text" id="wStat3Label" placeholder="e.g. Courses">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="window.saveWebsiteSection('about')">
+                <i class="fas fa-save"></i> Save About
+            </button>
+        </div>
+
+        <!-- ── POPUP / ANNOUNCEMENT ── -->
+        <div class="panel">
+            <h2><i class="fas fa-bullhorn" style="color:var(--primary);"></i> Announcement / Popup Banner</h2>
+            <label class="form-label">Popup Message</label>
+            <textarea id="wPopupMsg" rows="2" placeholder="e.g. 🎉 New course launched! Check it out now."></textarea>
+            <label class="form-label">Button Text (optional)</label>
+            <input type="text" id="wPopupBtn" placeholder="e.g. View Course">
+            <label class="form-label">Button Link (optional)</label>
+            <input type="url" id="wPopupLink" placeholder="https://…">
+            <div style="display:flex;align-items:center;gap:10px;margin:12px 0;">
+                <label class="form-label" style="margin:0;">Show Popup on Website?</label>
+                <select id="wPopupActive" style="width:auto;margin:0;padding:6px 12px;">
+                    <option value="false">No (Hidden)</option>
+                    <option value="true">Yes (Active)</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="window.saveWebsiteSection('popup')">
+                <i class="fas fa-save"></i> Save Popup
+            </button>
+        </div>
+
+        <!-- ── REVIEWS ── -->
+        <div class="panel">
+            <h2><i class="fas fa-star" style="color:var(--primary);"></i> Student Reviews</h2>
+            <p style="color:#888;font-size:0.87rem;margin-bottom:16px;">
+                Upload screenshots of student reviews. They appear as a scrollable gallery on the website.
+            </p>
+
+            <!-- Upload new review -->
+            <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1.5px dashed #c7d2fe;margin-bottom:18px;">
+                <label class="form-label">Student Name</label>
+                <input type="text" id="wRevName" placeholder="e.g. Kinjal" style="margin-bottom:10px;">
+                <label class="form-label">Role / Batch</label>
+                <input type="text" id="wRevRole" placeholder="e.g. Student · Canva Batch" style="margin-bottom:10px;">
+                <label class="form-label">Review Screenshot (max 3 MB)</label>
+                <input type="file" id="wRevFile" accept="image/*" style="margin-bottom:6px;">
+                <p style="font-size:0.78rem;color:#999;margin-bottom:12px;">
+                    <i class="fas fa-info-circle"></i> Image will be auto-compressed and stored
+                </p>
+                <button class="btn-primary" onclick="window.addReview()">
+                    <i class="fas fa-plus"></i> Add Review
+                </button>
+            </div>
+
+            <!-- Existing reviews list -->
+            <div id="adminReviewList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;"></div>
+        </div>
+
+        <!-- ── TEAM ── -->
+        <div class="panel">
+            <h2><i class="fas fa-users" style="color:var(--primary);"></i> Team Section</h2>
+            <p style="color:#888;font-size:0.87rem;margin-bottom:16px;">Add / remove team members visible on the website.</p>
+            <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1.5px dashed #c7d2fe;margin-bottom:18px;">
+                <div class="form-grid">
+                    <div>
+                        <label class="form-label">Name</label>
+                        <input type="text" id="wTeamName" placeholder="e.g. Diljeet Singh Sran">
+                        <label class="form-label">Role</label>
+                        <input type="text" id="wTeamRole" placeholder="e.g. Founder">
+                    </div>
+                    <div>
+                        <label class="form-label">Photo URL</label>
+                        <input type="url" id="wTeamPhoto" placeholder="https://…">
+                        <label class="form-label">LinkedIn URL</label>
+                        <input type="url" id="wTeamLinkedIn" placeholder="https://linkedin.com/in/…">
+                        <label class="form-label">Instagram URL</label>
+                        <input type="url" id="wTeamInsta" placeholder="https://instagram.com/…">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="window.addTeamMember()">
+                    <i class="fas fa-plus"></i> Add Member
+                </button>
+            </div>
+            <div id="adminTeamList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
+        </div>
+
+        <!-- ── BLOG / PROJECTS ── -->
+        <div class="panel">
+            <h2><i class="fas fa-newspaper" style="color:var(--primary);"></i> Blog / Projects</h2>
+            <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1.5px dashed #c7d2fe;margin-bottom:18px;">
+                <label class="form-label">Title</label>
+                <input type="text" id="wBlogTitle" placeholder="e.g. E-learning Platform">
+                <label class="form-label">Date</label>
+                <input type="text" id="wBlogDate" placeholder="e.g. 09 Dec 2022">
+                <label class="form-label">Description</label>
+                <textarea id="wBlogDesc" rows="2" placeholder="Short description…"></textarea>
+                <label class="form-label">Link URL</label>
+                <input type="url" id="wBlogLink" placeholder="https://…">
+                <button class="btn-primary" onclick="window.addBlogPost()">
+                    <i class="fas fa-plus"></i> Add Post
+                </button>
+            </div>
+            <div id="adminBlogList"></div>
+        </div>
+
+        <!-- ── CONTACT ── -->
+        <div class="panel">
+            <h2><i class="fas fa-address-card" style="color:var(--primary);"></i> Contact Info</h2>
+            <div class="form-grid">
+                <div>
+                    <label class="form-label">Address</label>
+                    <input type="text" id="wContactAddr" placeholder="City, State, Country">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="wContactEmail" placeholder="contact@example.com">
+                    <label class="form-label">Phone</label>
+                    <input type="text" id="wContactPhone" placeholder="+91 XXXXXXXXXX">
+                </div>
+                <div>
+                    <label class="form-label">Facebook URL</label>
+                    <input type="url" id="wSocFb" placeholder="https://facebook.com/…">
+                    <label class="form-label">Instagram URL</label>
+                    <input type="url" id="wSocInsta" placeholder="https://instagram.com/…">
+                    <label class="form-label">YouTube URL</label>
+                    <input type="url" id="wSocYt" placeholder="https://youtube.com/…">
+                    <label class="form-label">Footer Tagline</label>
+                    <input type="text" id="wFooterTag" placeholder="e.g. Created by Altmediia">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="window.saveWebsiteSection('contact')">
+                <i class="fas fa-save"></i> Save Contact
+            </button>
+        </div>
+
+    </div><!-- /websiteSection -->
 
 </main>
 

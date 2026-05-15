@@ -180,3 +180,12 @@ footer { background: #0f172a; color: white; padding: 4rem 5% 2rem; }
     .hero-text h1 { font-size: 1.9rem; }
     .section-header h2 { font-size: 1.9rem; }
 }
+
+/* ── Announcement Popup ── */
+#announcementPopup .modal-box {
+    background: linear-gradient(145deg, #fff, #eef2ff);
+    border-top: 4px solid var(--primary);
+}
+#popupMsg {
+    color: var(--text-main);
+}

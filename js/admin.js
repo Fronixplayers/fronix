@@ -3,7 +3,7 @@
 import {
     auth, db,
     onAuthStateChanged, signOut,
-    collection, addDoc, getDoc, doc, onSnapshot,
+    collection, addDoc, getDoc, getDocs, doc, setDoc, onSnapshot,
     query, updateDoc, where, orderBy, deleteDoc, serverTimestamp
 } from './firebase-config.js';
 
@@ -55,6 +55,7 @@ window.switchTab = (tab, el) => {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     const sec = document.getElementById(tab + 'Section');
     if (sec) sec.classList.add('active');
+    if (tab === 'website') loadWebsiteEditor();
     if (window.innerWidth <= 900) {
         document.querySelector('aside')?.classList.remove('active');
         document.querySelector('.sidebar-overlay')?.classList.remove('active');
@@ -817,3 +818,328 @@ window.sendTicketReply = async () => {
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Reply';
     }
 };
+
+// ══════════════════════════════════════════════════════════════
+// ─── WEBSITE EDITOR ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+
+// Load all website data into the editor when tab opens
+async function loadWebsiteEditor() {
+    try {
+        const snap = await getDoc(doc(db, 'website', 'content'));
+        const d = snap.exists() ? snap.data() : {};
+
+        // Hero
+        setVal('wHeroTitle',  d.hero?.title  || '');
+        setVal('wHeroSub',    d.hero?.sub    || '');
+        setVal('wHeroBtn1',   d.hero?.btn1   || '');
+        setVal('wHeroBtn2',   d.hero?.btn2   || '');
+        setVal('wSlide1',     d.hero?.slide1 || '');
+        setVal('wSlide2',     d.hero?.slide2 || '');
+        setVal('wSlide3',     d.hero?.slide3 || '');
+
+        // About
+        setVal('wAboutTitle',  d.about?.title  || '');
+        setVal('wAboutP1',     d.about?.p1     || '');
+        setVal('wAboutP2',     d.about?.p2     || '');
+        setVal('wAboutImg',    d.about?.img    || '');
+        setVal('wStat1Num',    d.about?.stat1Num   || '');
+        setVal('wStat1Label',  d.about?.stat1Label || '');
+        setVal('wStat2Num',    d.about?.stat2Num   || '');
+        setVal('wStat2Label',  d.about?.stat2Label || '');
+        setVal('wStat3Num',    d.about?.stat3Num   || '');
+        setVal('wStat3Label',  d.about?.stat3Label || '');
+
+        // Popup
+        setVal('wPopupMsg',    d.popup?.msg    || '');
+        setVal('wPopupBtn',    d.popup?.btn    || '');
+        setVal('wPopupLink',   d.popup?.link   || '');
+        const popSel = document.getElementById('wPopupActive');
+        if (popSel) popSel.value = d.popup?.active ? 'true' : 'false';
+
+        // Contact
+        setVal('wContactAddr',  d.contact?.address || '');
+        setVal('wContactEmail', d.contact?.email   || '');
+        setVal('wContactPhone', d.contact?.phone   || '');
+        setVal('wSocFb',        d.contact?.fb      || '');
+        setVal('wSocInsta',     d.contact?.insta   || '');
+        setVal('wSocYt',        d.contact?.yt      || '');
+        setVal('wFooterTag',    d.contact?.footerTag || '');
+
+    } catch(e) { console.warn('loadWebsiteEditor:', e); }
+
+    loadAdminReviews();
+    loadAdminTeam();
+    loadAdminBlog();
+}
+
+function setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+}
+
+// ── Generic section save ────────────────────────────────────
+window.saveWebsiteSection = async (section) => {
+    const btn = event.target;
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+    let data = {};
+
+    if (section === 'hero') {
+        data = { hero: {
+            title:  getVal('wHeroTitle'),
+            sub:    getVal('wHeroSub'),
+            btn1:   getVal('wHeroBtn1'),
+            btn2:   getVal('wHeroBtn2'),
+            slide1: getVal('wSlide1'),
+            slide2: getVal('wSlide2'),
+            slide3: getVal('wSlide3'),
+        }};
+    } else if (section === 'about') {
+        data = { about: {
+            title:      getVal('wAboutTitle'),
+            p1:         getVal('wAboutP1'),
+            p2:         getVal('wAboutP2'),
+            img:        getVal('wAboutImg'),
+            stat1Num:   getVal('wStat1Num'),
+            stat1Label: getVal('wStat1Label'),
+            stat2Num:   getVal('wStat2Num'),
+            stat2Label: getVal('wStat2Label'),
+            stat3Num:   getVal('wStat3Num'),
+            stat3Label: getVal('wStat3Label'),
+        }};
+    } else if (section === 'popup') {
+        data = { popup: {
+            msg:    getVal('wPopupMsg'),
+            btn:    getVal('wPopupBtn'),
+            link:   getVal('wPopupLink'),
+            active: document.getElementById('wPopupActive')?.value === 'true',
+        }};
+    } else if (section === 'contact') {
+        data = { contact: {
+            address:   getVal('wContactAddr'),
+            email:     getVal('wContactEmail'),
+            phone:     getVal('wContactPhone'),
+            fb:        getVal('wSocFb'),
+            insta:     getVal('wSocInsta'),
+            yt:        getVal('wSocYt'),
+            footerTag: getVal('wFooterTag'),
+        }};
+    }
+
+    try {
+        await setDoc(doc(db, 'website', 'content'), data, { merge: true });
+        showToast('✅ ' + section.charAt(0).toUpperCase() + section.slice(1) + ' saved!', 'success');
+    } catch(e) {
+        showToast('Save failed: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false; btn.innerHTML = orig;
+    }
+};
+
+function getVal(id) {
+    return document.getElementById(id)?.value?.trim() || '';
+}
+
+// ── REVIEWS ────────────────────────────────────────────────────
+async function loadAdminReviews() {
+    const list = document.getElementById('adminReviewList');
+    if (!list) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_reviews'), orderBy('createdAt', 'desc')));
+        list.innerHTML = '';
+        if (snap.empty) {
+            list.innerHTML = '<p style="color:#aaa;font-size:0.87rem;">No reviews yet.</p>';
+            return;
+        }
+        snap.forEach(d => {
+            const r = d.data();
+            list.innerHTML += `
+            <div class="review-admin-card">
+                <button class="del-review" onclick="window.deleteReview('${d.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <img src="${r.image}" alt="${r.name}" loading="lazy">
+                <div style="font-weight:700;font-size:0.87rem;">${r.name}</div>
+                <div style="color:#888;font-size:0.78rem;">${r.role || ''}</div>
+            </div>`;
+        });
+    } catch(e) { console.error(e); }
+}
+
+window.addReview = async () => {
+    const name = getVal('wRevName');
+    const role = getVal('wRevRole');
+    const file = document.getElementById('wRevFile')?.files[0];
+
+    if (!name) { showToast('Enter student name.', 'error'); return; }
+    if (!file) { showToast('Select a screenshot image.', 'error'); return; }
+    if (file.size > 3 * 1024 * 1024) { showToast('Image must be under 3 MB.', 'error'); return; }
+
+    const btn = event.target;
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+
+    try {
+        const compressed = await compressReviewImage(file, 700);
+        await addDoc(collection(db, 'website_reviews'), {
+            name, role, image: compressed,
+            createdAt: serverTimestamp()
+        });
+        showToast('✅ Review added!', 'success');
+        document.getElementById('wRevName').value = '';
+        document.getElementById('wRevRole').value = '';
+        document.getElementById('wRevFile').value = '';
+        loadAdminReviews();
+    } catch(e) {
+        showToast('Upload failed: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false; btn.innerHTML = orig;
+    }
+};
+
+window.deleteReview = async (id) => {
+    if (!confirm('Delete this review?')) return;
+    try {
+        await deleteDoc(doc(db, 'website_reviews', id));
+        showToast('Review deleted.', 'success');
+        loadAdminReviews();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+function compressReviewImage(file, targetKB = 700) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Read failed'));
+        reader.onload = ev => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Image load failed'));
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let { width, height } = img;
+                const MAX_PX = 1200;
+                if (width > MAX_PX || height > MAX_PX) {
+                    if (width >= height) { height = Math.round(height * MAX_PX / width); width = MAX_PX; }
+                    else { width = Math.round(width * MAX_PX / height); height = MAX_PX; }
+                }
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                let result = '';
+                for (const q of [0.85, 0.75, 0.6, 0.45, 0.3, 0.15]) {
+                    result = canvas.toDataURL('image/jpeg', q);
+                    if (result.length * 3 / 4 <= targetKB * 1024) break;
+                }
+                resolve(result);
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// ── TEAM ───────────────────────────────────────────────────────
+async function loadAdminTeam() {
+    const list = document.getElementById('adminTeamList');
+    if (!list) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_team'), orderBy('createdAt', 'asc')));
+        list.innerHTML = '';
+        if (snap.empty) { list.innerHTML = '<p style="color:#aaa;font-size:0.87rem;">No team members yet.</p>'; return; }
+        snap.forEach(d => {
+            const t = d.data();
+            list.innerHTML += `
+            <div class="team-admin-card">
+                <button class="del-team" onclick="window.deleteTeamMember('${d.id}')"><i class="fas fa-trash"></i></button>
+                <img src="${t.photo || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + t.name}" alt="${t.name}"
+                     onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${t.name}'">
+                <div style="font-weight:700;font-size:0.87rem;">${t.name}</div>
+                <div style="color:var(--primary);font-size:0.75rem;font-weight:700;">${t.role}</div>
+            </div>`;
+        });
+    } catch(e) { console.error(e); }
+}
+
+window.addTeamMember = async () => {
+    const name  = getVal('wTeamName');
+    const role  = getVal('wTeamRole');
+    const photo = getVal('wTeamPhoto');
+    if (!name || !role) { showToast('Name and Role are required.', 'error'); return; }
+    const btn = event.target; btn.disabled = true;
+    const orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding…';
+    try {
+        await addDoc(collection(db, 'website_team'), {
+            name, role, photo,
+            linkedin: getVal('wTeamLinkedIn'),
+            insta:    getVal('wTeamInsta'),
+            createdAt: serverTimestamp()
+        });
+        showToast('✅ Team member added!', 'success');
+        ['wTeamName','wTeamRole','wTeamPhoto','wTeamLinkedIn','wTeamInsta'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+        loadAdminTeam();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+    finally { btn.disabled = false; btn.innerHTML = orig; }
+};
+
+window.deleteTeamMember = async (id) => {
+    if (!confirm('Remove this team member?')) return;
+    try {
+        await deleteDoc(doc(db, 'website_team', id));
+        showToast('Removed.', 'success');
+        loadAdminTeam();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+// ── BLOG ───────────────────────────────────────────────────────
+async function loadAdminBlog() {
+    const list = document.getElementById('adminBlogList');
+    if (!list) return;
+    try {
+        const snap = await getDocs(query(collection(db, 'website_blog'), orderBy('createdAt', 'desc')));
+        list.innerHTML = '';
+        if (snap.empty) { list.innerHTML = '<p style="color:#aaa;font-size:0.87rem;">No posts yet.</p>'; return; }
+        snap.forEach(d => {
+            const b = d.data();
+            list.innerHTML += `
+            <div class="blog-admin-row">
+                <div>
+                    <div style="font-weight:700;font-size:0.88rem;">${b.title}</div>
+                    <div style="color:#888;font-size:0.78rem;">${b.date} · ${b.desc}</div>
+                </div>
+                <button class="action-btn btn-trash" onclick="window.deleteBlogPost('${d.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>`;
+        });
+    } catch(e) { console.error(e); }
+}
+
+window.addBlogPost = async () => {
+    const title = getVal('wBlogTitle');
+    const date  = getVal('wBlogDate');
+    const desc  = getVal('wBlogDesc');
+    const link  = getVal('wBlogLink');
+    if (!title) { showToast('Title is required.', 'error'); return; }
+    const btn = event.target; btn.disabled = true;
+    const orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding…';
+    try {
+        await addDoc(collection(db, 'website_blog'), { title, date, desc, link, createdAt: serverTimestamp() });
+        showToast('✅ Post added!', 'success');
+        ['wBlogTitle','wBlogDate','wBlogDesc','wBlogLink'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+        loadAdminBlog();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+    finally { btn.disabled = false; btn.innerHTML = orig; }
+};
+
+window.deleteBlogPost = async (id) => {
+    if (!confirm('Delete this post?')) return;
+    try {
+        await deleteDoc(doc(db, 'website_blog', id));
+        showToast('Deleted.', 'success');
+        loadAdminBlog();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+
