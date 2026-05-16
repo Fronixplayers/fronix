@@ -264,15 +264,26 @@
 </div>
 
 
-<!-- ─── ANNOUNCEMENT POPUP ─────────────────────────────── -->
-<div class="modal-overlay" id="announcementPopup" style="z-index:3000;">
-    <div class="modal-box" style="max-width:480px;width:92%;text-align:center;padding:36px 30px;">
-        <span class="modal-close" onclick="document.getElementById('announcementPopup').classList.remove('active')">&times;</span>
-        <div style="font-size:2.5rem;margin-bottom:12px;" id="popupEmoji">📢</div>
-        <p id="popupMsg" style="font-size:1.05rem;font-weight:600;color:#1f2937;margin-bottom:20px;line-height:1.6;"></p>
-        <div id="popupBtnWrap"></div>
+<!-- ─── LANDING POPUPS ──────────────────────────────────── -->
+<div id="landingPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);
+     backdrop-filter:blur(6px);z-index:3000;justify-content:center;align-items:center;"></div>
+<div id="landingPopupBox" style="display:none;position:fixed;top:50%;left:50%;
+     transform:translate(-50%,-50%);z-index:3001;background:white;border-radius:22px;
+     padding:30px;max-width:460px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.25);
+     max-height:88vh;overflow-y:auto;animation:lpopIn 0.35s cubic-bezier(0.34,1.56,0.64,1);">
+    <button onclick="window.closeLandingPopup()" style="position:absolute;top:14px;right:16px;
+            background:none;border:none;font-size:1.5rem;cursor:pointer;color:#aaa;line-height:1;">&times;</button>
+    <div id="lpImgWrap" style="display:none;margin-bottom:16px;border-radius:12px;overflow:hidden;">
+        <img id="lpImg" src="" alt="" style="width:100%;display:block;max-height:220px;object-fit:cover;">
     </div>
+    <div id="lpTitle" style="font-size:1.15rem;font-weight:800;margin-bottom:8px;color:#1f2937;"></div>
+    <div id="lpMsg"   style="font-size:0.92rem;color:#555;line-height:1.6;margin-bottom:16px;"></div>
+    <div id="lpBtnWrap"></div>
+    <div id="lpDots" style="display:flex;justify-content:center;gap:7px;margin-top:14px;"></div>
 </div>
+<style>
+@keyframes lpopIn { from{opacity:0;transform:translate(-50%,-54%) scale(0.9)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
+</style>
 <script type="module" src="js/landing.js"></script>
 <script type="module" src="js/firebase-config.js"></script>
 </body>

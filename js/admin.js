@@ -850,12 +850,8 @@ async function loadWebsiteEditor() {
         setVal('wStat3Num',    d.about?.stat3Num   || '');
         setVal('wStat3Label',  d.about?.stat3Label || '');
 
-        // Popup
-        setVal('wPopupMsg',    d.popup?.msg    || '');
-        setVal('wPopupBtn',    d.popup?.btn    || '');
-        setVal('wPopupLink',   d.popup?.link   || '');
-        const popSel = document.getElementById('wPopupActive');
-        if (popSel) popSel.value = d.popup?.active ? 'true' : 'false';
+        // Popups loaded separately
+        loadAdminPopups();
 
         // Contact
         setVal('wContactAddr',  d.contact?.address || '');
@@ -909,13 +905,6 @@ window.saveWebsiteSection = async (section) => {
             stat2Label: getVal('wStat2Label'),
             stat3Num:   getVal('wStat3Num'),
             stat3Label: getVal('wStat3Label'),
-        }};
-    } else if (section === 'popup') {
-        data = { popup: {
-            msg:    getVal('wPopupMsg'),
-            btn:    getVal('wPopupBtn'),
-            link:   getVal('wPopupLink'),
-            active: document.getElementById('wPopupActive')?.value === 'true',
         }};
     } else if (section === 'contact') {
         data = { contact: {
@@ -1143,3 +1132,143 @@ window.deleteBlogPost = async (id) => {
 };
 
 
+
+// ══════════════════════════════════════════════════════════════
+// ─── POPUPS MANAGER ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+
+async function loadAdminPopups() {
+    const list = document.getElementById('adminPopupList');
+    const badge = document.getElementById('popupCountBadge');
+    if (!list) return;
+    list.innerHTML = '<p style="color:#bbb;font-size:0.87rem;text-align:center;padding:20px;">Loading popups…</p>';
+    try {
+        const snap = await getDocs(query(collection(db, 'website_popups'), orderBy('createdAt', 'desc')));
+        const activeCount = snap.docs.filter(d => d.data().active).length;
+        if (badge) badge.innerText = activeCount + ' active';
+
+        if (snap.empty) {
+            list.innerHTML = '<p style="color:#aaa;font-size:0.87rem;text-align:center;padding:20px;">No popups yet. Create your first one above.</p>';
+            return;
+        }
+
+        list.innerHTML = '';
+        snap.forEach(d => {
+            const p = d.data();
+            const targetLabels = { both: '🌐 Both Pages', landing: '🏠 Landing Only', student: '🎓 Student Only' };
+            const targetLabel = targetLabels[p.target] || '🌐 Both Pages';
+            const statusColor = p.active ? '#10b981' : '#94a3b8';
+            const statusBg    = p.active ? '#dcfce7'  : '#f1f5f9';
+            const statusTxt   = p.active ? '✅ Active' : '⏸ Inactive';
+
+            list.innerHTML += `
+            <div style="background:white;border:1.5px solid #e5e7eb;border-radius:14px;padding:16px;
+                        margin-bottom:12px;transition:0.2s;display:flex;gap:14px;align-items:flex-start;"
+                 onmouseover="this.style.borderColor='#c7d2fe'" onmouseout="this.style.borderColor='#e5e7eb'">
+
+                <!-- Image preview -->
+                ${p.image ? `<img src="${p.image}" alt="" style="width:80px;height:80px;object-fit:cover;
+                    border-radius:10px;flex-shrink:0;border:1px solid #e5e7eb;">` :
+                    `<div style="width:80px;height:80px;border-radius:10px;background:#f8fafc;
+                    border:1.5px dashed #e5e7eb;display:flex;align-items:center;justify-content:center;
+                    flex-shrink:0;color:#ccc;font-size:1.5rem;"><i class="fas fa-image"></i></div>`}
+
+                <!-- Content -->
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px;">
+                        <strong style="font-size:0.95rem;">${p.title || '(No title)'}</strong>
+                        <span style="background:${statusBg};color:${statusColor};font-size:0.72rem;
+                              font-weight:700;padding:2px 9px;border-radius:20px;">${statusTxt}</span>
+                        <span style="background:#eef2ff;color:var(--primary);font-size:0.72rem;
+                              font-weight:700;padding:2px 9px;border-radius:20px;">${targetLabel}</span>
+                        <span style="background:#f1f5f9;color:#64748b;font-size:0.72rem;
+                              font-weight:700;padding:2px 9px;border-radius:20px;">
+                              ⏱ ${p.delay || 1}s delay</span>
+                    </div>
+                    <div style="color:#555;font-size:0.84rem;margin-bottom:8px;overflow:hidden;
+                                text-overflow:ellipsis;white-space:nowrap;">${p.msg || ''}</div>
+                    ${p.btnText ? `<div style="font-size:0.78rem;color:#888;">
+                        Button: <strong>${p.btnText}</strong>${p.btnLink ? ' → ' + p.btnLink : ''}</div>` : ''}
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex;flex-direction:column;gap:7px;flex-shrink:0;">
+                    <button class="action-btn ${p.active ? 'btn-block' : 'btn-approve'}"
+                            onclick="window.togglePopupActive('${d.id}', ${!p.active})">
+                        <i class="fas fa-${p.active ? 'pause' : 'play'}"></i>
+                        ${p.active ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button class="action-btn btn-trash"
+                            onclick="window.deletePopup('${d.id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>`;
+        });
+    } catch(e) {
+        list.innerHTML = '<p style="color:#ef4444;font-size:0.87rem;">Error loading popups: ' + e.message + '</p>';
+    }
+}
+
+window.createPopup = async () => {
+    const title  = getVal('npTitle');
+    const msg    = getVal('npMsg');
+    const btnTxt = getVal('npBtn');
+    const btnLnk = getVal('npLink');
+    const target = document.getElementById('npTarget')?.value || 'both';
+    const delay  = parseInt(document.getElementById('npDelay')?.value) || 1;
+    const active = document.getElementById('npActive')?.value === 'true';
+    const imgFile = document.getElementById('npImg')?.files[0];
+
+    if (!title && !msg) { showToast('Enter at least a title or message.', 'error'); return; }
+    if (imgFile && imgFile.size > 3 * 1024 * 1024) { showToast('Image must be under 3 MB.', 'error'); return; }
+
+    const btn = event.target;
+    btn.disabled = true;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…';
+
+    try {
+        let imageBase64 = '';
+        if (imgFile) imageBase64 = await compressReviewImage(imgFile, 600);
+
+        await addDoc(collection(db, 'website_popups'), {
+            title, msg,
+            btnText: btnTxt, btnLink: btnLnk,
+            target, delay, active,
+            image: imageBase64,
+            createdAt: serverTimestamp()
+        });
+
+        showToast('✅ Popup created!', 'success');
+        // Clear form
+        ['npTitle','npMsg','npBtn','npLink'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+        const npImg = document.getElementById('npImg'); if(npImg) npImg.value = '';
+        const npDelay = document.getElementById('npDelay'); if(npDelay) npDelay.value = '1';
+        const npTarget = document.getElementById('npTarget'); if(npTarget) npTarget.value = 'both';
+        const npActive = document.getElementById('npActive'); if(npActive) npActive.value = 'true';
+
+        loadAdminPopups();
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false; btn.innerHTML = orig;
+    }
+};
+
+window.togglePopupActive = async (id, newState) => {
+    try {
+        await updateDoc(doc(db, 'website_popups', id), { active: newState });
+        showToast(newState ? '✅ Popup activated!' : '⏸ Popup deactivated.', 'success');
+        loadAdminPopups();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};
+
+window.deletePopup = async (id) => {
+    if (!confirm('Delete this popup permanently?')) return;
+    try {
+        await deleteDoc(doc(db, 'website_popups', id));
+        showToast('Popup deleted.', 'success');
+        loadAdminPopups();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+};

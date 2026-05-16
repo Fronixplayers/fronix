@@ -259,6 +259,7 @@ loadWebsiteContent();
 loadReviews();
 loadTeam();
 loadBlog();
+loadLandingPopups();
 // ─── WEBSITE CONTENT LOADER ──────────────────────────────
 async function loadWebsiteContent() {
     try {
@@ -307,20 +308,7 @@ async function loadWebsiteContent() {
             setHref('socFb', c.fb); setHref('socInsta', c.insta); setHref('socYt', c.yt);
         }
 
-        // Popup
-        if (d.popup && d.popup.active && d.popup.msg) {
-            const popup = document.getElementById('announcementPopup');
-            const msgEl = document.getElementById('popupMsg');
-            const btnWrap = document.getElementById('popupBtnWrap');
-            if (popup && msgEl) {
-                msgEl.innerText = d.popup.msg;
-                if (d.popup.btn && d.popup.link && btnWrap) {
-                    btnWrap.innerHTML = `<a href="${d.popup.link}" class="btn btn-fill" style="display:inline-flex;justify-content:center;">
-                        ${d.popup.btn} <i class="fas fa-arrow-right"></i></a>`;
-                }
-                setTimeout(() => popup.classList.add('active'), 1200);
-            }
-        }
+        // Popups loaded via loadLandingPopups()
     } catch(e) { console.warn('loadWebsiteContent:', e); }
 }
 
@@ -426,3 +414,103 @@ async function loadBlog() {
     } catch(e) { console.warn('loadBlog:', e); }
 }
 
+
+// ─── LANDING PAGE POPUPS ──────────────────────────────────────
+let _landingPopups = [];
+let _landingPopupIdx = 0;
+
+async function loadLandingPopups() {
+    try {
+        const snap = await getDocs(query(
+            collection(db, 'website_popups'),
+            orderBy('createdAt', 'desc')
+        ));
+        _landingPopups = [];
+        snap.forEach(d => {
+            const p = d.data();
+            if (p.active && (p.target === 'landing' || p.target === 'both')) {
+                _landingPopups.push(p);
+            }
+        });
+        if (!_landingPopups.length) return;
+
+        _landingPopupIdx = 0;
+        // Delay by first popup's delay setting
+        const firstDelay = (_landingPopups[0].delay || 1) * 1000;
+        setTimeout(() => showLandingPopup(0), firstDelay);
+    } catch(e) { console.warn('loadLandingPopups:', e); }
+}
+
+function showLandingPopup(idx) {
+    const popups = _landingPopups;
+    if (!popups.length) return;
+    const p = popups[idx];
+    const box     = document.getElementById('landingPopupBox');
+    const overlay = document.getElementById('landingPopupOverlay');
+    if (!box || !overlay) return;
+
+    // Image
+    const imgWrap = document.getElementById('lpImgWrap');
+    const img     = document.getElementById('lpImg');
+    if (p.image) {
+        img.src = p.image;
+        imgWrap.style.display = 'block';
+    } else {
+        imgWrap.style.display = 'none';
+    }
+
+    // Text
+    document.getElementById('lpTitle').innerText  = p.title || '';
+    document.getElementById('lpMsg').innerText    = p.msg   || '';
+
+    // Button
+    const btnWrap = document.getElementById('lpBtnWrap');
+    btnWrap.innerHTML = p.btnText
+        ? `<a href="${p.btnLink || '#'}" class="btn btn-fill"
+              style="display:inline-flex;justify-content:center;width:100%;"
+              target="${p.btnLink ? '_blank' : '_self'}">
+               ${p.btnText} <i class="fas fa-arrow-right"></i>
+           </a>` : '';
+
+    // Dots for multiple popups
+    const dots = document.getElementById('lpDots');
+    dots.innerHTML = popups.length > 1
+        ? popups.map((_, i) =>
+            `<span onclick="window.goLandingPopup(${i})"
+                  style="width:8px;height:8px;border-radius:50%;cursor:pointer;transition:0.2s;
+                         background:${i === idx ? 'var(--primary)' : '#d1d5db'};
+                         display:inline-block;"></span>`).join('')
+        : '';
+
+    // Show
+    box.style.display = 'block';
+    overlay.style.display = 'flex';
+    _landingPopupIdx = idx;
+
+    // Auto-advance to next popup after 8s if multiple
+    if (popups.length > 1) {
+        clearTimeout(box._autoTimer);
+        box._autoTimer = setTimeout(() => {
+            const next = (idx + 1) % popups.length;
+            showLandingPopup(next);
+        }, 8000);
+    }
+}
+
+window.goLandingPopup = (idx) => {
+    clearTimeout(document.getElementById('landingPopupBox')?._autoTimer);
+    showLandingPopup(idx);
+};
+
+window.closeLandingPopup = () => {
+    const box     = document.getElementById('landingPopupBox');
+    const overlay = document.getElementById('landingPopupOverlay');
+    clearTimeout(box?._autoTimer);
+    if (box)     box.style.display     = 'none';
+    if (overlay) overlay.style.display = 'none';
+};
+
+// Close on overlay click
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('landingPopupOverlay')?.addEventListener('click', window.closeLandingPopup);
+});

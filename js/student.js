@@ -5,7 +5,7 @@ import {
     onAuthStateChanged, signOut,
     collection, addDoc, getDoc, doc, onSnapshot,
     query, orderBy, serverTimestamp, updateDoc,
-    where, limit, increment
+    where, limit, increment, getDocs
 } from './firebase-config.js';
 
 let currentUser   = null;
@@ -35,6 +35,9 @@ onAuthStateChanged(auth, (user) => {
     updateDoc(doc(db, 'users', user.uid), {
         lastLogin: serverTimestamp()
     }).catch(() => {}); // silent fail if user doc not ready yet
+
+    // Load student-targeted popups
+    loadStudentPopups();
 
     // Real-time listener so UI updates immediately when admin changes data
     onSnapshot(doc(db, 'users', user.uid), (snap) => {
@@ -169,6 +172,99 @@ window.toggleSidebar = () => {
     document.querySelector('aside')?.classList.toggle('open');
     document.querySelector('.sidebar-overlay')?.classList.toggle('active');
 };
+
+// ─── STUDENT POPUPS ──────────────────────────────────────────
+let _studentPopups = [];
+let _studentPopupIdx = 0;
+
+async function loadStudentPopups() {
+    try {
+        const snap = await getDocs(query(
+            collection(db, 'website_popups'),
+            orderBy('createdAt', 'desc')
+        ));
+        _studentPopups = [];
+        snap.forEach(d => {
+            const p = d.data();
+            if (p.active && (p.target === 'student' || p.target === 'both')) {
+                _studentPopups.push(p);
+            }
+        });
+        if (!_studentPopups.length) return;
+        _studentPopupIdx = 0;
+        const firstDelay = (_studentPopups[0].delay || 1) * 1000;
+        setTimeout(() => showStudentPopup(0), firstDelay);
+    } catch(e) { console.warn('loadStudentPopups:', e); }
+}
+
+function showStudentPopup(idx) {
+    const popups = _studentPopups;
+    if (!popups.length) return;
+    const p = popups[idx];
+
+    const box     = document.getElementById('studentPopupBox');
+    const overlay = document.getElementById('studentPopupOverlay');
+    if (!box || !overlay) return;
+
+    // Image
+    const imgWrap = document.getElementById('spImgWrap');
+    const img     = document.getElementById('spImg');
+    if (p.image) { img.src = p.image; imgWrap.style.display = 'block'; }
+    else { imgWrap.style.display = 'none'; }
+
+    // Text
+    document.getElementById('spTitle').innerText = p.title || '';
+    document.getElementById('spMsg').innerText   = p.msg   || '';
+
+    // Button
+    const btnWrap = document.getElementById('spBtnWrap');
+    btnWrap.innerHTML = p.btnText
+        ? `<a href="${p.btnLink || '#'}"
+              style="display:block;text-align:center;padding:11px 22px;background:var(--primary,#4F46E5);
+                     color:white;border-radius:50px;font-weight:700;font-size:0.95rem;text-decoration:none;
+                     transition:0.2s;" target="${p.btnLink ? '_blank' : '_self'}"
+              onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='var(--primary,#4F46E5)'">
+               ${p.btnText} →
+           </a>` : '';
+
+    // Dots
+    const dots = document.getElementById('spDots');
+    dots.innerHTML = popups.length > 1
+        ? popups.map((_, i) =>
+            `<span onclick="window.goStudentPopup(${i})"
+                  style="width:8px;height:8px;border-radius:50%;cursor:pointer;transition:0.2s;
+                         background:${i === idx ? '#4F46E5' : '#d1d5db'};display:inline-block;"></span>`
+          ).join('') : '';
+
+    // Show
+    box.style.display     = 'block';
+    overlay.style.display = 'flex';
+    _studentPopupIdx = idx;
+
+    // Auto-advance
+    if (popups.length > 1) {
+        clearTimeout(box._autoTimer);
+        box._autoTimer = setTimeout(() => {
+            showStudentPopup((idx + 1) % popups.length);
+        }, 8000);
+    }
+}
+
+window.goStudentPopup = (idx) => {
+    clearTimeout(document.getElementById('studentPopupBox')?._autoTimer);
+    showStudentPopup(idx);
+};
+
+window.closeStudentPopup = () => {
+    const box     = document.getElementById('studentPopupBox');
+    const overlay = document.getElementById('studentPopupOverlay');
+    clearTimeout(box?._autoTimer);
+    if (box)     box.style.display     = 'none';
+    if (overlay) overlay.style.display = 'none';
+};
+
+// close on overlay click
+document.getElementById('studentPopupOverlay')?.addEventListener('click', window.closeStudentPopup);
 
 // ─── SESSION TIME TRACKER ────────────────────────────────
 let _sessionStart = Date.now();
