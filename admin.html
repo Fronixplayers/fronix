@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fronixplayers Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg: #050a0e;
+  --surface: #0c1419;
+  --surface2: #111c24;
+  --border: rgba(0,210,133,0.12);
+  --accent: #00d285;
+  --accent2: #00aaff;
+  --danger: #ff4d6d;
+  --warn: #ffb800;
+  --text: #e8f4f0;
+  --muted: #6b8a80;
+  --radius: 14px;
+  --glow: 0 0 30px rgba(0,210,133,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ===== AUTH SCREEN ===== */
+#authScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+.auth-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,210,133,0.12),transparent),
+              radial-gradient(ellipse 50% 50% at 80% 80%,rgba(0,170,255,0.08),transparent);
+}
+.auth-card{
+  position:relative;z-index:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:48px 40px;
+  width:420px;
+  max-width:94vw;
+  box-shadow:var(--glow),0 40px 80px rgba(0,0,0,0.6);
+}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+.auth-logo .logo-icon{
+  width:44px;height:44px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;color:#000;
+}
+.auth-logo .logo-text{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;}
+.auth-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:6px;}
+.auth-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px;}
+.auth-tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:28px;}
+.auth-tab{
+  flex:1;padding:8px;text-align:center;border-radius:8px;
+  cursor:pointer;font-size:.9rem;color:var(--muted);transition:.2s;border:none;background:transparent;
+}
+.auth-tab.active{background:var(--surface2);color:var(--accent);font-weight:600;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.field-wrap{position:relative;}
+.field-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;}
+.field input{
+  width:100%;padding:12px 14px 12px 40px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:.95rem;font-family:'DM Sans',sans-serif;
+  transition:.2s;outline:none;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,210,133,0.1);}
+.btn-auth{
+  width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),#00b870);
+  color:#000;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  transition:.2s;margin-top:4px;
+}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,210,133,0.35);}
+.btn-auth:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.auth-forgot{text-align:right;margin-bottom:18px;}
+.auth-forgot a{color:var(--accent);font-size:.85rem;cursor:pointer;text-decoration:none;}
+.auth-msg{padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none;}
+.auth-msg.success{background:rgba(0,210,133,0.1);border:1px solid rgba(0,210,133,0.3);color:var(--accent);}
+.auth-msg.error{background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);color:var(--danger);}
+
+/* ===== DASHBOARD LAYOUT ===== */
+#dashboard{display:none;}
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:260px;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:100;
+  transition:.3s;
+}
+.sidebar-logo{
+  padding:24px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.sidebar-logo .logo-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:1rem;color:#000;
+}
+.sidebar-logo .logo-text{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+.sidebar-badge{font-size:.65rem;background:rgba(0,210,133,0.15);color:var(--accent);padding:2px 7px;border-radius:20px;margin-left:auto;}
+.sidebar-nav{flex:1;overflow-y:auto;padding:16px 12px;}
+.nav-section{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:8px 8px 4px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:10px;cursor:pointer;color:var(--muted);
+  transition:.2s;margin-bottom:2px;font-size:.92rem;
+}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(0,210,133,0.12);color:var(--accent);font-weight:600;}
+.nav-item i{width:20px;text-align:center;}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);}
+.admin-info{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.admin-avatar{
+  width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;font-size:.9rem;
+}
+.admin-name{font-size:.88rem;font-weight:600;}
+.admin-email{font-size:.75rem;color:var(--muted);}
+.btn-logout{
+  width:100%;padding:8px;border-radius:8px;
+  background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);
+  color:var(--danger);cursor:pointer;font-size:.85rem;transition:.2s;
+}
+.btn-logout:hover{background:rgba(255,77,109,0.2);}
+
+/* ===== MAIN CONTENT ===== */
+.main{margin-left:260px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{
+  padding:16px 28px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,210,133,0.4);}50%{box-shadow:0 0 0 6px rgba(0,210,133,0);}}
+.content{padding:28px;flex:1;}
+
+/* ===== PANELS ===== */
+.panel{display:none;}
+.panel.active{display:block;}
+.panel-header{margin-bottom:24px;}
+.panel-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;}
+.panel-desc{color:var(--muted);font-size:.9rem;margin-top:4px;}
+
+/* ===== OVERVIEW CARDS ===== */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+.ov-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;
+  transition:.2s;cursor:default;
+}
+.ov-card:hover{border-color:rgba(0,210,133,0.3);box-shadow:var(--glow);}
+.ov-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;margin-bottom:12px;
+}
+.ov-val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:700;}
+.ov-lbl{font-size:.82rem;color:var(--muted);margin-top:2px;}
+
+/* ===== FORMS ===== */
+.edit-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;margin-bottom:20px;
+}
+.edit-card-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;
+  margin-bottom:18px;display:flex;align-items:center;gap:8px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.edit-card-title i{color:var(--accent);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-row.single{grid-template-columns:1fr;}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr;}
+.f-group{display:flex;flex-direction:column;gap:6px;}
+.f-group label{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.f-group input,.f-group textarea,.f-group select{
+  padding:10px 14px;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:.92rem;font-family:'DM Sans',sans-serif;
+  outline:none;transition:.2s;resize:vertical;
+}
+.f-group input:focus,.f-group textarea:focus,.f-group select:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,210,133,0.1);
+}
+.btn-save{
+  padding:10px 24px;border:none;border-radius:8px;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),#00b870);
+  color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;
+  transition:.2s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,210,133,0.3);}
+.btn-save:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-danger{
+  padding:8px 18px;border:1px solid rgba(255,77,109,0.3);border-radius:8px;cursor:pointer;
+  background:rgba(255,77,109,0.1);color:var(--danger);font-size:.85rem;transition:.2s;
+}
+.btn-danger:hover{background:rgba(255,77,109,0.2);}
+.btn-add{
+  padding:9px 20px;border:1px solid rgba(0,210,133,0.3);border-radius:8px;cursor:pointer;
+  background:rgba(0,210,133,0.08);color:var(--accent);font-size:.88rem;transition:.2s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-add:hover{background:rgba(0,210,133,0.15);}
+.save-status{
+  display:inline-flex;align-items:center;gap:6px;font-size:.85rem;
+  margin-left:12px;opacity:0;transition:.3s;
+}
+.save-status.show{opacity:1;}
+.save-status.ok{color:var(--accent);}
+.save-status.err{color:var(--danger);}
+
+/* ===== POPUP MANAGER ===== */
+.popup-list{display:flex;flex-direction:column;gap:12px;}
+.popup-item{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;padding:18px;
+  display:grid;grid-template-columns:80px 1fr auto;gap:16px;align-items:center;
+}
+.popup-thumb{
+  width:80px;height:60px;border-radius:8px;object-fit:cover;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);
+  font-size:1.4rem;overflow:hidden;
+}
+.popup-thumb img{width:100%;height:100%;object-fit:cover;}
+.popup-meta h4{font-size:.95rem;font-weight:600;margin-bottom:4px;}
+.popup-meta p{font-size:.8rem;color:var(--muted);}
+.popup-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.toggle-switch{
+  display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);
+}
+.toggle{
+  position:relative;width:40px;height:22px;
+}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{
+  position:absolute;inset:0;border-radius:22px;
+  background:var(--surface2);cursor:pointer;transition:.2s;border:1px solid var(--border);
+}
+.toggle-slider:before{
+  content:'';position:absolute;width:16px;height:16px;
+  left:2px;bottom:2px;border-radius:50%;
+  background:var(--muted);transition:.2s;
+}
+.toggle input:checked + .toggle-slider{background:rgba(0,210,133,0.2);border-color:var(--accent);}
+.toggle input:checked + .toggle-slider:before{transform:translateX(18px);background:var(--accent);}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9990;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:28px;width:600px;max-width:95vw;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);
+}
+.modal-head h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+.modal-close{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg);cursor:pointer;color:var(--muted);font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;transition:.2s;
+}
+.modal-close:hover{color:var(--danger);border-color:rgba(255,77,109,0.3);}
+.img-preview{
+  width:100%;height:180px;border-radius:10px;
+  border:2px dashed var(--border);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;transition:.2s;background:var(--bg);
+  margin-bottom:4px;
+}
+.img-preview:hover{border-color:var(--accent);}
+.img-preview img{width:100%;height:100%;object-fit:cover;position:absolute;}
+.img-preview .upload-hint{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--muted);font-size:.85rem;pointer-events:none;
+}
+.img-preview .upload-hint i{font-size:1.8rem;}
+.img-preview input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+
+/* ===== TEAM CARDS ===== */
+.team-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.team-admin-card{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;padding:16px;text-align:center;
+}
+.team-admin-card img{
+  width:70px;height:70px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--border);margin-bottom:8px;
+}
+.team-admin-card h4{font-size:.95rem;font-weight:600;}
+.team-admin-card p{font-size:.8rem;color:var(--accent);margin-bottom:12px;}
+
+/* ===== SERVICE/PROJECT ITEMS ===== */
+.list-items{display:flex;flex-direction:column;gap:10px;}
+.list-item{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.list-item-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(0,210,133,0.1);border:1px solid rgba(0,210,133,0.2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent);flex-shrink:0;
+}
+.list-item-content{flex:1;}
+.list-item-content h4{font-size:.9rem;font-weight:600;margin-bottom:2px;}
+.list-item-content p{font-size:.78rem;color:var(--muted);}
+.list-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-icon{
+  width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surface);cursor:pointer;color:var(--muted);font-size:.8rem;
+  display:flex;align-items:center;justify-content:center;transition:.2s;
+}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent);}
+.btn-icon.del:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ===== TOAST ===== */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  padding:12px 18px;border-radius:10px;font-size:.88rem;
+  display:flex;align-items:center;gap:10px;min-width:220px;
+  animation:slideIn .3s ease;
+}
+.toast.ok{background:rgba(0,210,133,0.15);border:1px solid rgba(0,210,133,0.3);color:var(--accent);}
+.toast.err{background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.3);color:var(--danger);}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ===== HAMBURGER ===== */
+.mobile-menu-btn{
+  display:none;position:fixed;top:16px;left:16px;z-index:200;
+  width:40px;height:40px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  cursor:pointer;color:var(--text);font-size:1rem;
+  align-items:center;justify-content:center;
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .mobile-menu-btn{display:flex;}
+  .form-row{grid-template-columns:1fr;}
+  .form-row.triple{grid-template-columns:1fr;}
+  .popup-item{grid-template-columns:1fr;text-align:center;}
+  .popup-thumb{margin:0 auto;}
+  .popup-actions{justify-content:center;}
+}
+
+/* Loading spinner */
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(0,0,0,0.2);
+  border-top-color:#000;border-radius:50%;
+  animation:spin .6s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Mobile Menu Button -->
+<button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="fa-brands fa-phoenix-framework"></i></div>
+      <div class="logo-text">Fronixplayers</div>
+    </div>
+    <div id="loginSection">
+      <h2 class="auth-title">Admin Login</h2>
+      <p class="auth-sub">Sign in to manage your website</p>
+      <div id="authMsg" class="auth-msg"></div>
+      <div class="field">
+        <label>Email</label>
+        <div class="field-wrap">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="loginEmail" placeholder="admin@fronixplayers.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="field-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+        </div>
+      </div>
+      <div class="auth-forgot"><a onclick="showForgot()">Forgot password?</a></div>
+      <button class="btn-auth" id="loginBtn" onclick="doLogin()">
+        <span id="loginBtnText">Sign In</span>
+      </button>
+    </div>
+    <div id="forgotSection" style="display:none;">
+      <h2 class="auth-title">Reset Password</h2>
+      <p class="auth-sub">Enter your email to receive a reset link</p>
+      <div id="forgotMsg" class="auth-msg"></div>
+      <div class="field">
+        <label>Email</label>
+        <div class="field-wrap">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="forgotEmail" placeholder="admin@fronixplayers.com">
+        </div>
+      </div>
+      <button class="btn-auth" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
+      <div style="text-align:center;margin-top:16px;">
+        <a onclick="showLogin()" style="color:var(--accent);font-size:.88rem;cursor:pointer;">← Back to Login</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="fa-brands fa-phoenix-framework"></i></div>
+      <div class="logo-text">FronixAdmin</div>
+      <div class="sidebar-badge">v2</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="showPanel('overview',this)">
+        <i class="fas fa-gauge-high"></i> Dashboard
+      </div>
+      <div class="nav-section">Website Sections</div>
+      <div class="nav-item" onclick="showPanel('hero',this)">
+        <i class="fas fa-house"></i> Hero Section
+      </div>
+      <div class="nav-item" onclick="showPanel('about',this)">
+        <i class="fas fa-info-circle"></i> About Section
+      </div>
+      <div class="nav-item" onclick="showPanel('services',this)">
+        <i class="fas fa-briefcase"></i> Services
+      </div>
+      <div class="nav-item" onclick="showPanel('projects',this)">
+        <i class="fas fa-folder-open"></i> Projects
+      </div>
+      <div class="nav-item" onclick="showPanel('team',this)">
+        <i class="fas fa-users"></i> Team
+      </div>
+      <div class="nav-item" onclick="showPanel('contact',this)">
+        <i class="fas fa-phone"></i> Contact Info
+      </div>
+      <div class="nav-item" onclick="showPanel('footer',this)">
+        <i class="fas fa-layer-group"></i> Footer
+      </div>
+      <div class="nav-section">Features</div>
+      <div class="nav-item" onclick="showPanel('popups',this)">
+        <i class="fas fa-rectangle-ad"></i> Popup Manager
+      </div>
+      <div class="nav-item" onclick="showPanel('seo',this)">
+        <i class="fas fa-search"></i> SEO Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div>
+          <div class="admin-name" id="adminName">Admin</div>
+          <div class="admin-email" id="adminEmail">...</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard Overview</div>
+      <div class="topbar-right">
+        <div class="live-dot"></div>
+        <span style="font-size:.8rem;color:var(--muted);">Live</span>
+        <a href="https://fronixplayers.netlify.app/" target="_blank"
+           style="padding:7px 14px;border-radius:8px;background:rgba(0,210,133,0.1);border:1px solid rgba(0,210,133,0.2);color:var(--accent);text-decoration:none;font-size:.82rem;">
+          <i class="fas fa-external-link-alt"></i> View Site
+        </a>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- OVERVIEW PANEL -->
+      <div class="panel active" id="panel-overview">
+        <div class="panel-header">
+          <div class="panel-title">Welcome Back 👋</div>
+          <div class="panel-desc">Here's a summary of your Fronixplayers website.</div>
+        </div>
+        <div class="overview-grid">
+          <div class="ov-card">
+            <div class="ov-icon" style="background:rgba(0,210,133,0.1);color:var(--accent)"><i class="fas fa-users"></i></div>
+            <div class="ov-val">500+</div><div class="ov-lbl">Community Members</div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-icon" style="background:rgba(0,170,255,0.1);color:var(--accent2)"><i class="fas fa-handshake"></i></div>
+            <div class="ov-val">55+</div><div class="ov-lbl">Total Clients</div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-icon" style="background:rgba(255,184,0,0.1);color:var(--warn)"><i class="fas fa-folder"></i></div>
+            <div class="ov-val">5+</div><div class="ov-lbl">Live Projects</div>
+          </div>
+          <div class="ov-card">
+            <div class="ov-icon" style="background:rgba(255,77,109,0.1);color:var(--danger)"><i class="fas fa-rectangle-ad"></i></div>
+            <div class="ov-val" id="popupCountOv">0</div><div class="ov-lbl">Active Popups</div>
+          </div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-circle-info"></i> Quick Guide</div>
+          <p style="font-size:.9rem;color:var(--muted);line-height:1.7;">
+            Use the sidebar to navigate between sections. All changes are saved to <strong style="color:var(--text)">Firebase Firestore</strong> and reflected live on your website.
+            Add the <code style="color:var(--accent)">popup-loader.js</code> script to your <code style="color:var(--accent)">index.html</code> to enable popups on your site.
+          </p>
+          <div style="margin-top:16px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+            <p style="font-size:.78rem;color:var(--muted);margin-bottom:8px;">Add before &lt;/body&gt; in your index.html:</p>
+            <code style="color:var(--accent2);font-size:.82rem;">&lt;script type="module" src="popup-loader.js"&gt;&lt;/script&gt;</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO PANEL -->
+      <div class="panel" id="panel-hero">
+        <div class="panel-header">
+          <div class="panel-title">Hero Section</div>
+          <div class="panel-desc">Edit your homepage hero content</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-pen"></i> Hero Content</div>
+          <div class="form-row">
+            <div class="f-group"><label>Badge Text</label><input id="heroBadge" placeholder="Community of Future Billionaires"></div>
+            <div class="f-group"><label>Button 1 Text</label><input id="heroBtn1" placeholder="Unlock Your Success"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Headline Line 1</label><input id="heroLine1" placeholder="Unleash Digital"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Headline Line 2 (gradient)</label><input id="heroLine2" placeholder="Power with"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Headline Line 3</label><input id="heroLine3" placeholder="Fronixplayers"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Description</label><textarea id="heroDesc" rows="3" placeholder="We run many projects..."></textarea></div>
+          </div>
+          <div class="form-row triple">
+            <div class="f-group"><label>Stat 1 Value</label><input id="heroStat1Val" placeholder="500+"></div>
+            <div class="f-group"><label>Stat 2 Value</label><input id="heroStat2Val" placeholder="55+"></div>
+            <div class="f-group"><label>Stat 3 Value</label><input id="heroStat3Val" placeholder="5+"></div>
+          </div>
+          <div class="form-row triple">
+            <div class="f-group"><label>Stat 1 Label</label><input id="heroStat1Lbl" placeholder="Community"></div>
+            <div class="f-group"><label>Stat 2 Label</label><input id="heroStat2Lbl" placeholder="Clients"></div>
+            <div class="f-group"><label>Stat 3 Label</label><input id="heroStat3Lbl" placeholder="Projects"></div>
+          </div>
+          <button class="btn-save" onclick="saveSection('hero')"><i class="fas fa-save"></i> Save Hero <span id="heroStatus" class="save-status"></span></button>
+        </div>
+      </div>
+
+      <!-- ABOUT PANEL -->
+      <div class="panel" id="panel-about">
+        <div class="panel-header">
+          <div class="panel-title">About Section</div>
+          <div class="panel-desc">Edit the about/company info section</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-building"></i> About Content</div>
+          <div class="form-row">
+            <div class="f-group"><label>Section Tag</label><input id="aboutTag" placeholder="Who We Are"></div>
+            <div class="f-group"><label>Badge Text</label><input id="aboutBadge" placeholder="3+ Years Experience"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Title (part 1)</label><input id="aboutTitle1" placeholder="Discover the Heart of"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Title (gradient part)</label><input id="aboutTitle2" placeholder="Our Agency"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Lead Paragraph</label><textarea id="aboutLead" rows="3" placeholder="Fronixplayers – The Community of Future Billionaires..."></textarea></div>
+          </div>
+          <button class="btn-save" onclick="saveSection('about')"><i class="fas fa-save"></i> Save About <span id="aboutStatus" class="save-status"></span></button>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-spell-check"></i> FRONIX Acronym</div>
+          <div id="acronymFields">
+            <div class="form-row" id="acroRow-F">
+              <div class="f-group"><label>F — Letter Meaning</label><input id="acroF" placeholder="Follow up the lead"></div>
+              <div class="f-group"><label>R — Letter Meaning</label><input id="acroR" placeholder="Restart the work"></div>
+            </div>
+            <div class="form-row" id="acroRow-O">
+              <div class="f-group"><label>O — Letter Meaning</label><input id="acroO" placeholder="Observe the situations"></div>
+              <div class="f-group"><label>N — Letter Meaning</label><input id="acroN" placeholder="No fear"></div>
+            </div>
+            <div class="form-row">
+              <div class="f-group"><label>I — Letter Meaning</label><input id="acroI" placeholder="Immediately do the work"></div>
+              <div class="f-group"><label>X — Letter Meaning</label><input id="acroX" placeholder="Execute the plan"></div>
+            </div>
+          </div>
+          <button class="btn-save" onclick="saveSection('acronym')"><i class="fas fa-save"></i> Save Acronym <span id="acronymStatus" class="save-status"></span></button>
+        </div>
+      </div>
+
+      <!-- SERVICES PANEL -->
+      <div class="panel" id="panel-services">
+        <div class="panel-header">
+          <div class="panel-title">Services</div>
+          <div class="panel-desc">Manage your service offerings</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-briefcase"></i> Service Cards
+            <button class="btn-add" style="margin-left:auto;" onclick="openAddModal('service')"><i class="fas fa-plus"></i> Add Service</button>
+          </div>
+          <div class="list-items" id="servicesList"></div>
+        </div>
+      </div>
+
+      <!-- PROJECTS PANEL -->
+      <div class="panel" id="panel-projects">
+        <div class="panel-header">
+          <div class="panel-title">Projects</div>
+          <div class="panel-desc">Showcase your portfolio projects</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-folder-open"></i> Project Cards
+            <button class="btn-add" style="margin-left:auto;" onclick="openAddModal('project')"><i class="fas fa-plus"></i> Add Project</button>
+          </div>
+          <div class="list-items" id="projectsList"></div>
+        </div>
+      </div>
+
+      <!-- TEAM PANEL -->
+      <div class="panel" id="panel-team">
+        <div class="panel-header">
+          <div class="panel-title">Team</div>
+          <div class="panel-desc">Manage your team members</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-users"></i> Team Members
+            <button class="btn-add" style="margin-left:auto;" onclick="openAddModal('team')"><i class="fas fa-plus"></i> Add Member</button>
+          </div>
+          <div class="team-admin-grid" id="teamList"></div>
+        </div>
+      </div>
+
+      <!-- CONTACT PANEL -->
+      <div class="panel" id="panel-contact">
+        <div class="panel-header">
+          <div class="panel-title">Contact Info</div>
+          <div class="panel-desc">Update your contact details</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-phone"></i> Contact Details</div>
+          <div class="form-row">
+            <div class="f-group"><label>Phone Number</label><input id="contactPhone" placeholder="9115906955"></div>
+            <div class="f-group"><label>Email Address</label><input id="contactEmail" placeholder="fronixplayers@gmail.com"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Address</label><input id="contactAddress" placeholder="Kalanwali, Sirsa, Haryana, 125201"></div>
+          </div>
+          <div class="form-row">
+            <div class="f-group"><label>WhatsApp Link</label><input id="contactWhatsapp" placeholder="https://alvo.chat/5Vrk"></div>
+            <div class="f-group"><label>Formspree ID</label><input id="contactFormspree" placeholder="xdkozdgk"></div>
+          </div>
+          <button class="btn-save" onclick="saveSection('contact')"><i class="fas fa-save"></i> Save Contact <span id="contactStatus" class="save-status"></span></button>
+        </div>
+      </div>
+
+      <!-- FOOTER PANEL -->
+      <div class="panel" id="panel-footer">
+        <div class="panel-header">
+          <div class="panel-title">Footer</div>
+          <div class="panel-desc">Edit footer content and social links</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-layer-group"></i> Footer Content</div>
+          <div class="form-row single">
+            <div class="f-group"><label>Footer Tagline</label><textarea id="footerTagline" rows="2" placeholder="We're more than a platform..."></textarea></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Copyright Text</label><input id="footerCopyright" placeholder="Created with 🔥 by Altmediia | All Rights Reserved © 2026"></div>
+          </div>
+          <div class="form-row triple">
+            <div class="f-group"><label>Instagram URL</label><input id="footerIG" placeholder="https://instagram.com/..."></div>
+            <div class="f-group"><label>WhatsApp URL</label><input id="footerWA" placeholder="https://alvo.chat/..."></div>
+            <div class="f-group"><label>Telegram URL</label><input id="footerTG" placeholder="https://t.me/..."></div>
+          </div>
+          <button class="btn-save" onclick="saveSection('footer')"><i class="fas fa-save"></i> Save Footer <span id="footerStatus" class="save-status"></span></button>
+        </div>
+      </div>
+
+      <!-- POPUPS PANEL -->
+      <div class="panel" id="panel-popups">
+        <div class="panel-header">
+          <div class="panel-title">Popup Manager</div>
+          <div class="panel-desc">Create and manage website popups with images, buttons, and timing</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-rectangle-ad"></i> Active Popups
+            <button class="btn-add" style="margin-left:auto;" onclick="openPopupModal()"><i class="fas fa-plus"></i> New Popup</button>
+          </div>
+          <div class="popup-list" id="popupList">
+            <div style="text-align:center;padding:40px;color:var(--muted);">
+              <i class="fas fa-rectangle-ad" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
+              No popups yet. Click "New Popup" to create one.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO PANEL -->
+      <div class="panel" id="panel-seo">
+        <div class="panel-header">
+          <div class="panel-title">SEO Settings</div>
+          <div class="panel-desc">Manage meta tags and search engine settings</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-search"></i> Meta Tags</div>
+          <div class="form-row single">
+            <div class="f-group"><label>Page Title</label><input id="seoTitle" placeholder="Fronixplayers | Digital Agency"></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Meta Description</label><textarea id="seoDesc" rows="3" placeholder="Fronixplayers is a modern digital agency..."></textarea></div>
+          </div>
+          <div class="form-row single">
+            <div class="f-group"><label>Keywords</label><textarea id="seoKeywords" rows="2" placeholder="Fronixplayers, Digital Agency, Web Development..."></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="f-group"><label>OG Image URL</label><input id="seoOgImage" placeholder="https://..."></div>
+            <div class="f-group"><label>Canonical URL</label><input id="seoCanonical" placeholder="https://fronixplayers.netlify.app/"></div>
+          </div>
+          <button class="btn-save" onclick="saveSection('seo')"><i class="fas fa-save"></i> Save SEO <span id="seoStatus" class="save-status"></span></button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add Item</h3>
+      <button class="modal-close" onclick="closeModal('addModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="modalBody"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn-danger" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn-save" id="modalSaveBtn" onclick="saveModalItem()"><i class="fas fa-save"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP MODAL -->
+<div class="modal-overlay" id="popupModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="popupModalTitle">New Popup</h3>
+      <button class="modal-close" onclick="closeModal('popupModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-row">
+      <div class="f-group"><label>Popup Title</label><input id="pmTitle" placeholder="🔥 Special Offer!"></div>
+      <div class="f-group"><label>Show After (seconds)</label><input id="pmDelay" type="number" value="3" min="0"></div>
+    </div>
+    <div class="form-row single">
+      <div class="f-group"><label>Message / Body</label><textarea id="pmBody" rows="3" placeholder="Join our community and get free access to all courses!"></textarea></div>
+    </div>
+    <div class="form-row">
+      <div class="f-group"><label>Button Text</label><input id="pmBtnText" placeholder="Join Now"></div>
+      <div class="f-group"><label>Button URL</label><input id="pmBtnUrl" placeholder="https://fronixlearnners.netlify.app/"></div>
+    </div>
+    <div class="f-group" style="margin-bottom:16px;">
+      <label>Image URL (optional)</label>
+      <div class="img-preview" id="popupImgPreview" onclick="document.getElementById('pmImgFile').click()">
+        <input type="file" id="pmImgFile" accept="image/*" style="display:none;" onchange="previewPopupImg(this)">
+        <div class="upload-hint"><i class="fas fa-image"></i><span>Click to upload image (or paste URL below)</span></div>
+      </div>
+      <input id="pmImgUrl" placeholder="https://... or leave blank" style="margin-top:8px;padding:8px 12px;width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem;outline:none;" oninput="syncImgUrlPreview()">
+    </div>
+    <div class="form-row">
+      <div class="f-group">
+        <label>Background Color</label>
+        <input id="pmBgColor" type="color" value="#0c1419" style="height:40px;padding:4px;">
+      </div>
+      <div class="f-group">
+        <label>Display Type</label>
+        <select id="pmType">
+          <option value="center">Center Modal</option>
+          <option value="bottom-right">Bottom-Right Corner</option>
+          <option value="top-banner">Top Banner</option>
+          <option value="fullscreen">Fullscreen Overlay</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="f-group">
+        <label>Show On</label>
+        <select id="pmShowOn">
+          <option value="every">Every Visit</option>
+          <option value="once">Once Per Session</option>
+          <option value="daily">Once Per Day</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Active</label>
+        <label class="toggle" style="margin-top:10px;">
+          <input type="checkbox" id="pmActive" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button class="btn-danger" onclick="closeModal('popupModal')">Cancel</button>
+      <button class="btn-save" onclick="savePopup()"><i class="fas fa-save"></i> Save Popup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase + App Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection,
+  getDocs, addDoc, deleteDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC6w88P1Nrgp4djwrjJf0K2i2l6xQG8FEI",
+  authDomain: "fronix-afde1.firebaseapp.com",
+  projectId: "fronix-afde1",
+  storageBucket: "fronix-afde1.appspot.com",
+  messagingSenderId: "942976075894",
+  appId: "1:942976075894:web:dfab62b417f89cc66c3757",
+  measurementId: "G-DR773T6QF1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---- Expose to window ----
+window._auth = auth;
+window._db = db;
+window._doc = doc;
+window._getDoc = getDoc;
+window._setDoc = setDoc;
+window._collection = collection;
+window._getDocs = getDocs;
+window._addDoc = addDoc;
+window._deleteDoc = deleteDoc;
+window._updateDoc = updateDoc;
+window._serverTimestamp = serverTimestamp;
+window._signIn = (e,p) => signInWithEmailAndPassword(auth,e,p);
+window._signOut = () => signOut(auth);
+window._resetPass = (e) => sendPasswordResetEmail(auth,e);
+
+// ---- Auth State ----
+onAuthStateChanged(auth, user => {
+  if(user){
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    const name = user.email.split('@')[0];
+    document.getElementById('adminName').textContent = name.charAt(0).toUpperCase()+name.slice(1);
+    document.getElementById('adminEmail').textContent = user.email;
+    document.getElementById('adminAvatar').textContent = name.charAt(0).toUpperCase();
+    loadAllData();
+  } else {
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+});
+</script>
+
+<script>
+/* ===================== HELPERS ===================== */
+function toast(msg, type='ok'){
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas fa-${type==='ok'?'check-circle':'exclamation-circle'}"></i>${msg}`;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+
+function setStatus(id, ok, msg=''){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.className = `save-status show ${ok?'ok':'err'}`;
+  el.innerHTML = ok ? `<i class="fas fa-check"></i> Saved!` : `<i class="fas fa-times"></i> Error`;
+  setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+function showLogin(){ document.getElementById('loginSection').style.display=''; document.getElementById('forgotSection').style.display='none'; clearMsg(); }
+function showForgot(){ document.getElementById('loginSection').style.display='none'; document.getElementById('forgotSection').style.display=''; clearMsg(); }
+function clearMsg(){ let m=document.getElementById('authMsg'); m.style.display='none'; let f=document.getElementById('forgotMsg'); f.style.display='none'; }
+
+function showMsg(id, type, text){ const m=document.getElementById(id); m.className=`auth-msg ${type}`; m.textContent=text; m.style.display='block'; }
+
+function showPanel(name, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles = {overview:'Dashboard Overview',hero:'Hero Section',about:'About Section',
+    services:'Services',projects:'Projects',team:'Team',contact:'Contact Info',
+    footer:'Footer',popups:'Popup Manager',seo:'SEO Settings'};
+  document.getElementById('topbarTitle').textContent = titles[name]||name;
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+
+/* ===================== AUTH ===================== */
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  if(!email||!pass){ showMsg('authMsg','error','Fill in all fields.'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  try{
+    await window._signIn(email, pass);
+  } catch(e){
+    showMsg('authMsg','error', e.code==='auth/invalid-credential'?'Wrong email or password.':e.message);
+    btn.disabled=false; btn.innerHTML='Sign In';
+  }
+}
+
+async function doForgot(){
+  const email = document.getElementById('forgotEmail').value.trim();
+  if(!email){ showMsg('forgotMsg','error','Enter your email.'); return; }
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled=true; btn.textContent='Sending...';
+  try{
+    await window._resetPass(email);
+    showMsg('forgotMsg','success','Reset link sent! Check your inbox.');
+  } catch(e){
+    showMsg('forgotMsg','error',e.message);
+  }
+  btn.disabled=false; btn.textContent='Send Reset Link';
+}
+
+async function doLogout(){
+  await window._signOut();
+  toast('Logged out successfully.');
+}
+
+// Allow enter key
+document.getElementById('loginPassword')?.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
+/* ===================== LOAD ALL DATA ===================== */
+async function loadAllData(){
+  await Promise.all([
+    loadSection('hero'), loadSection('about'), loadSection('acronym'),
+    loadSection('contact'), loadSection('footer'), loadSection('seo'),
+    loadList('services','servicesList'), loadList('projects','projectsList'),
+    loadList('team','teamList'), loadPopups()
+  ]);
+}
+
+async function loadSection(section){
+  try{
+    const d = await window._getDoc(window._doc(window._db,'site',section));
+    const data = d.exists() ? d.data() : {};
+    fillForm(section, data);
+  } catch(e){ console.warn('load',section,e); }
+}
+
+function fillForm(section, data){
+  const maps = {
+    hero:['heroBadge','heroLine1','heroLine2','heroLine3','heroDesc','heroBtn1','heroStat1Val','heroStat2Val','heroStat3Val','heroStat1Lbl','heroStat2Lbl','heroStat3Lbl'],
+    about:['aboutTag','aboutBadge','aboutTitle1','aboutTitle2','aboutLead'],
+    acronym:['acroF','acroR','acroO','acroN','acroI','acroX'],
+    contact:['contactPhone','contactEmail','contactAddress','contactWhatsapp','contactFormspree'],
+    footer:['footerTagline','footerCopyright','footerIG','footerWA','footerTG'],
+    seo:['seoTitle','seoDesc','seoKeywords','seoOgImage','seoCanonical']
+  };
+  (maps[section]||[]).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && data[id]!==undefined) el.value=data[id];
+  });
+}
+
+async function saveSection(section){
+  const maps = {
+    hero:['heroBadge','heroLine1','heroLine2','heroLine3','heroDesc','heroBtn1','heroStat1Val','heroStat2Val','heroStat3Val','heroStat1Lbl','heroStat2Lbl','heroStat3Lbl'],
+    about:['aboutTag','aboutBadge','aboutTitle1','aboutTitle2','aboutLead'],
+    acronym:['acroF','acroR','acroO','acroN','acroI','acroX'],
+    contact:['contactPhone','contactEmail','contactAddress','contactWhatsapp','contactFormspree'],
+    footer:['footerTagline','footerCopyright','footerIG','footerWA','footerTG'],
+    seo:['seoTitle','seoDesc','seoKeywords','seoOgImage','seoCanonical']
+  };
+  const obj = {};
+  (maps[section]||[]).forEach(id=>{ const el=document.getElementById(id); if(el) obj[id]=el.value; });
+  try{
+    await window._setDoc(window._doc(window._db,'site',section), {...obj, updatedAt: window._serverTimestamp()}, {merge:true});
+    setStatus(section+'Status', true);
+    toast(`${section.charAt(0).toUpperCase()+section.slice(1)} section saved!`);
+  } catch(e){
+    setStatus(section+'Status', false);
+    toast('Error saving: '+e.message,'err');
+  }
+}
+
+/* ===================== LISTS ===================== */
+let currentModalType = '';
+let editingId = null;
+
+async function loadList(colName, listId){
+  try{
+    const snap = await window._getDocs(window._collection(window._db, colName));
+    const items = [];
+    snap.forEach(d => items.push({id:d.id,...d.data()}));
+    renderList(colName, listId, items);
+  } catch(e){ console.warn('loadList',colName,e); }
+}
+
+function renderList(colName, listId, items){
+  const el = document.getElementById(listId);
+  if(!el) return;
+  if(colName==='team'){
+    el.innerHTML = items.length ? items.map(item=>`
+      <div class="team-admin-card">
+        ${item.image ? `<img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70'">` : `<div style="width:70px;height:70px;border-radius:50%;background:var(--surface2);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--muted)"><i class="fas fa-user"></i></div>`}
+        <h4>${item.name||'Name'}</h4>
+        <p>${item.role||'Role'}</p>
+        <div style="display:flex;gap:6px;justify-content:center;">
+          <button class="btn-icon" onclick="openEditModal('team','${item.id}')"><i class="fas fa-pen"></i></button>
+          <button class="btn-icon del" onclick="deleteItem('team','${item.id}','teamList')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('') : '<p style="color:var(--muted);font-size:.88rem;">No team members yet.</p>';
+    return;
+  }
+  el.innerHTML = items.length ? items.map(item=>`
+    <div class="list-item">
+      <div class="list-item-icon"><i class="fas fa-${colName==='services'?'briefcase':'folder'}"></i></div>
+      <div class="list-item-content">
+        <h4>${item.title||item.name||'Untitled'}</h4>
+        <p>${item.description||item.desc||''}</p>
+      </div>
+      <div class="list-item-actions">
+        <button class="btn-icon" onclick="openEditModal('${colName}','${item.id}')"><i class="fas fa-pen"></i></button>
+        <button class="btn-icon del" onclick="deleteItem('${colName}','${item.id}','${listId}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('') : `<p style="color:var(--muted);font-size:.88rem;padding:12px;">No ${colName} yet. Add one above!</p>`;
+}
+
+function openAddModal(type){
+  currentModalType = type;
+  editingId = null;
+  document.getElementById('modalTitle').textContent = `Add ${type.charAt(0).toUpperCase()+type.slice(1)}`;
+  document.getElementById('modalBody').innerHTML = buildModalForm(type, {});
+  openModal('addModal');
+}
+
+async function openEditModal(type, id){
+  currentModalType = type;
+  editingId = id;
+  try{
+    const d = await window._getDoc(window._doc(window._db, type, id));
+    const data = d.exists() ? d.data() : {};
+    document.getElementById('modalTitle').textContent = `Edit ${type.charAt(0).toUpperCase()+type.slice(1)}`;
+    document.getElementById('modalBody').innerHTML = buildModalForm(type, data);
+    openModal('addModal');
+  } catch(e){ toast('Error loading: '+e.message,'err'); }
+}
+
+function buildModalForm(type, data){
+  if(type==='service') return `
+    <div class="form-row single"><div class="f-group"><label>Service Title</label><input id="mTitle" value="${data.title||''}"></div></div>
+    <div class="form-row single"><div class="f-group"><label>Description</label><textarea id="mDesc" rows="3">${data.description||''}</textarea></div></div>
+    <div class="form-row"><div class="f-group"><label>Icon (FontAwesome class)</label><input id="mIcon" value="${data.icon||'fa-star'}" placeholder="fa-graduation-cap"></div>
+    <div class="f-group"><label>Price / Tag</label><input id="mPrice" value="${data.price||''}" placeholder="Free / ₹499"></div></div>
+  `;
+  if(type==='project') return `
+    <div class="form-row single"><div class="f-group"><label>Project Name</label><input id="mTitle" value="${data.title||''}"></div></div>
+    <div class="form-row single"><div class="f-group"><label>Description</label><textarea id="mDesc" rows="2">${data.description||''}</textarea></div></div>
+    <div class="form-row">
+      <div class="f-group"><label>Image URL</label><input id="mImage" value="${data.image||''}" placeholder="https://..."></div>
+      <div class="f-group"><label>Project URL</label><input id="mUrl" value="${data.url||''}" placeholder="https://..."></div>
+    </div>
+    <div class="form-row"><div class="f-group"><label>Category Tag</label><input id="mTag" value="${data.tag||''}" placeholder="Web Dev"></div>
+    <div class="f-group"><label>Likes Count</label><input id="mLikes" type="number" value="${data.likes||0}"></div></div>
+  `;
+  if(type==='team') return `
+    <div class="form-row"><div class="f-group"><label>Full Name</label><input id="mName" value="${data.name||''}"></div>
+    <div class="f-group"><label>Role / Title</label><input id="mRole" value="${data.role||''}"></div></div>
+    <div class="form-row single"><div class="f-group"><label>Profile Image URL</label><input id="mImage" value="${data.image||''}" placeholder="images/person.jpg"></div></div>
+    <div class="form-row triple">
+      <div class="f-group"><label>Facebook URL</label><input id="mFB" value="${data.facebook||''}"></div>
+      <div class="f-group"><label>Telegram URL</label><input id="mTG" value="${data.telegram||''}"></div>
+      <div class="f-group"><label>Instagram URL</label><input id="mIG" value="${data.instagram||''}"></div>
+    </div>
+  `;
+  return '';
+}
+
+async function saveModalItem(){
+  const type = currentModalType;
+  let obj = {};
+  if(type==='service') obj={title:v('mTitle'),description:v('mDesc'),icon:v('mIcon'),price:v('mPrice')};
+  if(type==='project') obj={title:v('mTitle'),description:v('mDesc'),image:v('mImage'),url:v('mUrl'),tag:v('mTag'),likes:parseInt(v('mLikes'))||0};
+  if(type==='team') obj={name:v('mName'),role:v('mRole'),image:v('mImage'),facebook:v('mFB'),telegram:v('mTG'),instagram:v('mIG')};
+  try{
+    if(editingId){
+      await window._setDoc(window._doc(window._db,type,editingId),{...obj,updatedAt:window._serverTimestamp()},{merge:true});
+    } else {
+      await window._addDoc(window._collection(window._db,type),{...obj,createdAt:window._serverTimestamp()});
+    }
+    closeModal('addModal');
+    const listMap = {services:'servicesList',projects:'projectsList',team:'teamList'};
+    await loadList(type, listMap[type]||type+'List');
+    toast((editingId?'Updated':'Added')+' '+type+' successfully!');
+    editingId=null;
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function deleteItem(col, id, listId){
+  if(!confirm('Delete this item?')) return;
+  try{
+    await window._deleteDoc(window._doc(window._db,col,id));
+    await loadList(col, listId);
+    toast('Deleted!');
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+function v(id){ const el=document.getElementById(id); return el?el.value:''; }
+
+/* ===================== POPUPS ===================== */
+let editingPopupId = null;
+let popupsCache = [];
+
+async function loadPopups(){
+  try{
+    const snap = await window._getDocs(window._collection(window._db,'popups'));
+    popupsCache = [];
+    snap.forEach(d => popupsCache.push({id:d.id,...d.data()}));
+    renderPopups();
+    document.getElementById('popupCountOv').textContent = popupsCache.filter(p=>p.active).length;
+  } catch(e){ console.warn('loadPopups',e); }
+}
+
+function renderPopups(){
+  const el = document.getElementById('popupList');
+  if(!popupsCache.length){
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);"><i class="fas fa-rectangle-ad" style="font-size:2rem;margin-bottom:10px;display:block;"></i>No popups yet.</div>';
+    return;
+  }
+  el.innerHTML = popupsCache.map(p=>`
+    <div class="popup-item" id="popupItem-${p.id}">
+      <div class="popup-thumb">
+        ${p.image ? `<img src="${p.image}" alt="popup" onerror="this.style.display='none'">` : `<i class="fas fa-image"></i>`}
+      </div>
+      <div class="popup-meta">
+        <h4>${p.title||'Untitled Popup'}</h4>
+        <p>${p.body||'No message set'}</p>
+        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(0,170,255,0.1);color:var(--accent2);">${p.type||'center'}</span>
+          <span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(0,210,133,0.1);color:var(--accent);">${p.showOn||'every visit'}</span>
+          <span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:rgba(255,184,0,0.1);color:var(--warn);">+${p.delay||0}s delay</span>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <label class="toggle-switch">
+          <label class="toggle">
+            <input type="checkbox" ${p.active?'checked':''} onchange="togglePopup('${p.id}',this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          Active
+        </label>
+        <button class="btn-icon" onclick="openEditPopup('${p.id}')"><i class="fas fa-pen"></i></button>
+        <button class="btn-icon del" onclick="deletePopup('${p.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openPopupModal(){ editingPopupId=null; resetPopupForm(); document.getElementById('popupModalTitle').textContent='New Popup'; openModal('popupModal'); }
+
+async function openEditPopup(id){
+  editingPopupId = id;
+  const p = popupsCache.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('popupModalTitle').textContent = 'Edit Popup';
+  document.getElementById('pmTitle').value = p.title||'';
+  document.getElementById('pmBody').value = p.body||'';
+  document.getElementById('pmBtnText').value = p.btnText||'';
+  document.getElementById('pmBtnUrl').value = p.btnUrl||'';
+  document.getElementById('pmImgUrl').value = p.image||'';
+  document.getElementById('pmDelay').value = p.delay||3;
+  document.getElementById('pmBgColor').value = p.bgColor||'#0c1419';
+  document.getElementById('pmType').value = p.type||'center';
+  document.getElementById('pmShowOn').value = p.showOn||'every';
+  document.getElementById('pmActive').checked = !!p.active;
+  if(p.image){ const prev=document.getElementById('popupImgPreview'); prev.style.backgroundImage=`url(${p.image})`; prev.style.backgroundSize='cover'; }
+  openModal('popupModal');
+}
+
+function resetPopupForm(){
+  ['pmTitle','pmBody','pmBtnText','pmBtnUrl','pmImgUrl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pmDelay').value=3;
+  document.getElementById('pmBgColor').value='#0c1419';
+  document.getElementById('pmType').value='center';
+  document.getElementById('pmShowOn').value='every';
+  document.getElementById('pmActive').checked=true;
+  document.getElementById('popupImgPreview').style.backgroundImage='';
+}
+
+async function savePopup(){
+  const obj = {
+    title: v('pmTitle'),
+    body: v('pmBody'),
+    btnText: v('pmBtnText'),
+    btnUrl: v('pmBtnUrl'),
+    image: v('pmImgUrl'),
+    delay: parseInt(v('pmDelay'))||0,
+    bgColor: document.getElementById('pmBgColor').value,
+    type: v('pmType'),
+    showOn: v('pmShowOn'),
+    active: document.getElementById('pmActive').checked,
+    updatedAt: window._serverTimestamp()
+  };
+  try{
+    if(editingPopupId){
+      await window._setDoc(window._doc(window._db,'popups',editingPopupId), obj, {merge:true});
+    } else {
+      await window._addDoc(window._collection(window._db,'popups'), {...obj, createdAt:window._serverTimestamp()});
+    }
+    closeModal('popupModal');
+    await loadPopups();
+    toast((editingPopupId?'Popup updated!':'New popup created!'),'ok');
+    editingPopupId=null;
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function togglePopup(id, active){
+  try{
+    await window._updateDoc(window._doc(window._db,'popups',id),{active});
+    const p = popupsCache.find(x=>x.id===id);
+    if(p) p.active = active;
+    document.getElementById('popupCountOv').textContent = popupsCache.filter(p=>p.active).length;
+    toast(active ? 'Popup activated!' : 'Popup deactivated!');
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function deletePopup(id){
+  if(!confirm('Delete this popup?')) return;
+  try{
+    await window._deleteDoc(window._doc(window._db,'popups',id));
+    await loadPopups();
+    toast('Popup deleted!');
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+function previewPopupImg(input){
+  if(!input.files||!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('pmImgUrl').value = e.target.result;
+    const prev = document.getElementById('popupImgPreview');
+    prev.style.backgroundImage = `url(${e.target.result})`;
+    prev.style.backgroundSize = 'cover';
+    prev.style.backgroundPosition = 'center';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function syncImgUrlPreview(){
+  const url = document.getElementById('pmImgUrl').value;
+  const prev = document.getElementById('popupImgPreview');
+  if(url){ prev.style.backgroundImage=`url(${url})`; prev.style.backgroundSize='cover'; prev.style.backgroundPosition='center'; }
+  else prev.style.backgroundImage='';
+}
+
+/* ===================== MOBILE MENU ===================== */
+document.getElementById('mobileMenuBtn').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// Close sidebar on outside click (mobile)
+document.addEventListener('click', e=>{
+  if(window.innerWidth<=768){
+    const sidebar=document.getElementById('sidebar');
+    const btn=document.getElementById('mobileMenuBtn');
+    if(!sidebar.contains(e.target)&&!btn.contains(e.target)){
+      sidebar.classList.remove('open');
+    }
+  }
+});
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
