@@ -1,0 +1,659 @@
+/* 
+ * Diljeet Singh Sran - Modern Portfolio 2026
+ * Ultra Premium Glassmorphism Design
+ * Design by Altmediia
+ */
+
+/* ==================== */
+/* MODERN FONTS */
+/* ==================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ==================== */
+/* BASE & RESET */
+/* ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Modern 2026 Color Palette */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --warm-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --cool-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    
+    /* Glass Colors */
+    --glass-white: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: rgba(31, 38, 135, 0.15);
+    
+    /* Text */
+    --text-primary: #1a1a2e;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    
+    /* Modern Spacing */
+    --section-padding: 120px;
+    --card-padding: 40px;
+}
+
+body {
+    font-family: 'Sora', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* ==================== */
+/* MODERN SCROLLBAR */
+/* ==================== */
+
+::-webkit-scrollbar {
+    width: 14px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #764ba2, #667eea);
+}
+
+/* ==================== */
+/* ULTRA GLASSMORPHISM */
+/* ==================== */
+
+.glass-modern {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    box-shadow: 
+        0 8px 32px rgba(31, 38, 135, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 
+        0 20px 60px rgba(31, 38, 135, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==================== */
+/* MODERN GRADIENTS */
+/* ==================== */
+
+.gradient-text-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-text-warm {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-text-cool {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-bg-warm {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.gradient-bg-cool {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* ==================== */
+/* MODERN TYPOGRAPHY */
+/* ==================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.section-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* ==================== */
+/* PREMIUM ANIMATIONS */
+/* ==================== */
+
+@keyframes floatGentle {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-float-gentle {
+    animation: floatGentle 6s ease-in-out infinite;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ==================== */
+/* MODERN NAVBAR */
+/* ==================== */
+
+.navbar-modern {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-modern.scrolled {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(31, 38, 135, 0.1);
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== */
+/* MODERN BUTTONS */
+/* ==================== */
+
+.btn-modern {
+    position: relative;
+    padding: 16px 40px;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.btn-gradient-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5);
+}
+
+.btn-gradient-warm {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.4);
+}
+
+.btn-gradient-warm:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(250, 112, 154, 0.5);
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-primary);
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-4px);
+}
+
+/* ==================== */
+/* MODERN CARDS */
+/* ==================== */
+
+.card-modern {
+    position: relative;
+    padding: var(--card-padding);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(40px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.card-modern:hover {
+    transform: translateY(-12px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 25px 70px rgba(31, 38, 135, 0.2);
+}
+
+.card-modern:hover::before {
+    opacity: 1;
+}
+
+/* ==================== */
+/* HERO SECTION */
+/* ==================== */
+
+.hero-modern {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 120px 0;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(250, 112, 154, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 50%);
+}
+
+.hero-blob {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: floatGentle 8s ease-in-out infinite;
+}
+
+.hero-blob-1 {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    top: -10%;
+    left: -10%;
+}
+
+.hero-blob-2 {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    bottom: -10%;
+    right: -10%;
+    animation-delay: 2s;
+}
+
+.hero-image-container {
+    position: relative;
+    /* NO ROTATION - Static professional look */
+}
+
+.hero-image-frame {
+    position: relative;
+    border-radius: 32px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(30px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 30px 80px rgba(31, 38, 135, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-image-frame:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        0 40px 100px rgba(31, 38, 135, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.hero-image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Decorative Elements - NO ROTATION */
+.hero-decoration {
+    position: absolute;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    /* Static - no transform rotation */
+}
+
+/* ==================== */
+/* MODERN BADGES */
+/* ==================== */
+
+.badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.badge-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.badge-gradient {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+}
+
+/* ==================== */
+/* SERVICES/SKILLS SECTION */
+/* ==================== */
+
+.service-card {
+    position: relative;
+    padding: 40px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin-bottom: 24px;
+    transition: all 0.4s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-12px);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 25px 60px rgba(31, 38, 135, 0.2);
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* ==================== */
+/* PORTFOLIO ITEMS */
+/* ==================== */
+
+.portfolio-item-modern {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-item-modern img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-item-modern:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 30px 70px rgba(31, 38, 135, 0.25);
+}
+
+.portfolio-item-modern:hover img {
+    transform: scale(1.1);
+}
+
+.portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.portfolio-item-modern:hover .portfolio-overlay {
+    opacity: 1;
+}
+
+/* ==================== */
+/* SCROLL REVEAL */
+/* ==================== */
+
+.reveal-modern {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal-modern.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================== */
+/* SOCIAL ICONS */
+/* ==================== */
+
+.social-icon-modern {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 20px;
+}
+
+.social-icon-modern:hover {
+    transform: translateY(-5px) scale(1.1);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+/* ==================== */
+/* RESPONSIVE */
+/* ==================== */
+
+@media (max-width: 768px) {
+    :root {
+        --section-padding: 60px;
+        --card-padding: 24px;
+    }
+    
+    .hero-modern {
+        min-height: auto;
+        padding: 80px 0;
+    }
+    
+    .hero-blob {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .card-modern:hover {
+        transform: translateY(-8px) scale(1.01);
+    }
+}
+
+/* ==================== */
+/* UTILITY CLASSES */
+/* ==================== */
+
+.text-shadow-modern {
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.box-shadow-modern {
+    box-shadow: 0 20px 60px rgba(31, 38, 135, 0.15);
+}
+
+.border-gradient {
+    position: relative;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* ==================== */
+/* SELECTION */
+/* ==================== */
+
+::selection {
+    background: rgba(102, 126, 234, 0.3);
+    color: inherit;
+}
+
+/* ==================== */
+/* ACCESSIBILITY */
+/* ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================== */
+/* END OF MODERN STYLES */
+/* ==================== */

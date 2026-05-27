@@ -12,10 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="modern-style.css">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
 
@@ -37,7 +37,6 @@
                 <a href="#portfolio" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
                 <a href="#certificates" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
                 <a href="#contact" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
-                <a href="admin-complete.html" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Login</a>
             </div>
             
             <!-- CTA Button -->
@@ -63,7 +62,6 @@
                 <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
                 <a href="#contact" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
                 <a href="#contact" class="btn-modern btn-gradient-primary w-full text-center block mt-4">
-                <a href="admin-complete.html" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Login</a>
                     Let's Talk
                 </a>
             </div>
@@ -332,7 +330,7 @@
     </button>
 
     <!-- JavaScript -->
-    <script src="assets/js/script.js"></script>
+    <script src="modern-script.js"></script>
     
     <!-- Popup Loader -->
     <script type="module" src="popup-loader.js"></script>
@@ -343,12 +341,12 @@
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyC6w88P1Nrgp4djwrjJf0K2i2l6xQG8FEI",
-  authDomain: "fronix-afde1.firebaseapp.com",
-  projectId: "fronix-afde1",
-  storageBucket: "fronix-afde1.appspot.com",
-  messagingSenderId: "942976075894",
-  appId: "1:942976075894:web:dfab62b417f89cc66c3757"
+      apiKey: "AIzaSyC6w88P1Nrgp4djwrjJf0K2i2l6xQG8FEI",
+      authDomain: "fronix-afde1.firebaseapp.com",
+      projectId: "fronix-afde1",
+      storageBucket: "fronix-afde1.appspot.com",
+      messagingSenderId: "942976075894",
+      appId: "1:942976075894:web:dfab62b417f89cc66c3757"
     };
 
     const app = initializeApp(firebaseConfig, "website-loader");
@@ -473,6 +471,5 @@
       loadContactData();
     });
     </script>
-    
 </body>
 </html>
