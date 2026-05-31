@@ -201,6 +201,30 @@ code{background:rgba(139,92,246,0.12);padding:1px 6px;border-radius:4px;font-siz
   .portfolio-admin-grid{grid-template-columns:1fr;}
   .modal{padding:18px;}
 }
+
+/* ===== IMAGE UPLOAD WIDGET ===== */
+.img-upload-wrap{margin-bottom:14px;}
+.img-upload-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;}
+.img-drop-zone{border:2px dashed var(--border);border-radius:12px;background:var(--bg);cursor:pointer;transition:.2s;overflow:hidden;position:relative;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.img-drop-zone:hover{border-color:var(--accent);background:rgba(139,92,246,0.04);}
+.img-drop-zone.has-image{border-style:solid;border-color:rgba(139,92,246,0.4);}
+.img-drop-zone .drop-hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);pointer-events:none;padding:20px;}
+.img-drop-zone .drop-hint i{font-size:2rem;color:var(--accent);opacity:.6;}
+.img-drop-zone .drop-hint span{font-size:.8rem;}
+.img-drop-zone .drop-hint small{font-size:.7rem;opacity:.6;}
+.img-preview-thumb{width:100%;height:160px;object-fit:cover;display:block;border-radius:10px;}
+.img-upload-bar{height:3px;background:var(--surface2);border-radius:3px;margin-top:6px;overflow:hidden;display:none;}
+.img-upload-bar.show{display:block;}
+.img-upload-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s;width:0%;}
+.img-upload-status{font-size:.73rem;margin-top:4px;color:var(--muted);}
+.img-upload-status.uploading{color:var(--accent2);}
+.img-upload-status.done{color:#22c55e;}
+.img-upload-status.error{color:var(--danger);}
+.img-clear-btn{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:6px;background:rgba(244,63,94,0.8);border:none;cursor:pointer;color:#fff;font-size:.75rem;display:none;align-items:center;justify-content:center;z-index:2;}
+.img-drop-zone.has-image .img-clear-btn{display:flex;}
+.cloudinary-note{font-size:.7rem;color:var(--muted);margin-top:4px;padding:6px 10px;background:rgba(245,158,11,0.06);border-radius:6px;border:1px solid rgba(245,158,11,0.15);}
+.cloudinary-note a{color:var(--warn);text-decoration:none;}
+
 </style>
 </head>
 <body>
@@ -902,18 +926,25 @@ function renderList(col,listId,items){
   const el=document.getElementById(listId);if(!el)return;
   const iconMap={services:'briefcase',certificates:'certificate',press:'newspaper'};
   el.innerHTML=items.length?items.map(item=>`
-    <div class="list-item">
-      <div class="list-item-icon"><i class="fas fa-${iconMap[col]||'file'}"></i></div>
-      <div class="list-item-content">
+    <div class="list-item" style="align-items:flex-start;">
+      ${item.image
+        ? `<div style="flex-shrink:0;width:64px;height:54px;border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+             <img src="${item.image}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=width:100%;height:100%;background:var(--surface2);display:flex;align-items:center;justify-content:center;><i class=fas fa-image style=color:var(--muted)></i></div>'">
+           </div>`
+        : `<div class="list-item-icon" style="flex-shrink:0;"><i class="fas fa-${iconMap[col]||'file'}"></i></div>`
+      }
+      <div class="list-item-content" style="flex:1;">
         <h4>${item.title||item.name||'Untitled'}</h4>
         <p>${item.description||item.issuer||item.source||''}</p>
+        ${(col==='certificates'&&item.year)?`<span style="font-size:.7rem;color:var(--accent);background:rgba(139,92,246,0.1);padding:1px 6px;border-radius:4px;">${item.year}</span>`:''}
+        ${(col==='press'&&item.date)?`<span style="font-size:.7rem;color:var(--muted);">${item.date}</span>`:''}
       </div>
-      <div class="list-item-actions">
+      <div class="list-item-actions" style="flex-shrink:0;">
         <button class="btn-icon" onclick="openEditModal('${col}','${item.id}')"><i class="fas fa-pen"></i></button>
         <button class="btn-icon del" onclick="deleteItem('${col}','${item.id}','${listId}')"><i class="fas fa-trash"></i></button>
       </div>
     </div>
-  `).join(''):`<p style="color:var(--muted);font-size:.84rem;padding:10px;">No ${col} yet.</p>`;
+  `).join(''):`<p style="color:var(--muted);font-size:.84rem;padding:10px;">No ${col} yet. Add one above!</p>`;
 }
 
 function openAddModal(type){
@@ -933,6 +964,130 @@ async function openEditModal(type,id){
     document.getElementById('modalBody').innerHTML=buildModalForm(type,data);
     openModal('addModal');
   }catch(e){toast('Error: '+e.message,'err');}
+}
+
+
+/* ─── CLOUDINARY CONFIG ─── */
+// ⚠️ APNA CLOUDINARY CLOUD NAME DAALO (free.cloudinary.com pe signup karo)
+const CLOUDINARY_CLOUD = 'dvcd4ssat';
+const CLOUDINARY_PRESET = 'portfolio_upload'; 
+
+/* ─── IMAGE UPLOAD WIDGET ─── */
+function imageUploadWidget(id, existingUrl='') {
+  return `
+    <div class="img-upload-wrap">
+      <span class="img-upload-label">Image — Click or Drag & Drop to Upload</span>
+      <div class="img-drop-zone ${existingUrl?'has-image':''}" id="dropZone_${id}"
+           onclick="document.getElementById('fileInput_${id}').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor=''"
+           ondrop="handleDrop(event,'${id}')">
+        <input type="file" id="fileInput_${id}" accept="image/*" style="display:none"
+               onchange="handleFileSelect(this,'${id}')">
+        ${existingUrl
+          ? `<img class="img-preview-thumb" id="imgThumb_${id}" src="${existingUrl}" alt="preview">
+             <button class="img-clear-btn" onclick="clearImage(event,'${id}')"><i class="fas fa-times"></i></button>`
+          : `<div class="drop-hint" id="dropHint_${id}">
+               <i class="fas fa-cloud-upload-alt"></i>
+               <span>Click to upload image</span>
+               <small>PNG, JPG, WEBP up to 10MB</small>
+             </div>`
+        }
+      </div>
+      <div class="img-upload-bar" id="uploadBar_${id}">
+        <div class="img-upload-bar-fill" id="uploadFill_${id}"></div>
+      </div>
+      <div class="img-upload-status" id="uploadStatus_${id}">
+        ${existingUrl ? '✅ Image uploaded' : ''}
+      </div>
+      <input type="hidden" id="${id}" value="${existingUrl}">
+      <div class="cloudinary-note">
+        ℹ️ Images upload to Cloudinary (free). Setup: <a href="https://cloudinary.com" target="_blank">cloudinary.com</a> → Settings → Upload Presets → Add unsigned preset named <strong>portfolio_uploads</strong>
+      </div>
+    </div>
+  `;
+}
+
+function handleDrop(event, id) {
+  event.preventDefault();
+  document.getElementById('dropZone_'+id).style.borderColor='';
+  const file = event.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) uploadToCloudinary(file, id);
+}
+
+function handleFileSelect(input, id) {
+  const file = input.files[0];
+  if (file) uploadToCloudinary(file, id);
+}
+
+function clearImage(event, id) {
+  event.stopPropagation();
+  const zone = document.getElementById('dropZone_'+id);
+  zone.classList.remove('has-image');
+  zone.innerHTML = `
+    <input type="file" id="fileInput_${id}" accept="image/*" style="display:none"
+           onchange="handleFileSelect(this,'${id}')">
+    <div class="drop-hint" id="dropHint_${id}">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <span>Click to upload image</span>
+      <small>PNG, JPG, WEBP up to 10MB</small>
+    </div>`;
+  zone.onclick = () => document.getElementById('fileInput_'+id).click();
+  document.getElementById(id).value = '';
+  document.getElementById('uploadStatus_'+id).textContent = '';
+}
+
+async function uploadToCloudinary(file, id) {
+  const bar = document.getElementById('uploadBar_'+id);
+  const fill = document.getElementById('uploadFill_'+id);
+  const status = document.getElementById('uploadStatus_'+id);
+  const zone = document.getElementById('dropZone_'+id);
+
+  if (CLOUDINARY_CLOUD === 'YOUR_CLOUD_NAME') {
+    toast('⚠️ Pehle Cloudinary Cloud Name set karo admin.html mein!', 'err');
+    return;
+  }
+
+  bar.classList.add('show');
+  status.className = 'img-upload-status uploading';
+  status.textContent = 'Uploading...';
+  fill.style.width = '30%';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_PRESET);
+  formData.append('folder', 'portfolio');
+
+  try {
+    fill.style.width = '60%';
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.secure_url) {
+      fill.style.width = '100%';
+      document.getElementById(id).value = data.secure_url;
+      zone.classList.add('has-image');
+      zone.innerHTML = `
+        <img class="img-preview-thumb" id="imgThumb_${id}" src="${data.secure_url}" alt="preview">
+        <button class="img-clear-btn" onclick="clearImage(event,'${id}')"><i class="fas fa-times"></i></button>`;
+      zone.onclick = null;
+      status.className = 'img-upload-status done';
+      status.textContent = '✅ Image uploaded successfully!';
+      toast('Image upload ho gayi!');
+    } else {
+      throw new Error(data.error?.message || 'Upload failed');
+    }
+  } catch(e) {
+    fill.style.width = '100%';
+    fill.style.background = 'var(--danger)';
+    status.className = 'img-upload-status error';
+    status.textContent = '❌ Upload failed: ' + e.message;
+    toast('Upload error: ' + e.message, 'err');
+  }
+  setTimeout(() => { bar.classList.remove('show'); fill.style.width='0%'; fill.style.background=''; }, 2000);
 }
 
 function buildModalForm(type,d){
@@ -955,7 +1110,7 @@ function buildModalForm(type,d){
   if(type==='project')return`
     <div class="form-row single"><div class="f-group"><label>Project Title</label><input id="mTitle" value="${s(d.title)}"></div></div>
     <div class="form-row single"><div class="f-group"><label>Category</label><input id="mCategory" value="${s(d.category)}" placeholder="Web Development"></div></div>
-    <div class="form-row single"><div class="f-group"><label>Image URL</label><input id="mImage" value="${s(d.image)}" placeholder="https://..."></div></div>
+    ${imageUploadWidget('mImage', s(d.image))}
     <div class="form-row single"><div class="f-group"><label>Project URL (View Project link)</label><input id="mUrl" value="${s(d.url)}" placeholder="https://..."></div></div>
   `;
   if(type==='certificate')return`
@@ -964,7 +1119,7 @@ function buildModalForm(type,d){
       <div class="f-group"><label>Issuer</label><input id="mIssuer" value="${s(d.issuer)}" placeholder="Google / Coursera"></div>
       <div class="f-group"><label>Year</label><input id="mYear" value="${s(d.year)}" placeholder="2024"></div>
     </div>
-    <div class="form-row single"><div class="f-group"><label>Image URL</label><input id="mImage" value="${s(d.image)}" placeholder="assets/images/certficates/..."></div></div>
+    ${imageUploadWidget('mImage', s(d.image))}
     <div class="form-row single"><div class="f-group"><label>Verify URL (optional)</label><input id="mUrl" value="${s(d.url)}" placeholder="https://..."></div></div>
   `;
   if(type==='press')return`
@@ -974,7 +1129,7 @@ function buildModalForm(type,d){
       <div class="f-group"><label>Date</label><input id="mDate" value="${s(d.date)}" placeholder="Jul 3, 2024"></div>
     </div>
     <div class="form-row single"><div class="f-group"><label>Description</label><textarea id="mDesc" rows="2">${s(d.description)}</textarea></div></div>
-    <div class="form-row single"><div class="f-group"><label>Image URL</label><input id="mImage" value="${s(d.image)}" placeholder="https://..."></div></div>
+    ${imageUploadWidget('mImage', s(d.image))}
     <div class="form-row single"><div class="f-group"><label>Article URL</label><input id="mUrl" value="${s(d.url)}" placeholder="https://..."></div></div>
   `;
   return '';
