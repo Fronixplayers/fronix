@@ -9,49 +9,22 @@ import {
 
 // ⚠️ APNI FIREBASE CONFIG DAALO (same jo admin.html mein hai)
 const firebaseConfig = {
-  apiKey: "AIzaSyBXc9uq0r3tNzodrQNVelO_JtW4hT_wKEM",
-  authDomain: "diljeetsinghsran-fd322.firebaseapp.com",
-  projectId: "diljeetsinghsran-fd322",
-  storageBucket: "diljeetsinghsran-fd322.firebasestorage.app",
-  messagingSenderId: "806630457133",
-  appId: "1:806630457133:web:bfd789de366f803aa99da4",
-  measurementId: "G-B9QYBD5F81"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig, "portfolio-loader");
 const db  = getFirestore(app);
 
-/* ── Utility helpers ── */
-function setText(sel, val) {
-  if (!val) return;
-  const el = document.querySelector(sel);
-  if (el) el.textContent = val;
-}
-function setHtml(sel, val) {
-  if (!val) return;
-  const el = document.querySelector(sel);
-  if (el) el.innerHTML = val;
-}
-function setAttr(sel, attr, val) {
-  if (!val) return;
-  const el = document.querySelector(sel);
-  if (el) el.setAttribute(attr, val);
-}
-function setAllAttr(sel, attr, val) {
-  if (!val) return;
-  document.querySelectorAll(sel).forEach(el => el.setAttribute(attr, val));
-}
-function setAllText(sel, val) {
-  if (!val) return;
-  document.querySelectorAll(sel).forEach(el => el.textContent = val);
-}
-
-/* ── Firebase fetch helpers ── */
 async function fetchSection(name) {
   try {
     const snap = await getDoc(doc(db, 'portfolio', name));
     return snap.exists() ? snap.data() : null;
-  } catch(e) { console.warn('[Loader] fetchSection error:', name, e.message); return null; }
+  } catch(e) { console.warn('[Loader] fetchSection:', name, e.message); return null; }
 }
 async function fetchList(colName) {
   try {
@@ -59,78 +32,53 @@ async function fetchList(colName) {
     const items = [];
     snap.forEach(d => items.push({ id: d.id, ...d.data() }));
     return items;
-  } catch(e) { console.warn('[Loader] fetchList error:', colName, e.message); return []; }
+  } catch(e) { console.warn('[Loader] fetchList:', colName, e.message); return []; }
 }
-
-/* ══════════════════════════════════════
-   SECTION APPLIERS
-══════════════════════════════════════ */
 
 /* ── HERO ── */
 function applyHero(d) {
   if (!d) return;
-
-  // Name in h1
   if (d.heroName) {
     const h1 = document.querySelector('#home h1');
     if (h1) {
-      h1.innerHTML = `Hi, I'm <span class="gradient-text-primary">${d.heroName.split(' ').slice(0,2).join(' ')}</span>
-        <span class="gradient-text-warm">${d.heroName.split(' ').slice(2).join(' ')}</span> 👋`;
+      const parts = d.heroName.trim().split(' ');
+      const first = parts.slice(0,2).join(' ');
+      const last  = parts.slice(2).join(' ');
+      h1.innerHTML = `Hi, I'm <span class="gradient-text-primary">${first}</span> <span class="gradient-text-warm">${last}</span> 👋`;
     }
   }
-
-  // Badge
   if (d.heroBadge) {
     const badge = document.querySelector('#home .badge-gradient');
     if (badge) badge.innerHTML = `<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> ${d.heroBadge}`;
   }
-
-  // Tagline (roles paragraph)
   if (d.heroTagline) {
-    const roleP = document.querySelector('#home .space-y-3 p:first-of-type');
+    const roleP = document.querySelector('#home .space-y-3 p');
     if (roleP) roleP.innerHTML = `A Passionate <span class="gradient-text-primary font-bold">${d.heroTagline}</span>`;
   }
-
-  // Sub-line (experience / countries)
   if (d.heroSubline) {
-    const subP = document.querySelector('#home .space-y-3 p:last-of-type');
-    if (subP) subP.textContent = d.heroSubline;
-  }
-
-  // CTA Button 1
-  if (d.heroCta1Text) {
-    const btn1 = document.querySelector('#home a[href^="tel"]');
-    if (btn1) { btn1.innerHTML = `<i class="fas fa-phone mr-2"></i> ${d.heroCta1Text}`; }
+    const subs = document.querySelectorAll('#home .space-y-3 p');
+    if (subs[1]) subs[1].textContent = d.heroSubline;
   }
   if (d.heroCta1Link) {
-    const btn1 = document.querySelector('#home a[href^="tel"]');
-    if (btn1) btn1.href = d.heroCta1Link;
+    const btn = document.querySelector('#home a[href^="tel"]');
+    if (btn) btn.href = d.heroCta1Link;
   }
-
-  // Email (copy button)
+  if (d.heroCta1Text) {
+    const btn = document.querySelector('#home a[href^="tel"]');
+    if (btn) btn.innerHTML = `<i class="fas fa-phone mr-2"></i> ${d.heroCta1Text}`;
+  }
   if (d.heroEmail) {
     const copyBtn = document.getElementById('copyEmailBtn');
     if (copyBtn) copyBtn.dataset.email = d.heroEmail;
-    // Also update mailto links
-    document.querySelectorAll('a[href^="mailto"]').forEach(a => {
-      a.href = `mailto:${d.heroEmail}`;
-      if (a.textContent.includes('@')) a.textContent = d.heroEmail;
-    });
   }
-
-  // Profile image
   if (d.heroImage) {
-    const img = document.querySelector('#home img[alt*="Diljeet"], #home .hero-image-container img');
+    const img = document.querySelector('#home .hero-image-container img, #home img[alt*="Diljeet"]');
     if (img) img.src = d.heroImage;
   }
-
-  // Experience badge (inside image)
   if (d.heroExpBadge) {
-    const expEl = document.querySelector('#home .glass-modern .text-white.font-bold');
-    if (expEl) expEl.textContent = d.heroExpBadge;
+    const exp = document.querySelector('#home .glass-modern .text-white.font-bold');
+    if (exp) exp.textContent = d.heroExpBadge;
   }
-
-  // WhatsApp floating button
   if (d.heroWhatsapp) {
     const wa = document.querySelector('a[href*="wa.me"]');
     if (wa) wa.href = `https://wa.me/${d.heroWhatsapp.replace(/\D/g,'')}`;
@@ -140,51 +88,26 @@ function applyHero(d) {
 /* ── SOCIALS ── */
 function applySocials(d) {
   if (!d) return;
-  if (d.socialEmail) {
-    document.querySelectorAll('a[href^="mailto"]').forEach(a => {
-      a.href = `mailto:${d.socialEmail}`;
-      if (a.textContent.trim().includes('@')) a.textContent = d.socialEmail;
-    });
-  }
+  if (d.socialEmail)    document.querySelectorAll('a[href^="mailto"]').forEach(a => { a.href = `mailto:${d.socialEmail}`; if(a.textContent.includes('@')) a.textContent = d.socialEmail; });
   if (d.socialTwitter)  document.querySelectorAll('a[href*="x.com"], a[href*="twitter"]').forEach(a => a.href = d.socialTwitter);
-  if (d.socialInstagram) document.querySelectorAll('a[href*="instagram"]').forEach(a => a.href = d.socialInstagram);
-  if (d.socialLinkedin)  document.querySelectorAll('a[href*="linkedin"]').forEach(a => a.href = d.socialLinkedin);
+  if (d.socialInstagram)document.querySelectorAll('a[href*="instagram"]').forEach(a => a.href = d.socialInstagram);
+  if (d.socialLinkedin) document.querySelectorAll('a[href*="linkedin"]').forEach(a => a.href = d.socialLinkedin);
 }
 
 /* ── STATS ── */
 function applyStats(d) {
   if (!d) return;
   const counters = document.querySelectorAll('.counter');
-  const labels   = document.querySelectorAll('#services ~ section .text-gray-600.font-medium, section .counter ~ p, section .counter + p');
-
-  const statData = [
-    { num: d.stat1Num, lbl: d.stat1Lbl },
-    { num: d.stat2Num, lbl: d.stat2Lbl },
-    { num: d.stat3Num, lbl: d.stat3Lbl },
-    { num: d.stat4Num, lbl: d.stat4Lbl },
-  ];
-
-  counters.forEach((counter, i) => {
-    if (statData[i] && statData[i].num) {
-      counter.dataset.target = statData[i].num;
-      counter.textContent = '0';
-    }
+  const statNums = [d.stat1Num, d.stat2Num, d.stat3Num, d.stat4Num];
+  const statLbls = [d.stat1Lbl, d.stat2Lbl, d.stat3Lbl, d.stat4Lbl];
+  counters.forEach((c, i) => {
+    if (statNums[i]) { c.dataset.target = statNums[i]; c.textContent = '0'; }
+    // label is the next p sibling inside same div
+    const lbl = c.closest('div')?.parentElement?.querySelector('p');
+    if (lbl && statLbls[i]) lbl.textContent = statLbls[i];
   });
-
-  // Update labels — find all p tags inside stat blocks
-  const statSection = document.querySelector('.counter')?.closest('section') ||
-                      document.querySelector('.counter')?.closest('.glass-card');
-  if (statSection) {
-    const pTags = statSection.querySelectorAll('p.text-gray-600');
-    pTags.forEach((p, i) => {
-      if (statData[i] && statData[i].lbl) p.textContent = statData[i].lbl;
-    });
-  }
-
-  // Re-run counter animation
   animateCounters();
 }
-
 function animateCounters() {
   document.querySelectorAll('.counter').forEach(counter => {
     const target = parseInt(counter.dataset.target) || 0;
@@ -202,87 +125,121 @@ function animateCounters() {
 /* ── SERVICES ── */
 function applyServices(items) {
   if (!items || !items.length) return;
-  const grid = document.querySelector('#services .grid.md\\:grid-cols-2');
+  // Exact selector: #services section ke andar .grid jo md:grid-cols-2 lg:grid-cols-3 hai
+  const grid = document.querySelector('#services .grid');
   if (!grid) return;
-
-  const colorMap = {
-    primary: 'gradient-bg-primary',
-    warm:    'gradient-bg-warm',
-    cool:    'gradient-bg-cool',
-  };
-  const colors = ['primary','warm','cool','primary','warm','cool'];
-
+  const colorMap = { primary:'gradient-bg-primary', warm:'gradient-bg-warm', cool:'gradient-bg-cool' };
+  const fallback = ['primary','warm','cool','primary','warm','cool'];
   grid.innerHTML = items.map((s, i) => {
-    const colorClass = colorMap[s.color] || colorMap[colors[i % 3]];
-    const tags = (s.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+    const cls = colorMap[s.color] || colorMap[fallback[i % 3]];
+    const tags = (s.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
     return `
       <div class="service-card reveal-modern">
-        <div class="service-icon ${colorClass}">
-          <i class="fas ${s.icon || 'fa-star'} text-white"></i>
+        <div class="service-icon ${cls}">
+          <i class="fas ${s.icon||'fa-star'} text-white"></i>
         </div>
-        <h3 class="text-xl md:text-2xl font-bold mb-3">${s.title || 'Service'}</h3>
-        <p class="text-gray-600 mb-4 text-sm md:text-base">${s.description || ''}</p>
+        <h3 class="text-xl md:text-2xl font-bold mb-3">${s.title||'Service'}</h3>
+        <p class="text-gray-600 mb-4 text-sm md:text-base">${s.description||''}</p>
         ${tags.length ? `<div class="flex flex-wrap gap-2">${tags.map(t=>`<span class="badge-modern text-xs">${t}</span>`).join('')}</div>` : ''}
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
 /* ── PORTFOLIO / PROJECTS ── */
 function applyProjects(items) {
   if (!items || !items.length) return;
-  const grid = document.querySelector('#portfolio .grid.md\\:grid-cols-2');
+  // Exact selector: #portfolio section ke andar .grid
+  const grid = document.querySelector('#portfolio .grid');
   if (!grid) return;
-
   grid.innerHTML = items.map(p => `
     <div class="portfolio-item-modern reveal-modern">
-      <img src="${p.image || 'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title || ''}">
+      <img src="${p.image||'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title||''}">
       <div class="portfolio-overlay">
-        <h3 class="text-xl md:text-2xl font-bold text-white mb-2">${p.title || 'Project'}</h3>
-        <p class="text-white mb-4">${p.category || ''}</p>
+        <h3 class="text-xl md:text-2xl font-bold text-white mb-2">${p.title||'Project'}</h3>
+        <p class="text-white mb-4">${p.category||''}</p>
         ${p.url ? `<a href="${p.url}" target="_blank" class="btn-modern btn-glass text-white">View Project</a>` : ''}
       </div>
-    </div>
-  `).join('');
-}
-
-/* ── CERTIFICATES ── */
-function applyCertificates(items) {
-  if (!items || !items.length) return;
-  const grid = document.querySelector('#certificates .grid');
-  if (!grid) return;
-
-  grid.innerHTML = items.map(c => `
-    <div class="glass-card p-6 reveal-modern">
-      ${c.image ? `<img src="${c.image}" alt="${c.title||''}" class="w-full rounded-xl mb-4 object-cover" style="max-height:180px;">` : ''}
-      <h3 class="text-lg font-bold mb-1">${c.title || 'Certificate'}</h3>
-      <p class="text-sm text-gray-500 mb-2">${c.issuer || ''} ${c.year ? '• '+c.year : ''}</p>
-      ${c.url ? `<a href="${c.url}" target="_blank" class="text-sm gradient-text-primary font-semibold">Verify ↗</a>` : ''}
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 /* ── PRESS / ARTICLES ── */
 function applyPress(items) {
   if (!items || !items.length) return;
-  // Find press section by looking for a section that contains press-related content
-  const pressSection = document.querySelector('#press, section[id*="press"], section[id*="article"]');
-  if (!pressSection) return;
-  const grid = pressSection.querySelector('.grid');
+  // Exact selector: #press section ke andar .grid
+  const grid = document.querySelector('#press .grid');
+  if (!grid) return;
+  grid.innerHTML = items.map(p => {
+    const initials = (p.source||'PR').substring(0,2).toUpperCase();
+    return `
+      <div class="glass-card p-6 reveal-modern">
+        ${p.image ? `
+        <div class="overflow-hidden rounded-2xl mb-6">
+          <img src="${p.image}" alt="${p.title||''}" class="w-full h-auto hover:scale-110 transition-transform duration-500">
+        </div>` : ''}
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">
+            ${initials}
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">${p.source||''}</p>
+            <p class="text-sm text-gray-500">${p.date||''}</p>
+          </div>
+        </div>
+        <h3 class="text-xl md:text-2xl font-bold mb-3">${p.title||''}</h3>
+        <p class="text-gray-600 mb-4 text-sm md:text-base">${p.description||''}</p>
+        ${p.url ? `<a href="${p.url}" target="_blank" class="inline-flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">Read Article <i class="fas fa-arrow-right"></i></a>` : ''}
+      </div>`;
+  }).join('');
+}
+
+/* ── CERTIFICATES ── */
+function applyCertificates(items) {
+  if (!items || !items.length) return;
+  // Exact selector: #certificates section ke andar .grid
+  const grid = document.querySelector('#certificates .grid');
   if (!grid) return;
 
-  grid.innerHTML = items.map(p => `
-    <div class="glass-card p-6 reveal-modern">
-      ${p.image ? `<img src="${p.image}" alt="${p.title||''}" class="w-full rounded-xl mb-4 object-cover" style="max-height:160px;">` : ''}
-      <div class="flex items-center gap-2 mb-2">
-        <span class="badge-modern text-xs">${p.source || 'Press'}</span>
-        ${p.date ? `<span class="text-xs text-gray-500">${p.date}</span>` : ''}
-      </div>
-      <h3 class="text-base font-bold mb-2">${p.title || ''}</h3>
-      ${p.description ? `<p class="text-sm text-gray-600 mb-3">${p.description}</p>` : ''}
-      ${p.url ? `<a href="${p.url}" target="_blank" class="text-sm gradient-text-primary font-semibold">Read Article ↗</a>` : ''}
-    </div>
-  `).join('');
+  const iconColors = [
+    'from-orange-500 to-red-600',
+    'from-blue-500 to-blue-700',
+    'from-green-500 to-emerald-700',
+    'from-purple-500 to-purple-700',
+    'from-yellow-500 to-orange-600',
+    'from-pink-500 to-rose-600',
+  ];
+
+  grid.innerHTML = items.map((c, i) => {
+    const color = iconColors[i % iconColors.length];
+    return `
+      <div class="glass-card overflow-hidden reveal-modern group">
+        ${c.image ? `
+        <div class="overflow-hidden">
+          <img src="${c.image}" alt="${c.title||''}"
+               class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image">
+        </div>` : `
+        <div class="w-full h-40 bg-gradient-to-br ${color} flex items-center justify-center">
+          <i class="fas fa-certificate text-white text-5xl opacity-40"></i>
+        </div>`}
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-14 h-14 bg-gradient-to-r ${color} rounded-xl flex items-center justify-center text-white">
+              <i class="fas fa-award text-2xl"></i>
+            </div>
+            <span class="text-sm font-semibold text-gray-500">${c.year||''}</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2">${c.title||'Certificate'}</h3>
+          <p class="text-gray-600 mb-4 text-sm">Issued by ${c.issuer||''}</p>
+          ${c.url ? `
+          <div class="flex items-center gap-2 text-sm text-purple-600">
+            <i class="fas fa-external-link-alt"></i>
+            <a href="${c.url}" target="_blank" class="font-semibold hover:underline">Verify Certificate</a>
+          </div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Re-attach lightbox if it exists
+  if (typeof initCertLightbox === 'function') initCertLightbox();
 }
 
 /* ── CONTACT ── */
@@ -297,19 +254,17 @@ function applyContact(d) {
   if (d.contactPhone) {
     document.querySelectorAll('a[href^="tel"]').forEach(a => {
       a.href = `tel:${d.contactPhone.replace(/\s/g,'')}`;
-      if (a.textContent.trim().startsWith('+') || a.textContent.trim().startsWith('9')) {
-        a.textContent = d.contactPhone;
-      }
+      if (a.textContent.trim().match(/^\+|^9/)) a.textContent = d.contactPhone;
     });
   }
   if (d.contactLocation) {
-    // Location p tag inside contact section
-    const locEl = document.querySelector('#contact .gradient-text-cool');
-    if (locEl) locEl.textContent = d.contactLocation;
+    // Location: #contact section mein gradient-text-cool class wala p
+    const loc = document.querySelector('#contact .gradient-text-cool');
+    if (loc) loc.textContent = d.contactLocation;
   }
   if (d.contactFormspree) {
     const form = document.getElementById('contactForm');
-    if (form) form.setAttribute('action', `https://formspree.io/f/${d.contactFormspree}`);
+    if (form) form.action = `https://formspree.io/f/${d.contactFormspree}`;
   }
 }
 
@@ -317,12 +272,12 @@ function applyContact(d) {
 function applyFooter(d) {
   if (!d) return;
   if (d.footerName) {
-    const nameEl = document.querySelector('footer .gradient-text-primary');
-    if (nameEl) nameEl.textContent = d.footerName;
+    const el = document.querySelector('footer .gradient-text-primary');
+    if (el) el.textContent = d.footerName;
   }
   if (d.footerCopyright) {
-    const copy = document.querySelector('footer p.text-gray-600');
-    if (copy) copy.textContent = d.footerCopyright;
+    const el = document.querySelector('footer p.text-gray-600, footer p.text-sm');
+    if (el) el.textContent = d.footerCopyright;
   }
   if (d.footerEmail)     document.querySelectorAll('footer a[href^="mailto"]').forEach(a => a.href = `mailto:${d.footerEmail}`);
   if (d.footerTwitter)   document.querySelectorAll('footer a[href*="x.com"], footer a[href*="twitter"]').forEach(a => a.href = d.footerTwitter);
@@ -334,19 +289,17 @@ function applyFooter(d) {
 function applySEO(d) {
   if (!d) return;
   if (d.seoTitle) document.title = d.seoTitle;
-  if (d.seoDesc) {
-    let m = document.querySelector('meta[name="description"]');
-    if (!m) { m = document.createElement('meta'); m.name = 'description'; document.head.appendChild(m); }
-    m.content = d.seoDesc;
-  }
-  if (d.seoKeywords) {
-    let m = document.querySelector('meta[name="keywords"]');
-    if (!m) { m = document.createElement('meta'); m.name = 'keywords'; document.head.appendChild(m); }
-    m.content = d.seoKeywords;
-  }
+  const setMeta = (sel, val) => {
+    if (!val) return;
+    let m = document.querySelector(sel);
+    if (!m) { m = document.createElement('meta'); document.head.appendChild(m); }
+    m.content = val;
+  };
+  setMeta('meta[name="description"]', d.seoDesc);
+  setMeta('meta[name="keywords"]', d.seoKeywords);
   if (d.seoCanonical) {
     let l = document.querySelector('link[rel="canonical"]');
-    if (!l) { l = document.createElement('link'); l.rel = 'canonical'; document.head.appendChild(l); }
+    if (!l) { l = document.createElement('link'); l.rel='canonical'; document.head.appendChild(l); }
     l.href = d.seoCanonical;
   }
   if (d.seoOgImage) {
@@ -359,96 +312,53 @@ function applySEO(d) {
 /* ── POPUPS ── */
 function applyPopups(popups) {
   if (!popups || !popups.length) return;
-  const active = popups.filter(p => p.active);
-  active.sort((a,b) => (a.delay||0)-(b.delay||0));
-
-  // Inject popup styles once
-  if (!document.getElementById('fpx-popup-styles')) {
-    const style = document.createElement('style');
-    style.id = 'fpx-popup-styles';
-    style.textContent = `
-    .fpx-overlay{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
-    .fpx-overlay.fpx-show{opacity:1;pointer-events:all}
-    .fpx-modal{background:var(--fpx-bg,#0c1419);border:1px solid rgba(139,92,246,.2);border-radius:20px;overflow:hidden;max-width:480px;width:92vw;transform:scale(.88) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 40px 100px rgba(0,0,0,.7);position:relative}
-    .fpx-overlay.fpx-show .fpx-modal{transform:scale(1) translateY(0)}
-    .fpx-img{width:100%;max-height:220px;object-fit:cover;display:block}
-    .fpx-body{padding:24px}
-    .fpx-title{font-family:inherit;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:10px}
-    .fpx-text{font-size:.9rem;color:#aaa;line-height:1.65;margin-bottom:18px}
-    .fpx-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:10px;text-decoration:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-weight:700;font-size:.9rem;transition:.2s}
-    .fpx-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(139,92,246,.4)}
-    .fpx-close{position:absolute;top:12px;right:12px;z-index:2;width:32px;height:32px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);cursor:pointer;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:.2s}
-    .fpx-close:hover{color:#fff;background:rgba(244,63,94,.3)}
-    .fpx-corner{position:fixed;bottom:24px;right:24px;z-index:99991;max-width:310px;width:92vw;background:var(--fpx-bg,#0c1419);border:1px solid rgba(139,92,246,.2);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(120%);opacity:0;transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .3s;pointer-events:none}
-    .fpx-corner.fpx-show{transform:translateY(0);opacity:1;pointer-events:all}
-    .fpx-banner{position:fixed;top:0;left:0;right:0;z-index:99992;background:#0c1419;border-bottom:1px solid rgba(139,92,246,.2);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transform:translateY(-110%);opacity:0;transition:transform .4s,opacity .3s;pointer-events:none}
-    .fpx-banner.fpx-show{transform:translateY(0);opacity:1;pointer-events:all}
-    .fpx-banner .fpx-img{width:44px;height:44px;border-radius:8px;object-fit:cover}
-    .fpx-banner .fpx-body{flex:1;padding:0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-    .fpx-banner .fpx-title{font-size:.9rem;margin:0}
-    .fpx-banner .fpx-text{font-size:.8rem;margin:0;flex:1}
-    .fpx-banner .fpx-btn{padding:7px 14px;font-size:.8rem}
-    .fpx-banner .fpx-close{position:static;width:26px;height:26px;flex-shrink:0}
-    `;
-    document.head.appendChild(style);
+  const active = popups.filter(p => p.active).sort((a,b)=>(a.delay||0)-(b.delay||0));
+  if (!document.getElementById('fpx-styles')) {
+    const s = document.createElement('style');
+    s.id = 'fpx-styles';
+    s.textContent = `.fpx-overlay{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}.fpx-overlay.fpx-show{opacity:1;pointer-events:all}.fpx-modal{background:var(--fpx-bg,#0e0e1f);border:1px solid rgba(139,92,246,.2);border-radius:20px;overflow:hidden;max-width:480px;width:92vw;transform:scale(.88) translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 40px 100px rgba(0,0,0,.7);position:relative}.fpx-overlay.fpx-show .fpx-modal{transform:scale(1) translateY(0)}.fpx-img{width:100%;max-height:220px;object-fit:cover;display:block}.fpx-body{padding:24px}.fpx-title{font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:10px}.fpx-text{font-size:.9rem;color:#aaa;line-height:1.65;margin-bottom:18px}.fpx-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:10px;text-decoration:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-weight:700;font-size:.9rem;transition:.2s}.fpx-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);cursor:pointer;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:.2s}.fpx-corner{position:fixed;bottom:24px;right:24px;z-index:99991;max-width:310px;width:92vw;background:var(--fpx-bg,#0e0e1f);border:1px solid rgba(139,92,246,.2);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(120%);opacity:0;transition:transform .4s cubic-bezier(.34,1.4,.64,1),opacity .3s;pointer-events:none}.fpx-corner.fpx-show{transform:translateY(0);opacity:1;pointer-events:all}.fpx-banner{position:fixed;top:0;left:0;right:0;z-index:99992;background:#0e0e1f;border-bottom:1px solid rgba(139,92,246,.2);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transform:translateY(-110%);opacity:0;transition:transform .4s,opacity .3s;pointer-events:none}.fpx-banner.fpx-show{transform:translateY(0);opacity:1;pointer-events:all}.fpx-banner .fpx-img{width:44px;height:44px;border-radius:8px;object-fit:cover}.fpx-banner .fpx-body{flex:1;padding:0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}.fpx-banner .fpx-title{font-size:.9rem;margin:0}.fpx-banner .fpx-text{font-size:.8rem;margin:0;flex:1}.fpx-banner .fpx-btn{padding:7px 14px;font-size:.8rem}.fpx-banner .fpx-close{position:static;width:26px;height:26px}`;
+    document.head.appendChild(s);
   }
-
   active.forEach((popup, index) => {
-    const delay = ((popup.delay || 0) + index * 0.8) * 1000;
     setTimeout(() => {
-      // Frequency check
       const key = `fpx_${popup.id}`;
       const freq = popup.showOn || 'every';
-      if (freq === 'once' && sessionStorage.getItem(key)) return;
-      if (freq === 'daily') {
-        const last = localStorage.getItem(key);
-        if (last === new Date().toDateString()) return;
-        localStorage.setItem(key, new Date().toDateString());
-      }
-      if (freq === 'once') sessionStorage.setItem(key, '1');
-
-      const imgHtml = popup.image ? `<img class="fpx-img" src="${popup.image}" alt="">` : '';
-      const btnHtml = (popup.btnText && popup.btnUrl)
-        ? `<a class="fpx-btn" href="${popup.btnUrl}" target="_blank">${popup.btnText} ↗</a>` : '';
-      const type = popup.type || 'center';
-      const bg   = popup.bgColor || '#0c1419';
-
-      let el;
-      if (type === 'top-banner') {
-        el = document.createElement('div');
-        el.className = 'fpx-banner';
-        el.innerHTML = `${imgHtml}<div class="fpx-body"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btnHtml}</div><button class="fpx-close">✕</button>`;
-        el.querySelector('.fpx-close').addEventListener('click', () => { el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),400); });
+      if (freq==='once' && sessionStorage.getItem(key)) return;
+      if (freq==='daily') { const t=new Date().toDateString(); if(localStorage.getItem(key)===t) return; localStorage.setItem(key,t); }
+      if (freq==='once') sessionStorage.setItem(key,'1');
+      const img = popup.image ? `<img class="fpx-img" src="${popup.image}" alt="">` : '';
+      const btn = (popup.btnText&&popup.btnUrl) ? `<a class="fpx-btn" href="${popup.btnUrl}" target="_blank">${popup.btnText} ↗</a>` : '';
+      const type = popup.type||'center';
+      let el = document.createElement('div');
+      if (type==='top-banner') {
+        el.className='fpx-banner';
+        el.innerHTML=`${img}<div class="fpx-body"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btn}</div><button class="fpx-close" onclick="this.closest('.fpx-banner').classList.remove('fpx-show')">✕</button>`;
         document.body.appendChild(el);
-        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('fpx-show')));
-        setTimeout(() => { el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),400); }, 8000);
-      } else if (type === 'bottom-right') {
-        el = document.createElement('div');
-        el.className = 'fpx-corner';
-        el.style.setProperty('--fpx-bg', bg);
-        el.innerHTML = `${imgHtml}<div class="fpx-body"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btnHtml}</div><button class="fpx-close">✕</button>`;
-        el.querySelector('.fpx-close').addEventListener('click', () => { el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),500); });
+        requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('fpx-show')));
+        setTimeout(()=>el.classList.remove('fpx-show'),8000);
+      } else if (type==='bottom-right') {
+        el.className='fpx-corner';
+        el.style.setProperty('--fpx-bg', popup.bgColor||'#0e0e1f');
+        el.innerHTML=`${img}<div class="fpx-body" style="padding:16px"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btn}</div><button class="fpx-close" onclick="this.closest('.fpx-corner').classList.remove('fpx-show')">✕</button>`;
         document.body.appendChild(el);
-        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('fpx-show')));
-        setTimeout(() => { el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),500); }, 8000);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('fpx-show')));
+        setTimeout(()=>el.classList.remove('fpx-show'),8000);
       } else {
-        // Center modal (default + fullscreen)
-        el = document.createElement('div');
-        el.className = 'fpx-overlay';
-        el.innerHTML = `<div class="fpx-modal" style="--fpx-bg:${bg}">${imgHtml}<div class="fpx-body"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btnHtml}</div><button class="fpx-close">✕</button></div>`;
-        el.querySelector('.fpx-close').addEventListener('click', () => { el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),400); });
-        el.addEventListener('click', e => { if(e.target===el){ el.classList.remove('fpx-show'); setTimeout(()=>el.remove(),400); } });
+        el.className='fpx-overlay';
+        el.innerHTML=`<div class="fpx-modal" style="--fpx-bg:${popup.bgColor||'#0e0e1f'}">${img}<div class="fpx-body"><div class="fpx-title">${popup.title||''}</div><div class="fpx-text">${popup.body||''}</div>${btn}</div><button class="fpx-close" onclick="this.closest('.fpx-overlay').classList.remove('fpx-show')">✕</button></div>`;
+        el.addEventListener('click', e => { if(e.target===el) el.classList.remove('fpx-show'); });
         document.body.appendChild(el);
-        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('fpx-show')));
+        requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('fpx-show')));
       }
-    }, delay);
+    }, ((popup.delay||0) + index*0.8)*1000);
   });
 }
 
 /* ══════════════════════════════════════
-   MAIN — Sab kuch parallel fetch karo
+   MAIN
 ══════════════════════════════════════ */
 (async () => {
+  console.log('[D Sran] 🔄 Firebase se data load ho raha hai...');
   try {
     const [
       hero, socials, stats, contact, footer, seo,
@@ -473,14 +383,15 @@ function applyPopups(popups) {
     applyContact(contact);
     applyFooter(footer);
     applySEO(seo);
-    if (services.length)     applyServices(services);
-    if (projects.length)     applyProjects(projects);
-    if (certificates.length) applyCertificates(certificates);
-    if (press.length)        applyPress(press);
-    if (popups.length)       applyPopups(popups);
 
-    console.log('[D Sran Portfolio] ✅ Firebase se content load ho gaya!');
+    if (services.length)     { applyServices(services);     console.log('[D Sran] ✅ Services:', services.length); }
+    if (projects.length)     { applyProjects(projects);     console.log('[D Sran] ✅ Projects:', projects.length); }
+    if (press.length)        { applyPress(press);           console.log('[D Sran] ✅ Press:', press.length); }
+    if (certificates.length) { applyCertificates(certificates); console.log('[D Sran] ✅ Certificates:', certificates.length); }
+    if (popups.length)       { applyPopups(popups);         console.log('[D Sran] ✅ Popups:', popups.length); }
+
+    console.log('[D Sran] ✅ Sab kuch load ho gaya!');
   } catch(e) {
-    console.error('[D Sran Portfolio] ❌ Load error:', e.message);
+    console.error('[D Sran] ❌ Error:', e.message);
   }
 })();
