@@ -745,7 +745,201 @@
     <!-- Custom JavaScript -->
     <script src="assets/js/script.js"></script>
 
-    <!-- ✅ Firebase Live Content Loader - Admin panel se changes website pe apply hote hain -->
-    <script type="module" src="portfolio-content-loader.js"></script>
+    <!-- ✅ Firebase Live Content Loader INLINE — no cache issues -->
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBXc9uq0r3tNzodrQNVelO_JtW4hT_wKEM",
+  authDomain: "diljeetsinghsran-fd322.firebaseapp.com",
+  projectId: "diljeetsinghsran-fd322",
+  storageBucket: "diljeetsinghsran-fd322.firebasestorage.app",
+  messagingSenderId: "806630457133",
+  appId: "1:806630457133:web:bfd789de366f803aa99da4"
+};
+
+const app = initializeApp(firebaseConfig, "dsran-loader");
+const db  = getFirestore(app);
+
+async function fsGet(name) {
+  try { const s=await getDoc(doc(db,'portfolio',name)); return s.exists()?s.data():null; }
+  catch(e){ console.warn('[DSran]',name,e.message); return null; }
+}
+async function fsList(col) {
+  try { const s=await getDocs(collection(db,col)); const r=[]; s.forEach(d=>r.push({id:d.id,...d.data()})); return r; }
+  catch(e){ console.warn('[DSran]',col,e.message); return []; }
+}
+
+// SAFE INJECT — find exact parent div by looking at first child's class
+function findGrid(sectionId, childClass) {
+  const sec = document.getElementById(sectionId);
+  if (!sec) { console.warn('[DSran] No section:', sectionId); return null; }
+  const child = sec.querySelector(childClass);
+  if (!child) { console.warn('[DSran] No child', childClass, 'in', sectionId); return null; }
+  return child.parentElement;
+}
+
+(async () => {
+  console.log('[DSran] 🔥 Starting Firebase load...');
+  
+  const [hero, socials, stats, contact, footer, seo,
+         services, projects, certificates, press] = await Promise.all([
+    fsGet('hero'), fsGet('socials'), fsGet('stats'),
+    fsGet('contact'), fsGet('footer'), fsGet('seo'),
+    fsList('services'), fsList('projects'),
+    fsList('certificates'), fsList('press')
+  ]);
+
+  console.log('[DSran] Data fetched:', {
+    hero: !!hero, services: services.length,
+    projects: projects.length, certificates: certificates.length, press: press.length
+  });
+
+  // ── HERO ──
+  if (hero) {
+    if (hero.heroName) {
+      const h1 = document.querySelector('#home h1');
+      if (h1) { const p=hero.heroName.trim().split(' '); h1.innerHTML=`Hi, I'm <span class="gradient-text-primary">${p.slice(0,2).join(' ')}</span> <span class="gradient-text-warm">${p.slice(2).join(' ')}</span> 👋`; }
+    }
+    if (hero.heroBadge) { const b=document.querySelector('#home .badge-gradient'); if(b) b.innerHTML=`<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> ${hero.heroBadge}`; }
+    if (hero.heroTagline) { const p=document.querySelector('#home .space-y-3 p'); if(p) p.innerHTML=`A Passionate <span class="gradient-text-primary font-bold">${hero.heroTagline}</span>`; }
+    if (hero.heroSubline) { const ps=document.querySelectorAll('#home .space-y-3 p'); if(ps[1]) ps[1].textContent=hero.heroSubline; }
+    if (hero.heroCta1Link) { const a=document.querySelector('#home a[href^="tel"]'); if(a) a.href=hero.heroCta1Link; }
+    if (hero.heroCta1Text) { const a=document.querySelector('#home a[href^="tel"]'); if(a) a.innerHTML=`<i class="fas fa-phone mr-2"></i>${hero.heroCta1Text}`; }
+    if (hero.heroImage) { const img=document.querySelector('#home .hero-image-container img')||document.querySelector('#home img[alt*="Diljeet"]'); if(img) img.src=hero.heroImage; }
+    if (hero.heroWhatsapp) { const wa=document.querySelector('a[href*="wa.me"]'); if(wa) wa.href=`https://wa.me/${hero.heroWhatsapp.replace(/\D/g,'')}`; }
+  }
+
+  // ── SOCIALS ──
+  if (socials) {
+    if (socials.socialEmail)    document.querySelectorAll('a[href^="mailto"]').forEach(a=>{a.href=`mailto:${socials.socialEmail}`;if(a.textContent.includes('@'))a.textContent=socials.socialEmail;});
+    if (socials.socialTwitter)  document.querySelectorAll('a[href*="x.com"],a[href*="twitter"]').forEach(a=>a.href=socials.socialTwitter);
+    if (socials.socialInstagram)document.querySelectorAll('a[href*="instagram"]').forEach(a=>a.href=socials.socialInstagram);
+    if (socials.socialLinkedin) document.querySelectorAll('a[href*="linkedin"]').forEach(a=>a.href=socials.socialLinkedin);
+  }
+
+  // ── STATS ──
+  if (stats) {
+    const counters=document.querySelectorAll('.counter');
+    [[stats.stat1Num,stats.stat1Lbl],[stats.stat2Num,stats.stat2Lbl],[stats.stat3Num,stats.stat3Lbl],[stats.stat4Num,stats.stat4Lbl]].forEach(([num,lbl],i)=>{
+      if(counters[i]){
+        if(num) counters[i].dataset.target=num;
+        const p=counters[i].closest('.reveal-modern')?.querySelector('p'); if(p&&lbl) p.textContent=lbl;
+        const target=parseInt(counters[i].dataset.target)||0; let cur=0; counters[i].textContent='0';
+        const step=Math.max(1,Math.floor(target/60));
+        const t=setInterval(()=>{cur=Math.min(cur+step,target);counters[i].textContent=cur;if(cur>=target)clearInterval(t);},30);
+      }
+    });
+  }
+
+  // ── SERVICES ──
+  if (services.length) {
+    const grid = findGrid('services', '.service-card');
+    if (grid) {
+      const cm={primary:'gradient-bg-primary',warm:'gradient-bg-warm',cool:'gradient-bg-cool'};
+      const df=['primary','warm','cool','primary','warm','cool'];
+      grid.innerHTML = services.map((s,i)=>{
+        const cls=cm[s.color]||cm[df[i%3]];
+        const tags=(s.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+        return `<div class="service-card reveal-modern">
+          <div class="service-icon ${cls}"><i class="fas ${s.icon||'fa-star'} text-white"></i></div>
+          <h3 class="text-xl md:text-2xl font-bold mb-3">${s.title||''}</h3>
+          <p class="text-gray-600 mb-4 text-sm md:text-base">${s.description||''}</p>
+          ${tags.length?`<div class="flex flex-wrap gap-2">${tags.map(t=>`<span class="badge-modern text-xs">${t}</span>`).join('')}</div>`:''}
+        </div>`;
+      }).join('');
+      console.log('[DSran] ✅ Services done:', services.length);
+    }
+  }
+
+  // ── PORTFOLIO ──
+  if (projects.length) {
+    const grid = findGrid('portfolio', '.portfolio-item-modern');
+    if (grid) {
+      grid.innerHTML = projects.map(p=>`
+        <div class="portfolio-item-modern reveal-modern">
+          <img src="${p.image||'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title||''}">
+          <div class="portfolio-overlay">
+            <h3 class="text-xl md:text-2xl font-bold text-white mb-2">${p.title||''}</h3>
+            <p class="text-white mb-4">${p.category||''}</p>
+            ${p.url?`<a href="${p.url}" target="_blank" class="btn-modern btn-glass text-white">View Project</a>`:''}
+          </div>
+        </div>`).join('');
+      console.log('[DSran] ✅ Projects done:', projects.length);
+    }
+  }
+
+  // ── PRESS ──
+  if (press.length) {
+    const grid = findGrid('press', '.glass-card');
+    if (grid) {
+      grid.innerHTML = press.map(p=>`
+        <div class="glass-card p-6 reveal-modern">
+          ${p.image?`<div class="overflow-hidden rounded-2xl mb-6"><img src="${p.image}" alt="" class="w-full h-auto hover:scale-110 transition-transform duration-500"></div>`:''}
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">${(p.source||'PR').substring(0,2).toUpperCase()}</div>
+            <div><p class="font-bold text-gray-800">${p.source||''}</p><p class="text-sm text-gray-500">${p.date||''}</p></div>
+          </div>
+          <h3 class="text-xl md:text-2xl font-bold mb-3">${p.title||''}</h3>
+          <p class="text-gray-600 mb-4 text-sm">${p.description||''}</p>
+          ${p.url?`<a href="${p.url}" target="_blank" class="inline-flex items-center gap-2 text-purple-600 font-semibold">Read Article <i class="fas fa-arrow-right"></i></a>`:''}
+        </div>`).join('');
+      console.log('[DSran] ✅ Press done:', press.length);
+    }
+  }
+
+  // ── CERTIFICATES ──
+  if (certificates.length) {
+    const grid = findGrid('certificates', '.glass-card');
+    if (grid) {
+      const cols=['from-orange-500 to-red-600','from-blue-500 to-blue-700','from-green-500 to-emerald-700','from-purple-500 to-purple-700','from-yellow-500 to-orange-600','from-pink-500 to-rose-600'];
+      grid.innerHTML = certificates.map((c,i)=>{
+        const col=cols[i%cols.length];
+        return `<div class="glass-card overflow-hidden reveal-modern group">
+          ${c.image
+            ?`<div class="overflow-hidden"><img src="${c.image}" alt="${c.title||''}" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image"></div>`
+            :`<div class="w-full h-40 bg-gradient-to-br ${col} flex items-center justify-center"><i class="fas fa-certificate text-white text-5xl opacity-40"></i></div>`}
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-r ${col} rounded-xl flex items-center justify-center text-white"><i class="fas fa-award text-2xl"></i></div>
+              <span class="text-sm font-semibold text-gray-500">${c.year||''}</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2">${c.title||'Certificate'}</h3>
+            <p class="text-gray-600 mb-4 text-sm">Issued by ${c.issuer||''}</p>
+            ${c.url?`<div class="flex items-center gap-2 text-sm text-purple-600"><i class="fas fa-external-link-alt"></i><a href="${c.url}" target="_blank" class="font-semibold hover:underline">Verify Certificate</a></div>`:''}
+          </div>
+        </div>`;
+      }).join('');
+      console.log('[DSran] ✅ Certificates done:', certificates.length);
+    }
+  }
+
+  // ── CONTACT ──
+  if (contact) {
+    if (contact.contactEmail) document.querySelectorAll('a[href^="mailto"]').forEach(a=>{a.href=`mailto:${contact.contactEmail}`;if(a.textContent.trim().includes('@'))a.textContent=contact.contactEmail;});
+    if (contact.contactPhone) document.querySelectorAll('a[href^="tel"]').forEach(a=>{a.href=`tel:${contact.contactPhone.replace(/\s/g,'')}`;});
+    if (contact.contactFormspree){const f=document.getElementById('contactForm');if(f)f.action=`https://formspree.io/f/${contact.contactFormspree}`;}
+  }
+
+  // ── FOOTER ──
+  if (footer) {
+    if (footer.footerName){const e=document.querySelector('footer .gradient-text-primary');if(e)e.textContent=footer.footerName;}
+    if (footer.footerCopyright){const e=document.querySelector('footer p.text-gray-600')||document.querySelector('footer p.text-sm');if(e)e.textContent=footer.footerCopyright;}
+    if (footer.footerEmail)     document.querySelectorAll('footer a[href^="mailto"]').forEach(a=>a.href=`mailto:${footer.footerEmail}`);
+    if (footer.footerTwitter)   document.querySelectorAll('footer a[href*="x.com"],footer a[href*="twitter"]').forEach(a=>a.href=footer.footerTwitter);
+    if (footer.footerInstagram) document.querySelectorAll('footer a[href*="instagram"]').forEach(a=>a.href=footer.footerInstagram);
+    if (footer.footerLinkedin)  document.querySelectorAll('footer a[href*="linkedin"]').forEach(a=>a.href=footer.footerLinkedin);
+  }
+
+  // ── SEO ──
+  if (seo) {
+    if (seo.seoTitle) document.title=seo.seoTitle;
+    if (seo.seoDesc){let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m);}m.content=seo.seoDesc;}
+  }
+
+  console.log('[DSran] ✅ ALL DONE!');
+})();
+    </script>
 </body>
 </html>
