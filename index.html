@@ -7,6 +7,30 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      safelist: [
+        'grid','gap-8','p-6','overflow-hidden','reveal-modern','group',
+        'w-full','h-64','object-cover','cursor-pointer','certificate-image',
+        'flex','items-center','gap-3','mb-4','w-14','h-14','rounded-xl',
+        'justify-center','text-white','text-2xl','fas','fa-award',
+        'text-xl','font-bold','mb-2','text-gray-600','mb-4','text-sm',
+        'text-purple-600','fa-external-link-alt','font-semibold','hover:underline',
+        'service-card','service-icon','gradient-bg-primary','gradient-bg-warm','gradient-bg-cool',
+        'text-xl','md:text-2xl','font-bold','mb-3','text-gray-600','badge-modern','text-xs',
+        'flex-wrap','gap-2','portfolio-item-modern','portfolio-overlay',
+        'btn-modern','btn-glass','glass-card','rounded-2xl','mb-6',
+        'h-auto','hover:scale-110','transition-transform','duration-500',
+        'from-orange-500','to-red-600','from-blue-500','to-blue-700',
+        'from-green-500','to-emerald-700','from-purple-500','to-purple-700',
+        'from-yellow-500','to-orange-600','from-pink-500','to-rose-600',
+        'bg-gradient-to-r','bg-gradient-to-br','w-40','h-40','fa-certificate','opacity-40',
+        'fa-arrow-right','inline-flex','gap-2','hover:gap-4','transition-all',
+        'from-blue-500','to-blue-700','w-12','h-12','font-bold',
+        'font-bold','text-gray-800','text-gray-500',
+      ]
+    }
+    </script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -186,7 +210,7 @@
             </div>
             
             <!-- Services Grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="services-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 <!-- Service 1 - Web Development -->
                 <div class="service-card reveal-modern">
@@ -349,7 +373,7 @@
             </div>
             
             <!-- Portfolio Grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="portfolio-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 <!-- Portfolio Item 1 - Website -->
                 <div class="portfolio-item-modern reveal-modern">
@@ -435,7 +459,7 @@
             </div>
             
             <!-- Articles Grid -->
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div id="press-grid" class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 
                 <!-- Article 1 -->
                 <div class="glass-card p-6 reveal-modern">
@@ -511,7 +535,7 @@
             </div>
             
             <!-- Certificates Grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="cert-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 <!-- Certificate 1 - Google SEO -->
                 <div class="glass-card overflow-hidden reveal-modern group">
@@ -771,13 +795,18 @@ async function fsList(col) {
   catch(e){ console.warn('[DSran]',col,e.message); return []; }
 }
 
-// SAFE INJECT — find exact parent div by looking at first child's class
+// DIRECT ID — no class selector needed
 function findGrid(sectionId, childClass) {
-  const sec = document.getElementById(sectionId);
-  if (!sec) { console.warn('[DSran] No section:', sectionId); return null; }
-  const child = sec.querySelector(childClass);
-  if (!child) { console.warn('[DSran] No child', childClass, 'in', sectionId); return null; }
-  return child.parentElement;
+  const idMap = {
+    'services': 'services-grid',
+    'portfolio': 'portfolio-grid',
+    'press': 'press-grid',
+    'certificates': 'cert-grid'
+  };
+  const el = document.getElementById(idMap[sectionId]);
+  if (!el) { console.warn('[DSran] Grid not found for:', sectionId); return null; }
+  console.log('[DSran] Grid found:', idMap[sectionId], el);
+  return el;
 }
 
 (async () => {
