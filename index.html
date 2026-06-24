@@ -38,6 +38,56 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
     
+    <style>
+    /* ── MARQUEE / FLAGS ── */
+    .marquee-wrapper{width:100%;overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent);}
+    .marquee-track{display:flex;gap:16px;width:max-content;animation:marqueeLeft 30s linear infinite;}
+    .marquee-track.marquee-reverse{animation:marqueeRight 35s linear infinite;}
+    .marquee-track:hover,.marquee-track.marquee-reverse:hover{animation-play-state:paused;}
+    .flag-pill{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border-radius:50px;
+      background:rgba(255,255,255,0.55);backdrop-filter:blur(12px);
+      border:1.5px solid rgba(255,255,255,0.4);white-space:nowrap;
+      font-size:.88rem;font-weight:600;color:#1a1a2e;
+      box-shadow:0 4px 14px rgba(31,38,135,0.08);transition:transform .2s,box-shadow .2s;}
+    .flag-pill:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 8px 24px rgba(31,38,135,0.14);}
+    .flag-pill .fi{font-size:1.5rem;}
+    @keyframes marqueeLeft{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+    @keyframes marqueeRight{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+
+    /* ── EXTRA ENTER ANIMATIONS ── */
+    .anim-pop{animation:popIn .6s cubic-bezier(.34,1.56,.64,1) both;}
+    @keyframes popIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+    .anim-slide-left{animation:slideLeft .7s cubic-bezier(.4,0,.2,1) both;}
+    @keyframes slideLeft{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
+    .anim-slide-right{animation:slideRight .7s cubic-bezier(.4,0,.2,1) both;}
+    @keyframes slideRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+
+    /* ── SCROLL REVEAL DELAYS ── */
+    .reveal-modern[data-delay="100"]{transition-delay:.1s;}
+    .reveal-modern[data-delay="200"]{transition-delay:.2s;}
+    .reveal-modern[data-delay="300"]{transition-delay:.3s;}
+    .reveal-modern[data-delay="400"]{transition-delay:.4s;}
+    .reveal-modern[data-delay="500"]{transition-delay:.5s;}
+
+    /* ── CARD HOVER GLOW ── */
+    .service-card,.glass-card,.portfolio-item-modern{position:relative;}
+    .service-card::after,.glass-card::after{
+      content:'';position:absolute;inset:0;border-radius:inherit;
+      background:linear-gradient(135deg,rgba(102,126,234,.07),rgba(118,75,162,.07));
+      opacity:0;transition:opacity .4s;pointer-events:none;
+    }
+    .service-card:hover::after,.glass-card:hover::after{opacity:1;}
+
+    /* ── SECTION ENTER ANIMATIONS triggered by JS ── */
+    .section-animate-in > *{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease;}
+    .section-animate-in.triggered > *:nth-child(1){opacity:1;transform:none;transition-delay:.05s;}
+    .section-animate-in.triggered > *:nth-child(2){opacity:1;transform:none;transition-delay:.15s;}
+    .section-animate-in.triggered > *:nth-child(3){opacity:1;transform:none;transition-delay:.25s;}
+    .section-animate-in.triggered > *:nth-child(4){opacity:1;transform:none;transition-delay:.35s;}
+    .section-animate-in.triggered > *:nth-child(5){opacity:1;transform:none;transition-delay:.45s;}
+    .section-animate-in.triggered > *:nth-child(6){opacity:1;transform:none;transition-delay:.55s;}
+    </style>
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
@@ -86,10 +136,14 @@
                 <a href="#portfolio" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
                 <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
                 <a href="#contact" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
-                <a href="#contact" class="btn-modern btn-gradient-primary w-full text-center block mt-4">
-                <a href="admin.html" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin</a>    
-                    Let's Talk
-                </a>
+                <div class="border-t border-white/20 pt-4 flex flex-col gap-3">
+                    <a href="admin.html" class="block text-center py-2 px-4 rounded-xl text-purple-600 font-medium border border-purple-200 hover:bg-purple-50 transition-colors">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </a>
+                    <a href="#contact" class="btn-modern btn-gradient-primary w-full text-center block">
+                        <i class="fas fa-comments mr-2"></i>Let's Talk
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -349,6 +403,33 @@
                     </div>
                     
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================ -->
+    <!-- COUNTRIES MARQUEE SECTION -->
+    <!-- ================================ -->
+    <section id="countries" class="py-16 overflow-hidden">
+        <div class="container mx-auto px-6 mb-10 text-center reveal-modern">
+            <span class="badge-modern mb-4 inline-flex">
+                <i class="fas fa-globe mr-2"></i> Global Reach
+            </span>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
+                Countries I've <span class="gradient-text-primary">Worked With</span>
+            </h2>
+            <p class="text-gray-600">Trusted by clients across <span id="countriesCount" class="font-bold gradient-text-warm">24+</span> countries worldwide</p>
+        </div>
+
+        <!-- Marquee Track 1 — left to right -->
+        <div class="marquee-wrapper mb-4">
+            <div class="marquee-track" id="flagTrack1">
+                <!-- Flags injected by JS or static fallback -->
+            </div>
+        </div>
+        <!-- Marquee Track 2 — right to left -->
+        <div class="marquee-wrapper">
+            <div class="marquee-track marquee-reverse" id="flagTrack2">
             </div>
         </div>
     </section>
@@ -769,6 +850,92 @@
     <!-- Custom JavaScript -->
     <script src="assets/js/script.js"></script>
 
+    <!-- ── COUNTRIES FLAGS + ANIMATIONS ── -->
+    <script>
+    /* ── COUNTRIES DATA — admin se override hoga ── */
+    const DEFAULT_COUNTRIES = [
+      {code:'US',name:'United States'},{code:'GB',name:'United Kingdom'},
+      {code:'CA',name:'Canada'},{code:'AU',name:'Australia'},
+      {code:'AE',name:'UAE'},{code:'DE',name:'Germany'},
+      {code:'FR',name:'France'},{code:'NL',name:'Netherlands'},
+      {code:'SG',name:'Singapore'},{code:'NZ',name:'New Zealand'},
+      {code:'IN',name:'India'},{code:'PK',name:'Pakistan'},
+      {code:'BD',name:'Bangladesh'},{code:'NG',name:'Nigeria'},
+      {code:'ZA',name:'South Africa'},{code:'KE',name:'Kenya'},
+      {code:'PH',name:'Philippines'},{code:'MY',name:'Malaysia'},
+      {code:'SA',name:'Saudi Arabia'},{code:'QA',name:'Qatar'},
+      {code:'KW',name:'Kuwait'},{code:'BH',name:'Bahrain'},
+      {code:'JP',name:'Japan'},{code:'KR',name:'South Korea'}
+    ];
+
+    function buildFlagPill(c) {
+      return `<div class="flag-pill">
+        <img src="https://flagcdn.com/48x36/${c.code.toLowerCase()}.png"
+             alt="${c.name}" style="width:28px;height:21px;border-radius:4px;object-fit:cover;"
+             onerror="this.style.display='none'">
+        <span>${c.name}</span>
+      </div>`;
+    }
+
+    window.renderCountryFlags = function(countries) {
+      const list = (countries && countries.length) ? countries : DEFAULT_COUNTRIES;
+      document.getElementById('countriesCount').textContent = list.length + '+';
+      // Duplicate for seamless loop
+      const html = list.map(buildFlagPill).join('');
+      document.getElementById('flagTrack1').innerHTML = html + html;
+      document.getElementById('flagTrack2').innerHTML = html + html;
+    };
+
+    // Render defaults immediately — Firebase override will call renderCountryFlags again
+    renderCountryFlags(null);
+
+    /* ── EXTRA SCROLL ANIMATIONS ── */
+    // Add staggered delays to grid children
+    document.querySelectorAll('#services-grid, #portfolio-grid, #cert-grid, #press-grid').forEach(grid => {
+      grid.classList.add('section-animate-in');
+    });
+
+    const animObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('triggered');
+          animObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section-animate-in').forEach(el => animObs.observe(el));
+
+    // Counter animation on scroll
+    const counterObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.counter').forEach(c => {
+          const target = parseInt(c.dataset.target) || 0;
+          let cur = 0;
+          const step = Math.max(1, Math.floor(target / 60));
+          const t = setInterval(() => {
+            cur = Math.min(cur + step, target);
+            c.textContent = cur;
+            if (cur >= target) clearInterval(t);
+          }, 25);
+        });
+        counterObs.unobserve(e.target);
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.counter').forEach(c => counterObs.observe(c.closest('.reveal-modern') || c));
+
+    // Parallax on hero blobs on mouse move
+    document.addEventListener('mousemove', e => {
+      const xF = (e.clientX / window.innerWidth - .5) * 30;
+      const yF = (e.clientY / window.innerHeight - .5) * 30;
+      const b1 = document.querySelector('.hero-blob-1');
+      const b2 = document.querySelector('.hero-blob-2');
+      if (b1) b1.style.transform = `translate(${xF}px,${yF}px)`;
+      if (b2) b2.style.transform = `translate(${-xF}px,${-yF}px)`;
+    });
+    </script>
+
     <!-- ✅ Firebase Live Content Loader INLINE — no cache issues -->
     <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -813,11 +980,12 @@ function findGrid(sectionId, childClass) {
   console.log('[DSran] 🔥 Starting Firebase load...');
   
   const [hero, socials, stats, contact, footer, seo,
-         services, projects, certificates, press] = await Promise.all([
+         services, projects, certificates, press, countriesSnap] = await Promise.all([
     fsGet('hero'), fsGet('socials'), fsGet('stats'),
     fsGet('contact'), fsGet('footer'), fsGet('seo'),
     fsList('services'), fsList('projects'),
-    fsList('certificates'), fsList('press')
+    fsList('certificates'), fsList('press'),
+    fsList('countries')
   ]);
 
   console.log('[DSran] Data fetched:', {
@@ -965,6 +1133,11 @@ function findGrid(sectionId, childClass) {
   if (seo) {
     if (seo.seoTitle) document.title=seo.seoTitle;
     if (seo.seoDesc){let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m);}m.content=seo.seoDesc;}
+  }
+
+  // ── COUNTRIES FLAGS ──
+  if (countriesSnap && countriesSnap.length) {
+    window.renderCountryFlags(countriesSnap);
   }
 
   console.log('[DSran] ✅ ALL DONE!');

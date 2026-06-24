@@ -338,6 +338,7 @@ code{background:rgba(139,92,246,0.12);padding:1px 6px;border-radius:4px;font-siz
       <div class="nav-section">Features</div>
       <div class="nav-item" onclick="showPanel('popups',this)"><i class="fas fa-rectangle-ad"></i> Popup Manager</div>
       <div class="nav-item" onclick="showPanel('seo',this)"><i class="fas fa-search"></i> SEO Settings</div>
+      <div class="nav-item" onclick="showPanel('countries',this)"><i class="fas fa-globe"></i> Countries / Flags</div>
     </nav>
     <div class="sidebar-footer">
       <div class="admin-info">
@@ -600,6 +601,26 @@ code{background:rgba(139,92,246,0.12);padding:1px 6px;border-radius:4px;font-siz
         </div>
       </div>
 
+      <!-- COUNTRIES PANEL -->
+      <div class="panel" id="panel-countries">
+        <div class="panel-header">
+          <div class="panel-title">Countries / Flags</div>
+          <div class="panel-desc">Jis countries ke clients hain unke flags add karo — website pe auto-scroll marquee mein dikhenge</div>
+        </div>
+        <div class="edit-card">
+          <div class="edit-card-title"><i class="fas fa-plus-circle"></i> Add Country
+            <button class="btn-add" style="margin-left:auto;" onclick="openAddCountry()"><i class="fas fa-plus"></i> Add Country</button>
+          </div>
+          <p style="color:var(--muted);font-size:.82rem;margin-bottom:16px;">
+            Country code 2 letters ka hona chahiye — e.g. <strong style="color:var(--accent)">US, GB, IN, AE, CA</strong>
+            — <a href="https://flagcdn.com/" target="_blank" style="color:var(--accent2);">All country codes →</a>
+          </p>
+          <div id="countriesList" class="list-items">
+            <div style="text-align:center;padding:20px;color:var(--muted);">Loading...</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -829,7 +850,7 @@ function showPanel(name,el){
   document.getElementById('panel-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el)el.classList.add('active');
-  const t={overview:'Dashboard Overview',hero:'Hero / Banner',stats:'Stats Counter',services:'Services',portfolio:'Portfolio / Work',certificates:'Certificates & Awards',press:'Press / Articles',contact:'Contact Info',footer:'Footer & Socials',popups:'Popup Manager',seo:'SEO Settings'};
+  const t={overview:'Dashboard Overview',hero:'Hero / Banner',stats:'Stats Counter',services:'Services',portfolio:'Portfolio / Work',certificates:'Certificates & Awards',press:'Press / Articles',contact:'Contact Info',footer:'Footer & Socials',popups:'Popup Manager',seo:'SEO Settings',countries:'Countries / Flags'};
   document.getElementById('topbarTitle').textContent=t[name]||name;
   document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0,0);
@@ -844,7 +865,8 @@ async function loadAllData(){
     loadProjectsList(),
     loadList('certificates','certificatesList'),
     loadList('press','pressList'),
-    loadPopups()
+    loadPopups(),
+    loadCountries()
   ]);
 }
 
@@ -884,6 +906,96 @@ async function saveSection(sec){
     await window._setDoc(window._doc(window._db,'portfolio',sec),{...obj,updatedAt:window._serverTimestamp()},{merge:true});
     setStatus(sec+'Status',true);toast(sec+' saved!');
   }catch(e){setStatus(sec+'Status',false);toast('Error: '+e.message,'err');}
+}
+
+/* ─── COUNTRIES ─── */
+let _countriesCache = [];
+
+async function loadCountries() {
+  try {
+    const snap = await window._getDocs(window._collection(window._db,'countries'));
+    _countriesCache = [];
+    snap.forEach(d => _countriesCache.push({id:d.id,...d.data()}));
+    renderCountriesList();
+  } catch(e) { console.warn('loadCountries',e); }
+}
+
+function renderCountriesList() {
+  const el = document.getElementById('countriesList');
+  if (!el) return;
+  el.innerHTML = _countriesCache.length
+    ? _countriesCache.map(c => `
+        <div class="list-item">
+          <div class="list-item-icon" style="overflow:hidden;border-radius:8px;width:48px;height:36px;flex-shrink:0;">
+            <img src="https://flagcdn.com/48x36/${(c.code||'').toLowerCase()}.png" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='🌍'">
+          </div>
+          <div class="list-item-content">
+            <h4>${c.name||'Unknown'}</h4>
+            <p style="font-size:.75rem;color:var(--accent);">Code: <strong>${c.code||''}</strong></p>
+          </div>
+          <div class="list-item-actions">
+            <button class="btn-icon del" onclick="deleteCountry('${c.id}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>`)
+      .join('')
+    : '<p style="color:var(--muted);font-size:.84rem;padding:12px;">No countries added yet. Add one above!</p>';
+}
+
+function openAddCountry() {
+  const html = `
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="f-group">
+        <label>Country Name</label>
+        <input id="newCountryName" placeholder="e.g. United States" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;outline:none;">
+      </div>
+      <div class="f-group">
+        <label>Country Code (2 letters)</label>
+        <input id="newCountryCode" placeholder="e.g. US" maxlength="2" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;outline:none;text-transform:uppercase;"
+          oninput="updateCountryPreview(this.value)">
+      </div>
+    </div>
+    <div id="countryFlagPreview" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface2);border-radius:10px;min-height:54px;">
+      <span style="color:var(--muted);font-size:.82rem;">Flag preview here — type code above</span>
+    </div>`;
+
+  document.getElementById('modalTitle').textContent = 'Add Country';
+  document.getElementById('modalBody').innerHTML = html;
+
+  // Override save button
+  document.querySelector('#addModal .btn-save').onclick = saveNewCountry;
+  openModal('addModal');
+}
+
+function updateCountryPreview(code) {
+  const el = document.getElementById('countryFlagPreview');
+  if (!el || code.length < 2) { if(el) el.innerHTML = '<span style="color:var(--muted);font-size:.82rem;">Type 2-letter code</span>'; return; }
+  el.innerHTML = `
+    <img src="https://flagcdn.com/48x36/${code.toLowerCase()}.png" style="width:48px;height:36px;border-radius:6px;object-fit:cover;" onerror="this.src=''">
+    <span style="font-weight:600;color:var(--text);">${code.toUpperCase()}</span>
+    <span style="color:var(--muted);font-size:.82rem;">${document.getElementById('newCountryName')?.value||''}</span>`;
+}
+
+async function saveNewCountry() {
+  const name = document.getElementById('newCountryName')?.value.trim();
+  const code = document.getElementById('newCountryCode')?.value.trim().toUpperCase();
+  if (!name || !code || code.length !== 2) { toast('Name aur 2-letter code dono zaroori hain!','err'); return; }
+  try {
+    await window._addDoc(window._collection(window._db,'countries'),{name,code,createdAt:window._serverTimestamp()});
+    closeModal('addModal');
+    await loadCountries();
+    toast('Country add ho gayi! 🌍');
+    // Reset save button
+    document.querySelector('#addModal .btn-save').onclick = saveModalItem;
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
+
+async function deleteCountry(id) {
+  if (!confirm('Delete this country?')) return;
+  try {
+    await window._deleteDoc(window._doc(window._db,'countries',id));
+    await loadCountries();
+    toast('Country removed!');
+  } catch(e) { toast('Error: '+e.message,'err'); }
 }
 
 /* ─── LISTS ─── */
