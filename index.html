@@ -637,7 +637,14 @@
                 
                 <!-- Contact Form -->
                 <div class="glass-card p-8 reveal-modern">
-                    <form id="contactForm" class="space-y-6">
+                    <form id="contactForm"
+                          action="https://formspree.io/f/xjkvrknp"
+                          method="POST"
+                          class="space-y-6">
+
+                        <!-- Hidden field for Formspree -->
+                        <input type="hidden" name="_subject" value="New message from D Sran Portfolio">
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
                             <input type="text" name="name" required 
@@ -656,9 +663,18 @@
                                       class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors resize-none"></textarea>
                         </div>
                         
-                        <button type="submit" class="btn-modern btn-gradient-primary w-full text-lg">
+                        <button type="submit" id="contactSubmitBtn" class="btn-modern btn-gradient-primary w-full text-lg">
                             <i class="fas fa-paper-plane mr-2"></i> Send Message
                         </button>
+
+                        <!-- Success Message -->
+                        <div id="formSuccess" class="hidden text-center py-3 px-4 rounded-xl bg-green-100 border border-green-300 text-green-700 font-medium">
+                            ✅ Message sent! I'll get back to you soon.
+                        </div>
+                        <!-- Error Message -->
+                        <div id="formError" class="hidden text-center py-3 px-4 rounded-xl bg-red-100 border border-red-300 text-red-700 font-medium">
+                            ❌ Something went wrong. Please try again.
+                        </div>
                     </form>
                 </div>
                 
@@ -965,8 +981,52 @@ function findGrid(sectionId, childClass) {
     }
     if (contact.contactFormspree){
       const f=document.getElementById('contactForm');
-      if(f) f.action=`https://formspree.io/f/xjkvrknp}`;
+      if(f) f.action=`https://formspree.io/f/${contact.contactFormspree}`;
     }
+  }
+
+  // ── CONTACT FORM SUBMIT (AJAX — no page reload) ──
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('contactSubmitBtn');
+      const successEl = document.getElementById('formSuccess');
+      const errorEl = document.getElementById('formError');
+
+      // Reset messages
+      successEl.classList.add('hidden');
+      errorEl.classList.add('hidden');
+
+      // Button loading state
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+
+      try {
+        const formData = new FormData(contactForm);
+        const res = await fetch(contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          successEl.classList.remove('hidden');
+          contactForm.reset();
+          btn.innerHTML = '<i class="fas fa-check mr-2"></i> Message Sent!';
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Message';
+          }, 3000);
+        } else {
+          throw new Error('Server error');
+        }
+      } catch(err) {
+        errorEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Message';
+      }
+    });
   }
 
   // ── FOOTER ──
