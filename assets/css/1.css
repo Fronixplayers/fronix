@@ -498,14 +498,12 @@ h1, h2, h3, h4, h5, h6 {
     backdrop-filter: blur(20px);
     border: 2px solid rgba(255, 255, 255, 0.2);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 300px; /* ✅ Fixed height so images always show */
 }
 
 .portfolio-item-modern img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

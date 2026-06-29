@@ -427,6 +427,30 @@
             <!-- Portfolio Grid -->
             <div id="portfolio-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
+                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
+                    <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Web Development Project">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-xl font-bold text-white mb-2">Web Development</h3>
+                        <p class="text-white mb-4">Full Stack Project</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
+                    <img src="assets/images/certficates/excel-KWI.jpg" alt="Graphic Design Project">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-xl font-bold text-white mb-2">Graphic Design</h3>
+                        <p class="text-white mb-4">Brand Identity</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
+                    <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="SEO Project">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-xl font-bold text-white mb-2">SEO Optimization</h3>
+                        <p class="text-white mb-4">Digital Marketing</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -434,7 +458,7 @@
     <!-- ================================ -->
     <!-- PRESS/ARTICLES SECTION -->
     <!-- ================================ -->
-    <section id="press" class="py-20 bg-gradient-to-b from-transparent to-gray-50">
+    <section id="articles" class="py-20 bg-gradient-to-b from-transparent to-gray-50">
         <div class="container mx-auto px-6">
             
             <!-- Section Header -->
@@ -453,8 +477,7 @@
             <!-- Articles Grid -->
             <div id="press-grid" class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 
-
-                <!-- Article 2 -->
+                <!-- Article 1 -->
                 <div class="glass-card p-6 reveal-modern">
                     <div class="overflow-hidden rounded-2xl mb-6">
                         <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="IssueWire Article" class="w-full h-auto hover:scale-110 transition-transform duration-500">
@@ -477,8 +500,7 @@
                     <a href="#" target="_blank" class="inline-flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">
                         Read Article <i class="fas fa-arrow-right"></i>
                     </a>
-                </div>
-                
+                </div>                
             </div>
         </div>
     </section>
@@ -524,49 +546,7 @@
                             <span>Verified Certificate</span>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Add more certificates as needed -->
-                <div class="glass-card overflow-hidden reveal-modern group">
-                    <div class="overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 h-64 flex items-center justify-center">
-                        <img src="assets/images/certficates/excel-KWI.jpg" alt="Google SEO Certificate" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
-                                <i class="fas fa-code text-2xl"></i>
-                            </div>
-                            <span class="text-sm font-semibold text-gray-500">2024</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Full Stack Development</h3>
-                        <p class="text-gray-600 mb-4 text-sm">Advanced Web Development</p>
-                        <div class="flex items-center gap-2 text-sm text-purple-600">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Certified Developer</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="glass-card overflow-hidden reveal-modern group">
-                    <div class="overflow-hidden bg-gradient-to-br from-pink-100 to-yellow-100 h-64 flex items-center justify-center">
-                        <img src="assets/images/certficates/excel-KWI.jpg" alt="Google SEO Certificate" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-xl flex items-center justify-center text-white">
-                                <i class="fas fa-palette text-2xl"></i>
-                            </div>
-                            <span class="text-sm font-semibold text-gray-500">2023</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Graphic Design Professional</h3>
-                        <p class="text-gray-600 mb-4 text-sm">Adobe Creative Suite</p>
-                        <div class="flex items-center gap-2 text-sm text-purple-600">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Adobe Certified</span>
-                        </div>
-                    </div>
-                </div>
-                
+                </div>                
             </div>
         </div>
     </section>
@@ -887,8 +867,8 @@ function findGrid(sectionId, childClass) {
     const grid = findGrid('portfolio', '.portfolio-item-modern');
     if (grid) {
       grid.innerHTML = projects.map(p=>`
-        <div class="portfolio-item-modern reveal-modern">
-          <img src="${p.image||'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title||''}">
+        <div class="portfolio-item-modern reveal-modern active" style="height:300px;">
+          <img src="${p.image||'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title||''}" style="width:100%;height:100%;object-fit:cover;display:block;">
           <div class="portfolio-overlay">
             <h3 class="text-xl md:text-2xl font-bold text-white mb-2">${p.title||''}</h3>
             <p class="text-white mb-4">${p.category||''}</p>
