@@ -40,6 +40,22 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
+    <style>
+    /* ── MARQUEE FLAGS ── */
+    .marquee-wrapper{width:100%;overflow:hidden;mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);}
+    .marquee-track{display:flex;gap:12px;width:max-content;animation:marqueeLeft 28s linear infinite;}
+    .marquee-track.marquee-reverse{animation:marqueeRight 34s linear infinite;}
+    .marquee-track:hover,.marquee-track.marquee-reverse:hover{animation-play-state:paused;}
+    @keyframes marqueeLeft{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+    @keyframes marqueeRight{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+    .flag-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:50px;
+      background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);
+      border:1.5px solid rgba(255,255,255,0.5);white-space:nowrap;
+      font-size:.85rem;font-weight:600;color:#1a1a2e;cursor:default;
+      box-shadow:0 3px 12px rgba(31,38,135,0.07);transition:transform .2s,box-shadow .2s;}
+    .flag-pill:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(31,38,135,0.13);}
+    </style>
 </head>
 <body>
 
@@ -80,16 +96,20 @@
         <!-- Mobile Menu -->
         <div id="mobileNav" class="hidden md:hidden mt-4 px-6">
             <div class="glass-modern rounded-3xl p-6 space-y-4">
-                <a href="#home" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</a>
-                <a href="#about" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">About</a>
-                <a href="#services" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Services</a>
-                <a href="#portfolio" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
-                <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
-                <a href="#contact" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
-                <a href="#contact" class="btn-modern btn-gradient-primary w-full text-center block mt-4">
-                <a href="admin.html" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin</a>    
-                    Let's Talk
-                </a>
+                <a href="#home"         class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Home</a>
+                <a href="#about"        class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">About</a>
+                <a href="#services"     class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Services</a>
+                <a href="#portfolio"    class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Portfolio</a>
+                <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Certificates</a>
+                <a href="#contact"      class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Contact</a>
+                <div class="border-t border-white/30 pt-4 flex flex-col gap-3">
+                    <a href="admin.html" class="block text-center py-2 px-4 rounded-xl text-purple-600 font-semibold border-2 border-purple-200 hover:bg-purple-50 transition-colors">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </a>
+                    <a href="#contact" class="mobile-link btn-modern btn-gradient-primary w-full text-center block">
+                        <i class="fas fa-comments mr-2"></i>Let's Talk
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -350,6 +370,27 @@
                     
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- ================================ -->
+    <!-- COUNTRIES MARQUEE SECTION -->
+    <!-- ================================ -->
+    <section id="countries" class="py-16 overflow-hidden">
+        <div class="container mx-auto px-6 mb-10 text-center reveal-modern">
+            <span class="badge-modern mb-4 inline-flex">
+                <i class="fas fa-globe mr-2"></i> Global Reach
+            </span>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
+                Countries I've <span class="gradient-text-primary">Worked With</span>
+            </h2>
+            <p class="text-gray-600">Trusted by clients across <span id="countriesCount" class="font-bold gradient-text-warm">24+</span> countries worldwide</p>
+        </div>
+        <div class="marquee-wrapper mb-3">
+            <div class="marquee-track" id="flagTrack1"></div>
+        </div>
+        <div class="marquee-wrapper">
+            <div class="marquee-track marquee-reverse" id="flagTrack2"></div>
         </div>
     </section>
 
@@ -753,19 +794,52 @@
     <!-- ================================ -->
     <!-- WHATSAPP FLOATING BUTTON -->
     <!-- ================================ -->
-    <a href="https://wa.me/919671441422" target="_blank" id="whatsappBtn"
-       class="fixed bottom-6 right-5 w-14 h-14 md:w-16 md:h-16 md:bottom-8 md:right-8 rounded-full gradient-bg-primary flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform z-50 animate-float-gentle">
+    <a href="https://wa.me/919671441422" target="_blank" 
+       class="fixed bottom-8 right-8 w-16 h-16 rounded-full gradient-bg-primary flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform z-50 animate-float-gentle">
         <i class="fab fa-whatsapp"></i>
     </a>
 
+    <!-- ================================ -->
     <!-- BACK TO TOP BUTTON -->
-    <button id="backToTop"
-            class="fixed bottom-24 right-5 md:bottom-28 md:right-8 w-12 h-12 md:w-14 md:h-14 rounded-full glass-modern items-center justify-center text-gray-700 shadow-xl hover:scale-110 transition-all z-50 hidden">
+    <!-- ================================ -->
+    <button id="backToTop" 
+            class="fixed bottom-24 right-8 w-14 h-14 rounded-full glass-modern items-center justify-center text-gray-700 shadow-xl hover:scale-110 transition-all z-50 hidden">
         <i class="fas fa-arrow-up"></i>
     </button>
 
     <!-- Custom JavaScript -->
     <script src="assets/js/script.js"></script>
+
+    <!-- Default Countries — Firebase override karega agar data hai -->
+    <script>
+    (function renderDefaultFlags() {
+      const defaults = [
+        {code:'US',name:'United States'},{code:'GB',name:'United Kingdom'},
+        {code:'CA',name:'Canada'},{code:'AU',name:'Australia'},
+        {code:'AE',name:'UAE'},{code:'DE',name:'Germany'},
+        {code:'FR',name:'France'},{code:'NL',name:'Netherlands'},
+        {code:'SG',name:'Singapore'},{code:'NZ',name:'New Zealand'},
+        {code:'IN',name:'India'},{code:'PK',name:'Pakistan'},
+        {code:'BD',name:'Bangladesh'},{code:'NG',name:'Nigeria'},
+        {code:'ZA',name:'South Africa'},{code:'KE',name:'Kenya'},
+        {code:'PH',name:'Philippines'},{code:'MY',name:'Malaysia'},
+        {code:'SA',name:'Saudi Arabia'},{code:'QA',name:'Qatar'},
+        {code:'KW',name:'Kuwait'},{code:'BH',name:'Bahrain'},
+        {code:'JP',name:'Japan'},{code:'KR',name:'South Korea'}
+      ];
+      const html = defaults.map(c=>`
+        <div class="flag-pill">
+          <img src="https://flagcdn.com/48x36/${c.code.toLowerCase()}.png"
+               alt="${c.name}" style="width:28px;height:21px;border-radius:4px;object-fit:cover;"
+               onerror="this.style.display='none'">
+          <span>${c.name}</span>
+        </div>`).join('');
+      const t1=document.getElementById('flagTrack1');
+      const t2=document.getElementById('flagTrack2');
+      if(t1) t1.innerHTML=html+html;
+      if(t2) t2.innerHTML=html+html;
+    })();
+    </script>
 
     <!-- ✅ Firebase Live Content Loader INLINE — no cache issues -->
     <script type="module">
@@ -811,11 +885,12 @@ function findGrid(sectionId, childClass) {
   console.log('[DSran] 🔥 Starting Firebase load...');
   
   const [hero, socials, stats, contact, footer, seo,
-         services, projects, certificates, press] = await Promise.all([
+         services, projects, certificates, press, countries] = await Promise.all([
     fsGet('hero'), fsGet('socials'), fsGet('stats'),
     fsGet('contact'), fsGet('footer'), fsGet('seo'),
     fsList('services'), fsList('projects'),
-    fsList('certificates'), fsList('press')
+    fsList('certificates'), fsList('press'),
+    fsList('countries')
   ]);
 
   console.log('[DSran] Data fetched:', {
@@ -902,7 +977,7 @@ function findGrid(sectionId, childClass) {
     const grid = findGrid('press', '.glass-card');
     if (grid) {
       grid.innerHTML = press.map(p=>`
-        <div class="glass-card p-6 reveal-modern">
+        <div class="glass-card p-6 reveal-modern active">
           ${p.image?`<div class="overflow-hidden rounded-2xl mb-6"><img src="${p.image}" alt="" class="w-full h-auto hover:scale-110 transition-transform duration-500"></div>`:''}
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">${(p.source||'PR').substring(0,2).toUpperCase()}</div>
@@ -923,7 +998,7 @@ function findGrid(sectionId, childClass) {
       const cols=['from-orange-500 to-red-600','from-blue-500 to-blue-700','from-green-500 to-emerald-700','from-purple-500 to-purple-700','from-yellow-500 to-orange-600','from-pink-500 to-rose-600'];
       grid.innerHTML = certificates.map((c,i)=>{
         const col=cols[i%cols.length];
-        return `<div class="glass-card overflow-hidden reveal-modern group">
+        return `<div class="glass-card overflow-hidden reveal-modern active group">
           ${c.image
             ?`<div class="overflow-hidden"><img src="${c.image}" alt="${c.title||''}" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image"></div>`
             :`<div class="w-full h-40 bg-gradient-to-br ${col} flex items-center justify-center"><i class="fas fa-certificate text-white text-5xl opacity-40"></i></div>`}
@@ -942,6 +1017,23 @@ function findGrid(sectionId, childClass) {
     }
   }
 
+  // ── COUNTRIES FLAGS ──
+  if (countries && countries.length) {
+    document.getElementById('countriesCount') && (document.getElementById('countriesCount').textContent = countries.length + '+');
+    const html = countries.map(c=>`
+      <div class="flag-pill">
+        <img src="https://flagcdn.com/48x36/${(c.code||'').toLowerCase()}.png"
+             alt="${c.name||''}" style="width:28px;height:21px;border-radius:4px;object-fit:cover;"
+             onerror="this.style.display='none'">
+        <span>${c.name||''}</span>
+      </div>`).join('');
+    const t1 = document.getElementById('flagTrack1');
+    const t2 = document.getElementById('flagTrack2');
+    if (t1) t1.innerHTML = html + html;
+    if (t2) t2.innerHTML = html + html;
+    console.log('[DSran] ✅ Countries done:', countries.length);
+  }
+
   // ── CONTACT ──
   if (contact) {
     if (contact.contactEmail) {
@@ -951,21 +1043,18 @@ function findGrid(sectionId, childClass) {
       });
     }
     if (contact.contactPhone) {
-      // Update href on all tel links
       document.querySelectorAll('a[href^="tel"]').forEach(a=>{
         a.href=`tel:${contact.contactPhone.replace(/\s/g,'')}`;
       });
-      // Update display text in contact section
-      const pd = document.getElementById('contactPhoneDisplay');
-      if (pd) pd.textContent = contact.contactPhone;
+      const pd=document.getElementById('contactPhoneDisplay');
+      if(pd) pd.textContent=contact.contactPhone;
     }
     if (contact.contactLocation) {
-      const ld = document.getElementById('contactLocationDisplay');
-      if (ld) ld.textContent = contact.contactLocation;
+      const ld=document.getElementById('contactLocationDisplay');
+      if(ld) ld.textContent=contact.contactLocation;
     }
     if (contact.contactWhatsapp) {
-      const wa = document.getElementById('whatsappBtn');
-      if (wa) wa.href = `https://wa.me/${contact.contactWhatsapp.replace(/\D/g,'')}`;
+      document.querySelectorAll('a[href*="wa.me"]').forEach(a=>a.href=`https://wa.me/${contact.contactWhatsapp.replace(/\D/g,'')}`);
     }
     if (contact.contactFormspree){
       const f=document.getElementById('contactForm');
