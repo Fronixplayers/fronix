@@ -4,102 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diljeet Singh Sran | Full Stack Developer & Graphic Designer</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <meta name="description" content="Diljeet Singh Sran — Full Stack Developer, Graphic Designer, Video Editor & SEO Expert with 3+ years experience across 24+ countries.">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-    tailwind.config = {
-      safelist: [
-        'grid','gap-8','p-6','overflow-hidden','reveal-modern','group',
-        'w-full','h-64','object-cover','cursor-pointer','certificate-image',
-        'flex','items-center','gap-3','mb-4','w-14','h-14','rounded-xl',
-        'justify-center','text-white','text-2xl','fas','fa-award',
-        'text-xl','font-bold','mb-2','text-gray-600','mb-4','text-sm',
-        'text-purple-600','fa-external-link-alt','font-semibold','hover:underline',
-        'service-card','service-icon','gradient-bg-primary','gradient-bg-warm','gradient-bg-cool',
-        'text-xl','md:text-2xl','font-bold','mb-3','text-gray-600','badge-modern','text-xs',
-        'flex-wrap','gap-2','portfolio-item-modern','portfolio-overlay',
-        'btn-modern','btn-glass','glass-card','rounded-2xl','mb-6',
-        'h-auto','hover:scale-110','transition-transform','duration-500',
-        'from-orange-500','to-red-600','from-blue-500','to-blue-700',
-        'from-green-500','to-emerald-700','from-purple-500','to-purple-700',
-        'from-yellow-500','to-orange-600','from-pink-500','to-rose-600',
-        'bg-gradient-to-r','bg-gradient-to-br','w-40','h-40','fa-certificate','opacity-40',
-        'fa-arrow-right','inline-flex','gap-2','hover:gap-4','transition-all',
-        'from-blue-500','to-blue-700','w-12','h-12','font-bold',
-        'font-bold','text-gray-800','text-gray-500',
-      ]
-    }
+    tailwind.config={safelist:['grid','gap-8','p-6','overflow-hidden','reveal-modern','active','group','w-full','h-64','object-cover','cursor-pointer','certificate-image','flex','items-center','gap-3','mb-4','w-14','h-14','rounded-xl','justify-center','text-white','text-2xl','fas','fa-award','text-xl','font-bold','mb-2','text-gray-600','mb-4','text-sm','text-purple-600','fa-external-link-alt','font-semibold','hover:underline','service-card','service-icon','gradient-bg-primary','gradient-bg-warm','gradient-bg-cool','md:text-2xl','mb-3','badge-modern','text-xs','flex-wrap','gap-2','portfolio-item-modern','portfolio-overlay','btn-modern','btn-glass','glass-card','rounded-2xl','mb-6','h-auto','hover:scale-110','transition-transform','duration-500','from-orange-500','to-red-600','from-blue-500','to-blue-700','from-green-500','to-emerald-700','from-purple-500','to-purple-700','from-yellow-500','to-orange-600','from-pink-500','to-rose-600','bg-gradient-to-r','bg-gradient-to-br','h-40','fa-certificate','opacity-40','fa-arrow-right','inline-flex','gap-2','w-12','h-12','text-gray-800','text-gray-500']}
     </script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
-
-    <style>
-    /* ── MARQUEE FLAGS ── */
-    .marquee-wrapper{width:100%;overflow:hidden;mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);}
-    .marquee-track{display:flex;gap:12px;width:max-content;animation:marqueeLeft 28s linear infinite;}
-    .marquee-track.marquee-reverse{animation:marqueeRight 34s linear infinite;}
-    .marquee-track:hover,.marquee-track.marquee-reverse:hover{animation-play-state:paused;}
-    @keyframes marqueeLeft{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-    @keyframes marqueeRight{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
-    .flag-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:50px;
-      background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);
-      border:1.5px solid rgba(255,255,255,0.5);white-space:nowrap;
-      font-size:.85rem;font-weight:600;color:#1a1a2e;cursor:default;
-      box-shadow:0 3px 12px rgba(31,38,135,0.07);transition:transform .2s,box-shadow .2s;}
-    .flag-pill:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(31,38,135,0.13);}
-    </style>
 </head>
 <body>
 
-    <!-- ================================ -->
-    <!-- MODERN NAVBAR -->
-    <!-- ================================ -->
+    <!-- NAVBAR -->
     <nav id="navbar" class="navbar-modern fixed w-full top-0 z-50 py-4">
         <div class="container mx-auto px-6 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="#" class="text-2xl font-bold">
-                <span class="gradient-text-primary">D Sran</span>
-            </a>
-            
-            <!-- Desktop Menu -->
+            <a href="#" class="text-2xl font-bold"><span class="gradient-text-primary">D Sran</span></a>
             <div class="hidden md:flex items-center gap-8">
-                <a href="#home" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</a>
-                <a href="#services" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Services</a>
-                <a href="#portfolio" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
-                <a href="#articles" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Articles</a>
+                <a href="#home"         class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</a>
+                <a href="#services"     class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Services</a>
+                <a href="#portfolio"    class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
+                <a href="#articles"     class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Articles</a>
                 <a href="#certificates" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
-                <a href="#contact" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
-                <a href="admin.html" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin Login</a>
+                <a href="#contact"      class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
+                <a href="admin.html"    class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin Login</a>
             </div>
-            
-            <!-- CTA Button -->
             <div class="hidden md:block">
-                <a href="#contact" class="btn-modern btn-gradient-primary">
-                    Let's Talk
-                </a>
+                <a href="#contact" class="btn-modern btn-gradient-primary">Let's Talk</a>
             </div>
-            
-            <!-- Mobile Menu Button -->
-            <button id="mobileMenuBtn" class="md:hidden text-gray-700 text-2xl">
-                <i class="fas fa-bars"></i>
-            </button>
+            <button id="mobileMenuBtn" class="md:hidden text-gray-700 text-2xl"><i class="fas fa-bars"></i></button>
         </div>
-        
         <!-- Mobile Menu -->
         <div id="mobileNav" class="hidden md:hidden mt-4 px-6">
             <div class="glass-modern rounded-3xl p-6 space-y-4">
                 <a href="#home"         class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Home</a>
                 <a href="#services"     class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Services</a>
                 <a href="#portfolio"    class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Portfolio</a>
-                <a href="#articles"        class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Articles</a>
+                <a href="#articles"     class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Articles</a>
                 <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Certificates</a>
                 <a href="#contact"      class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Contact</a>
                 <div class="border-t border-white/30 pt-4 flex flex-col gap-3">
@@ -114,83 +62,54 @@
         </div>
     </nav>
 
-    <!-- ================================ -->
-    <!-- HERO SECTION - MODERN -->
-    <!-- ================================ -->
+    <!-- HERO -->
     <section id="home" class="hero-modern">
-        <!-- Background -->
         <div class="hero-bg"></div>
         <div class="hero-blob hero-blob-1"></div>
         <div class="hero-blob hero-blob-2"></div>
-        
         <div class="container mx-auto px-6 relative z-10">
             <div class="grid md:grid-cols-2 gap-12 items-center">
-                
-                <!-- Left Content -->
                 <div class="space-y-6 animate-fade-up">
-                    <!-- Badge -->
                     <div class="inline-flex">
                         <span class="badge-modern badge-gradient">
                             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                             Available For Hire
                         </span>
                     </div>
-                    
-                    <!-- Main Heading -->
                     <div class="space-y-3">
                         <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
                             Hi, I'm <span class="gradient-text-primary">Diljeet Singh</span>
                             <span class="gradient-text-warm">Sran</span> 👋
                         </h1>
-                        
                         <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
-                            A Passionate 
-                            <span class="gradient-text-primary font-bold">Full Stack Developer</span> 💻 & 
+                            A Passionate <span class="gradient-text-primary font-bold">Full Stack Developer</span> 💻 &
                             <span class="gradient-text-warm font-bold">Graphic Designer</span> 🎨<br>
-                            & <span class="gradient-text-cool font-bold">Video Editor</span> 🎬 & 
+                            & <span class="gradient-text-cool font-bold">Video Editor</span> 🎬 &
                             <span class="gradient-text-primary font-bold">SEO Expert</span> 🚀
                         </p>
-                        
                         <p class="text-base md:text-lg text-gray-500">
-                            Having <span class="font-bold gradient-text-warm">3 years</span> of experience over 
+                            Having <span class="font-bold gradient-text-warm">3 years</span> of experience over
                             <span class="font-bold gradient-text-cool">24+ countries</span> worldwide.
                         </p>
                     </div>
-                    
-                    <!-- CTA Buttons -->
                     <div class="flex flex-wrap gap-4">
                         <a href="tel:+919115906955" class="btn-modern btn-gradient-primary">
                             <i class="fas fa-phone mr-2"></i> Book A Call
                         </a>
-                        <button id="copyEmailBtn" class="btn-modern btn-glass">
+                        <button id="copyEmailBtn" data-email="sranhub@gmail.com" class="btn-modern btn-glass">
                             <i class="fas fa-envelope mr-2"></i> Copy Email
                         </button>
                     </div>
-                    
-                    <!-- Social Icons -->
                     <div class="flex gap-4 pt-4">
-                        <a href="mailto:sranhub@gmail.com" class="social-icon-modern" title="Email">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                        <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern" title="Twitter">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern" title="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern" title="LinkedIn">
-                            <i class="fab fa-linkedin"></i>
-                        </a>
+                        <a href="mailto:sranhub@gmail.com" class="social-icon-modern" title="Email"><i class="fas fa-envelope"></i></a>
+                        <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
-                
-                <!-- Right - Hero Image (NO ROTATION) -->
                 <div class="hero-image-container animate-scale-in">
                     <div class="hero-image-frame relative">
-                        <!-- Your Profile Image -->
                         <img src="assets/images/profile-1.png" alt="Diljeet Singh Sran" class="w-full h-auto">
-                        
-                        <!-- Badge on Image -->
                         <div class="absolute bottom-6 left-6 right-6">
                             <div class="glass-modern rounded-2xl p-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
@@ -200,853 +119,198 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Decorative Elements - NO ROTATION -->
                     <div class="hero-decoration absolute -top-6 -right-6 w-32 h-32 bg-gradient-primary opacity-60"></div>
                     <div class="hero-decoration absolute -bottom-6 -left-6 w-24 h-24 bg-gradient-warm opacity-60"></div>
                 </div>
-                
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- SERVICES SECTION -->
-    <!-- ================================ -->
+    <!-- SERVICES -->
     <section id="services" class="py-20 relative">
         <div class="container mx-auto px-6">
-            
-            <!-- Section Header -->
             <div class="text-center mb-16 reveal-modern">
-                <span class="badge-modern mb-4">
-                    <i class="fas fa-briefcase mr-2"></i> What I Do
-                </span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
-                    My <span class="gradient-text-primary">Services</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                    Delivering excellence across multiple domains with modern solutions
-                </p>
+                <span class="badge-modern mb-4"><i class="fas fa-briefcase mr-2"></i> What I Do</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">My <span class="gradient-text-primary">Services</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Delivering excellence across multiple domains with modern solutions</p>
             </div>
-            
-            <!-- Services Grid -->
             <div id="services-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Service 1 - Web Development -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-primary">
-                        <i class="fas fa-code text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Web Development</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Full-stack web applications with modern technologies like React, Node.js, and MongoDB,PHP Full stack .
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">React</span>
-                        <span class="badge-modern text-xs">Node.js</span>
-                        <span class="badge-modern text-xs">MongoDB</span>
-                        <span class="badge-modern text-xs">PHP</span>
-                        <span class="badge-modern text-xs">HTML</span>
-                        <span class="badge-modern text-xs">CSS</span>
-                        <span class="badge-modern text-xs">JavaScript</span>
-                        <span class="badge-modern text-xs">MYSQL</span>
-                    </div>
-                </div>
-                
-                <!-- Service 2 - Graphic Design -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-warm">
-                        <i class="fas fa-palette text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Graphic Design</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Eye-catching designs for branding, social media, and marketing materials.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">Photoshop</span>
-                        <span class="badge-modern text-xs">Illustrator</span>
-                        <span class="badge-modern text-xs">Figma</span>
-                        <span class="badge-modern text-xs">Canva</span>
-                    </div>
-                </div>
-                
-                <!-- Service 3 - Video Editing -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-cool">
-                        <i class="fas fa-video text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Video Editing</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Professional video editing for YouTube, social media, and promotional content.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">Premiere Pro</span>
-                        <span class="badge-modern text-xs">After Effects</span>
-                        <span class="badge-modern text-xs">DaVinci</span>
-                        <span class="badge-modern text-xs">Capcut Advance</span>
-                    </div>
-                </div>
-                
-                <!-- Service 4 - SEO -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-primary">
-                        <i class="fas fa-search text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">SEO Optimization</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Boost your website's visibility and ranking on search engines.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">On-Page SEO</span>
-                        <span class="badge-modern text-xs">Off-Page SEO</span>
-                        <span class="badge-modern text-xs">Analytics</span>
-                        <span class="badge-modern text-xs">Keywords</span>
-                        <span class="badge-modern text-xs">Deep Research</span>
-                    </div>
-                </div>
-                
-                <!-- Service 5 - Social Media -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-warm">
-                        <i class="fas fa-share-alt text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Social Media</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Strategic social media management and content creation for brand growth.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">Instagram</span>
-                        <span class="badge-modern text-xs">Facebook</span>
-                        <span class="badge-modern text-xs">LinkedIn</span>
-                        <span class="badge-modern text-xs">Youtube</span>
-                        <span class="badge-modern text-xs">Twitter (X)</span>
-                    </div>
-                </div>
-                
-                <!-- Service 6 - UI/UX Design -->
-                <div class="service-card reveal-modern">
-                    <div class="service-icon gradient-bg-cool">
-                        <i class="fas fa-paint-brush text-white"></i>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">UI/UX Design</h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        User-centered design solutions for web and mobile applications.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="badge-modern text-xs">Figma</span>
-                        <span class="badge-modern text-xs">Wireframing</span>
-                        <span class="badge-modern text-xs">Prototyping</span>
-                    </div>
-                </div>
-                
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-primary"><i class="fas fa-code text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Web Development</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Full-stack web applications with modern technologies like React, Node.js, MongoDB & PHP.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">React</span><span class="badge-modern text-xs">Node.js</span><span class="badge-modern text-xs">MongoDB</span><span class="badge-modern text-xs">PHP</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-warm"><i class="fas fa-palette text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Graphic Design</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Eye-catching designs for branding, social media, and marketing materials.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Photoshop</span><span class="badge-modern text-xs">Illustrator</span><span class="badge-modern text-xs">Figma</span><span class="badge-modern text-xs">Canva</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-cool"><i class="fas fa-video text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Video Editing</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Professional video editing for YouTube, social media, and promotional content.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Premiere Pro</span><span class="badge-modern text-xs">After Effects</span><span class="badge-modern text-xs">DaVinci</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-primary"><i class="fas fa-search text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">SEO Optimization</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Boost your website's visibility and ranking on search engines.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">On-Page SEO</span><span class="badge-modern text-xs">Off-Page SEO</span><span class="badge-modern text-xs">Analytics</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-warm"><i class="fas fa-share-alt text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Social Media</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Strategic social media management and content creation for brand growth.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Instagram</span><span class="badge-modern text-xs">LinkedIn</span><span class="badge-modern text-xs">Youtube</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-cool"><i class="fas fa-paint-brush text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">UI/UX Design</h3><p class="text-gray-600 mb-4 text-sm md:text-base">User-centered design solutions for web and mobile applications.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Figma</span><span class="badge-modern text-xs">Wireframing</span><span class="badge-modern text-xs">Prototyping</span></div></div>
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- STATS SECTION -->
-    <!-- ================================ -->
+    <!-- STATS -->
     <section class="py-16 relative">
         <div class="container mx-auto px-6">
             <div class="glass-card p-8 md:p-12">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    
-                    <div class="reveal-modern">
-                        <div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2">
-                            <span class="counter" data-target="50">0</span>+
-                        </div>
-                        <p class="text-gray-600 font-medium text-sm md:text-base">Projects Completed</p>
-                    </div>
-                    
-                    <div class="reveal-modern">
-                        <div class="text-4xl md:text-5xl font-bold gradient-text-warm mb-2">
-                            <span class="counter" data-target="24">0</span>+
-                        </div>
-                        <p class="text-gray-600 font-medium text-sm md:text-base">Countries Served</p>
-                    </div>
-                    
-                    <div class="reveal-modern">
-                        <div class="text-4xl md:text-5xl font-bold gradient-text-cool mb-2">
-                            <span class="counter" data-target="40">0</span>+
-                        </div>
-                        <p class="text-gray-600 font-medium text-sm md:text-base">Happy Clients</p>
-                    </div>
-                    
-                    <div class="reveal-modern">
-                        <div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2">
-                            <span class="counter" data-target="3">0</span>+
-                        </div>
-                        <p class="text-gray-600 font-medium text-sm md:text-base">Years Experience</p>
-                    </div>
-                    
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2"><span class="counter" data-target="50">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Projects Completed</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-warm mb-2"><span class="counter" data-target="24">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Countries Served</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-cool mb-2"><span class="counter" data-target="40">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Happy Clients</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2"><span class="counter" data-target="3">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Years Experience</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- COUNTRIES MARQUEE SECTION -->
-    <!-- ================================ -->
+    <!-- COUNTRIES MARQUEE -->
     <section id="countries" class="py-16 overflow-hidden">
         <div class="container mx-auto px-6 mb-10 text-center reveal-modern">
-            <span class="badge-modern mb-4 inline-flex">
-                <i class="fas fa-globe mr-2"></i> Global Reach
-            </span>
-            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
-                Countries I've <span class="gradient-text-primary">Worked With</span>
-            </h2>
+            <span class="badge-modern mb-4 inline-flex"><i class="fas fa-globe mr-2"></i> Global Reach</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">Countries I've <span class="gradient-text-primary">Worked With</span></h2>
             <p class="text-gray-600">Trusted by clients across <span id="countriesCount" class="font-bold gradient-text-warm">24+</span> countries worldwide</p>
         </div>
-        <div class="marquee-wrapper mb-3">
-            <div class="marquee-track" id="flagTrack1"></div>
-        </div>
-        <div class="marquee-wrapper">
-            <div class="marquee-track marquee-reverse" id="flagTrack2"></div>
-        </div>
+        <div class="marquee-wrapper mb-3"><div class="marquee-track" id="flagTrack1"></div></div>
+        <div class="marquee-wrapper"><div class="marquee-track marquee-reverse" id="flagTrack2"></div></div>
     </section>
 
-    <!-- ================================ -->
-    <!-- PORTFOLIO SECTION -->
-    <!-- ================================ -->
+    <!-- PORTFOLIO -->
     <section id="portfolio" class="py-20">
         <div class="container mx-auto px-6">
-            
-            <!-- Section Header -->
             <div class="text-center mb-16 reveal-modern">
-                <span class="badge-modern mb-4">
-                    <i class="fas fa-folder-open mr-2"></i> My Work
-                </span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
-                    Featured <span class="gradient-text-primary">Projects</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                    Showcasing my best work across different domains
-                </p>
+                <span class="badge-modern mb-4"><i class="fas fa-folder-open mr-2"></i> My Work</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Featured <span class="gradient-text-primary">Projects</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Showcasing my best work across different domains</p>
             </div>
-            
-            <!-- Portfolio Grid -->
             <div id="portfolio-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
-                    <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Web Development Project">
-                    <div class="portfolio-overlay">
-                        <h3 class="text-xl font-bold text-white mb-2">Web Development</h3>
-                        <p class="text-white mb-4">Full Stack Project</p>
-                    </div>
-                </div>
-
-                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
-                    <img src="assets/images/certficates/excel-KWI.jpg" alt="Graphic Design Project">
-                    <div class="portfolio-overlay">
-                        <h3 class="text-xl font-bold text-white mb-2">Graphic Design</h3>
-                        <p class="text-white mb-4">Brand Identity</p>
-                    </div>
-                </div>
-
-                <div class="portfolio-item-modern reveal-modern" style="height:300px;">
-                    <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="SEO Project">
-                    <div class="portfolio-overlay">
-                        <h3 class="text-xl font-bold text-white mb-2">SEO Optimization</h3>
-                        <p class="text-white mb-4">Digital Marketing</p>
-                    </div>
-                </div>
-
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Project 1" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">Web Development</h3><p class="text-white mb-4">Full Stack Project</p></div></div>
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/excel-KWI.jpg" alt="Project 2" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">Graphic Design</h3><p class="text-white mb-4">Brand Identity</p></div></div>
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Project 3" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">SEO Optimization</h3><p class="text-white mb-4">Digital Marketing</p></div></div>
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- PRESS/ARTICLES SECTION -->
-    <!-- ================================ -->
-    <section id="articles" class="py-20 bg-gradient-to-b from-transparent to-gray-50">
+    <!-- PRESS / ARTICLES -->
+    <section id="articles" class="py-20">
         <div class="container mx-auto px-6">
-            
-            <!-- Section Header -->
             <div class="text-center mb-16 reveal-modern">
-                <span class="badge-modern mb-4">
-                    <i class="fas fa-newspaper mr-2"></i> In the Press
-                </span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
-                    Featured <span class="gradient-text-primary">Articles</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                    Recognition and features in leading publications
-                </p>
+                <span class="badge-modern mb-4"><i class="fas fa-newspaper mr-2"></i> In the Press</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Articles & <span class="gradient-text-primary">Features</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Press coverage and featured articles</p>
             </div>
-            
-            <!-- Articles Grid -->
-            <div id="press-grid" class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                
-                <!-- Article 1 -->
-                <div class="glass-card p-6 reveal-modern">
-                    <div class="overflow-hidden rounded-2xl mb-6">
-                        <img src="assets/images/certficates/business-negotation-KWI.jpg" alt="IssueWire Article" class="w-full h-auto hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">
-                            IW
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-800">IssueWire</p>
-                            <p class="text-sm text-gray-500">Jul 3, 2024</p>
-                        </div>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">
-                        Fronixplayers: A Revolutionary Force in Digital Agency
-                    </h3>
-                    <p class="text-gray-600 mb-4 text-sm md:text-base">
-                        Featured article highlighting innovation in digital agency, education, and trading sectors.
-                    </p>
-                    <a href="#" target="_blank" class="inline-flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">
-                        Read Article <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>                
+            <div id="press-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-6 reveal-modern active">
+                    <div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">PR</div><div><p class="font-bold text-gray-800">Press Feature</p><p class="text-sm text-gray-500">2024</p></div></div>
+                    <h3 class="text-xl font-bold mb-3">Articles will appear here</h3>
+                    <p class="text-gray-600 text-sm">Add articles from admin panel to display them here.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- CERTIFICATES SECTION -->
-    <!-- ================================ -->
+    <!-- CERTIFICATES -->
     <section id="certificates" class="py-20">
         <div class="container mx-auto px-6">
-            
-            <!-- Section Header -->
             <div class="text-center mb-16 reveal-modern">
-                <span class="badge-modern mb-4">
-                    <i class="fas fa-certificate mr-2"></i> Achievements
-                </span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
-                    Certifications & <span class="gradient-text-primary">Awards</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                    Continuous learning and professional development
-                </p>
+                <span class="badge-modern mb-4"><i class="fas fa-award mr-2"></i> Achievements</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Certificates & <span class="gradient-text-primary">Awards</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Professional certifications and achievements</p>
             </div>
-            
-            <!-- Certificates Grid -->
             <div id="cert-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Certificate 1 - Google SEO -->
-                <div class="glass-card overflow-hidden reveal-modern group">
-                    <div class="overflow-hidden">
-                        <img src="assets/images/certficates/excel-KWI.jpg" alt="Google SEO Certificate" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center text-white">
-                                <i class="fas fa-search text-2xl"></i>
-                            </div>
-                            <span class="text-sm font-semibold text-gray-500">2023</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Introduction to Google SEO</h3>
-                        <p class="text-gray-600 mb-4 text-sm">Issued by UC Davis & Coursera</p>
-                        <div class="flex items-center gap-2 text-sm text-purple-600">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Verified Certificate</span>
-                        </div>
-                    </div>
-                </div>                
-            </div>
-        </div>
-    </section>
-
-    <!-- ================================ -->
-    <!-- CTA SECTION -->
-    <!-- ================================ -->
-    <section class="py-20">
-        <div class="container mx-auto px-6">
-            <div class="glass-card text-center p-12 md:p-16 reveal-modern">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">
-                    Ready to Start Your <span class="gradient-text-primary">Project?</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                    Let's collaborate and bring your ideas to life with cutting-edge solutions
-                </p>
-                <div class="flex flex-wrap gap-4 justify-center">
-                    <a href="#contact" class="btn-modern btn-gradient-primary text-lg">
-                        <i class="fas fa-rocket mr-2"></i> Get Started
-                    </a>
-                    <a href="#portfolio" class="btn-modern btn-glass text-lg">
-                        <i class="fas fa-eye mr-2"></i> View Work
-                    </a>
+                <div class="glass-card overflow-hidden reveal-modern active">
+                    <div class="w-full h-40 bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center"><i class="fas fa-certificate text-white text-5xl opacity-40"></i></div>
+                    <div class="p-6"><h3 class="text-xl font-bold mb-2">Your certificates</h3><p class="text-gray-600 text-sm">Add certificates from admin panel to display them here.</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
-    <!-- CONTACT SECTION -->
-    <!-- ================================ -->
+    <!-- CONTACT -->
     <section id="contact" class="py-20">
         <div class="container mx-auto px-6">
-            
-            <!-- Section Header -->
             <div class="text-center mb-16 reveal-modern">
-                <span class="badge-modern mb-4">
-                    <i class="fas fa-paper-plane mr-2"></i> Get In Touch
-                </span>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
-                    Let's <span class="gradient-text-primary">Connect</span>
-                </h2>
-                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                    Have a project in mind? Let's discuss how I can help you
-                </p>
+                <span class="badge-modern mb-4"><i class="fas fa-envelope mr-2"></i> Get In Touch</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Let's <span class="gradient-text-primary">Connect</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Have a project in mind? Let's discuss how I can help you</p>
             </div>
-            
             <div class="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-                
                 <!-- Contact Info -->
                 <div class="space-y-6 reveal-modern">
                     <div class="glass-card p-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl gradient-bg-primary flex items-center justify-center text-white text-2xl">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Email</p>
-                                <a href="mailto:sranhub@gmail.com" class="text-base md:text-lg font-semibold gradient-text-primary">sranhub@gmail.com</a>
-                            </div>
+                            <div class="w-14 h-14 rounded-xl gradient-bg-primary flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-envelope"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Email</p><a href="mailto:sranhub@gmail.com" class="text-base md:text-lg font-semibold gradient-text-primary">sranhub@gmail.com</a></div>
                         </div>
                     </div>
-                    
                     <div class="glass-card p-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl gradient-bg-warm flex items-center justify-center text-white text-2xl">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Phone</p>
-                                <a id="contactPhoneDisplay" href="tel:+919671441422" class="text-base md:text-lg font-semibold gradient-text-warm">+91 96714 41422</a>
-                            </div>
+                            <div class="w-14 h-14 rounded-xl gradient-bg-warm flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-phone"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Phone</p><a id="contactPhoneDisplay" href="tel:+919671441422" class="text-base md:text-lg font-semibold gradient-text-warm">+91 96714 41422</a></div>
                         </div>
                     </div>
-                    
                     <div class="glass-card p-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-2xl gradient-bg-cool flex items-center justify-center text-white text-2xl">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 mb-1">Location</p>
-                                <p id="contactLocationDisplay" class="text-base md:text-lg font-semibold gradient-text-cool">Delhi, India</p>
-                            </div>
+                            <div class="w-14 h-14 rounded-xl gradient-bg-cool flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-map-marker-alt"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Location</p><p id="contactLocationDisplay" class="text-base md:text-lg font-semibold gradient-text-cool">Delhi, India</p></div>
                         </div>
                     </div>
                 </div>
-                
                 <!-- Contact Form -->
                 <div class="glass-card p-8 reveal-modern">
-                    <form id="contactForm"
-                          action="https://formspree.io/f/xjkvrknp"
-                          method="POST"
-                          class="space-y-6">
-
-                        <!-- Hidden field for Formspree -->
+                    <form id="contactForm" action="https://formspree.io/f/xjkvrknp" method="POST" class="space-y-6">
                         <input type="hidden" name="_subject" value="New message from D Sran Portfolio">
-
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                            <input type="text" name="name" required 
-                                   class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
+                            <input type="text" name="name" required class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
                         </div>
-                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" name="email" required 
-                                   class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
+                            <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
                         </div>
-                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                            <textarea name="message" required rows="4" 
-                                      class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors resize-none"></textarea>
+                            <textarea name="message" required rows="4" class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors resize-none"></textarea>
                         </div>
-                        
                         <button type="submit" id="contactSubmitBtn" class="btn-modern btn-gradient-primary w-full text-lg">
                             <i class="fas fa-paper-plane mr-2"></i> Send Message
                         </button>
-
-                        <!-- Success Message -->
-                        <div id="formSuccess" class="hidden text-center py-3 px-4 rounded-xl bg-green-100 border border-green-300 text-green-700 font-medium">
-                            ✅ Message sent! I'll get back to you soon.
-                        </div>
-                        <!-- Error Message -->
-                        <div id="formError" class="hidden text-center py-3 px-4 rounded-xl bg-red-100 border border-red-300 text-red-700 font-medium">
-                            ❌ Something went wrong. Please try again.
-                        </div>
+                        <div id="formSuccess" class="hidden text-center py-3 px-4 rounded-xl bg-green-100 border border-green-300 text-green-700 font-medium">✅ Message sent! I'll get back to you soon.</div>
+                        <div id="formError"   class="hidden text-center py-3 px-4 rounded-xl bg-red-100 border border-red-300 text-red-700 font-medium">❌ Something went wrong. Please try again.</div>
                     </form>
                 </div>
-                
             </div>
         </div>
     </section>
 
-    <!-- ================================ -->
     <!-- FOOTER -->
-    <!-- ================================ -->
     <footer class="py-12 border-t border-white/20">
         <div class="container mx-auto px-6">
             <div class="text-center space-y-6">
-                <div class="text-2xl md:text-3xl font-bold">
-                    <span class="gradient-text-primary">Diljeet Singh Sran</span>
-                </div>
-                
+                <div class="text-2xl md:text-3xl font-bold"><span class="gradient-text-primary">Diljeet Singh Sran</span></div>
                 <div class="flex justify-center gap-4">
-                    <a href="mailto:sranhub@gmail.com" class="social-icon-modern">
-                        <i class="fas fa-envelope"></i>
-                    </a>
-                    <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
+                    <a href="mailto:sranhub@gmail.com" class="social-icon-modern"><i class="fas fa-envelope"></i></a>
+                    <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern"><i class="fab fa-linkedin"></i></a>
                 </div>
-                
-                <p class="text-gray-600 text-sm md:text-base">
-                    © 2026 Diljeet Singh Sran. All rights reserved.
-                </p>
+                <p class="text-gray-600 text-sm md:text-base">© 2026 Diljeet Singh Sran. All rights reserved. | Design by <span class="gradient-text-primary font-semibold">Altmediia</span></p>
             </div>
         </div>
     </footer>
 
-    <!-- ================================ -->
-    <!-- WHATSAPP FLOATING BUTTON -->
-    <!-- ================================ -->
-    <a href="https://wa.me/919671441422" target="_blank" 
-       class="fixed bottom-8 right-8 w-16 h-16 rounded-full gradient-bg-primary flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform z-50 animate-float-gentle">
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/919671441422" target="_blank" id="whatsappBtn"
+       class="fixed bottom-6 right-5 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 rounded-full gradient-bg-primary flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform z-50 animate-float-gentle">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- ================================ -->
-    <!-- BACK TO TOP BUTTON -->
-    <!-- ================================ -->
-    <button id="backToTop" 
-            class="fixed bottom-24 right-8 w-14 h-14 rounded-full glass-modern items-center justify-center text-gray-700 shadow-xl hover:scale-110 transition-all z-50 hidden">
+    <!-- BACK TO TOP -->
+    <button id="backToTop"
+            class="fixed bottom-24 right-5 md:bottom-28 md:right-8 w-12 h-12 md:w-14 md:h-14 rounded-full glass-modern items-center justify-center text-gray-700 shadow-xl hover:scale-110 transition-all z-50 hidden">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- Custom JavaScript -->
-    <script src="assets/js/script.js"></script>
+    <!-- JS: UI logic + default flags -->
+    <script src="assets/js/app.js"></script>
 
-    <!-- Default Countries — Firebase override karega agar data hai -->
-    <script>
-    (function renderDefaultFlags() {
-      const defaults = [
-        {code:'US',name:'United States'},{code:'GB',name:'United Kingdom'},
-        {code:'CA',name:'Canada'},{code:'AU',name:'Australia'},
-        {code:'AE',name:'UAE'},{code:'DE',name:'Germany'},
-        {code:'FR',name:'France'},{code:'NL',name:'Netherlands'},
-        {code:'SG',name:'Singapore'},{code:'NZ',name:'New Zealand'},
-        {code:'IN',name:'India'},{code:'PK',name:'Pakistan'},
-        {code:'BD',name:'Bangladesh'},{code:'NG',name:'Nigeria'},
-        {code:'ZA',name:'South Africa'},{code:'KE',name:'Kenya'},
-        {code:'PH',name:'Philippines'},{code:'MY',name:'Malaysia'},
-        {code:'SA',name:'Saudi Arabia'},{code:'QA',name:'Qatar'},
-        {code:'KW',name:'Kuwait'},{code:'BH',name:'Bahrain'},
-        {code:'JP',name:'Japan'},{code:'KR',name:'South Korea'}
-      ];
-      const html = defaults.map(c=>`
-        <div class="flag-pill">
-          <img src="https://flagcdn.com/48x36/${c.code.toLowerCase()}.png"
-               alt="${c.name}" style="width:28px;height:21px;border-radius:4px;object-fit:cover;"
-               onerror="this.style.display='none'">
-          <span>${c.name}</span>
-        </div>`).join('');
-      const t1=document.getElementById('flagTrack1');
-      const t2=document.getElementById('flagTrack2');
-      if(t1) t1.innerHTML=html+html;
-      if(t2) t2.innerHTML=html+html;
-    })();
-    </script>
+    <!-- JS: Firebase live content loader -->
+    <script type="module" src="assets/js/firebase-loader.js"></script>
 
-    <!-- ✅ Firebase Live Content Loader INLINE — no cache issues -->
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBXc9uq0r3tNzodrQNVelO_JtW4hT_wKEM",
-  authDomain: "diljeetsinghsran-fd322.firebaseapp.com",
-  projectId: "diljeetsinghsran-fd322",
-  storageBucket: "diljeetsinghsran-fd322.firebasestorage.app",
-  messagingSenderId: "806630457133",
-  appId: "1:806630457133:web:bfd789de366f803aa99da4"
-};
-
-const app = initializeApp(firebaseConfig, "dsran-loader");
-const db  = getFirestore(app);
-
-async function fsGet(name) {
-  try { const s=await getDoc(doc(db,'portfolio',name)); return s.exists()?s.data():null; }
-  catch(e){ console.warn('[DSran]',name,e.message); return null; }
-}
-async function fsList(col) {
-  try { const s=await getDocs(collection(db,col)); const r=[]; s.forEach(d=>r.push({id:d.id,...d.data()})); return r; }
-  catch(e){ console.warn('[DSran]',col,e.message); return []; }
-}
-
-// DIRECT ID — no class selector needed
-function findGrid(sectionId, childClass) {
-  const idMap = {
-    'services': 'services-grid',
-    'portfolio': 'portfolio-grid',
-    'press': 'press-grid',
-    'certificates': 'cert-grid'
-  };
-  const el = document.getElementById(idMap[sectionId]);
-  if (!el) { console.warn('[DSran] Grid not found for:', sectionId); return null; }
-  console.log('[DSran] Grid found:', idMap[sectionId], el);
-  return el;
-}
-
-(async () => {
-  console.log('[DSran] 🔥 Starting Firebase load...');
-  
-  const [hero, socials, stats, contact, footer, seo,
-         services, projects, certificates, press, countries] = await Promise.all([
-    fsGet('hero'), fsGet('socials'), fsGet('stats'),
-    fsGet('contact'), fsGet('footer'), fsGet('seo'),
-    fsList('services'), fsList('projects'),
-    fsList('certificates'), fsList('press'),
-    fsList('countries')
-  ]);
-
-  console.log('[DSran] Data fetched:', {
-    hero: !!hero, services: services.length,
-    projects: projects.length, certificates: certificates.length, press: press.length
-  });
-
-  // ── HERO ──
-  if (hero) {
-    if (hero.heroName) {
-      const h1 = document.querySelector('#home h1');
-      if (h1) { const p=hero.heroName.trim().split(' '); h1.innerHTML=`Hi, I'm <span class="gradient-text-primary">${p.slice(0,2).join(' ')}</span> <span class="gradient-text-warm">${p.slice(2).join(' ')}</span> 👋`; }
-    }
-    if (hero.heroBadge) { const b=document.querySelector('#home .badge-gradient'); if(b) b.innerHTML=`<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> ${hero.heroBadge}`; }
-    if (hero.heroTagline) { const p=document.querySelector('#home .space-y-3 p'); if(p) p.innerHTML=`A Passionate <span class="gradient-text-primary font-bold">${hero.heroTagline}</span>`; }
-    if (hero.heroSubline) { const ps=document.querySelectorAll('#home .space-y-3 p'); if(ps[1]) ps[1].textContent=hero.heroSubline; }
-    if (hero.heroCta1Link) { const a=document.querySelector('#home a[href^="tel"]'); if(a) a.href=hero.heroCta1Link; }
-    if (hero.heroCta1Text) { const a=document.querySelector('#home a[href^="tel"]'); if(a) a.innerHTML=`<i class="fas fa-phone mr-2"></i>${hero.heroCta1Text}`; }
-    if (hero.heroImage) { const img=document.querySelector('#home .hero-image-container img')||document.querySelector('#home img[alt*="Diljeet"]'); if(img) img.src=hero.heroImage; }
-    if (hero.heroWhatsapp) { const wa=document.querySelector('a[href*="wa.me"]'); if(wa) wa.href=`https://wa.me/${hero.heroWhatsapp.replace(/\D/g,'')}`; }
-  }
-
-  // ── SOCIALS ──
-  if (socials) {
-    if (socials.socialEmail)    document.querySelectorAll('a[href^="mailto"]').forEach(a=>{a.href=`mailto:${socials.socialEmail}`;if(a.textContent.includes('@'))a.textContent=socials.socialEmail;});
-    if (socials.socialTwitter)  document.querySelectorAll('a[href*="x.com"],a[href*="twitter"]').forEach(a=>a.href=socials.socialTwitter);
-    if (socials.socialInstagram)document.querySelectorAll('a[href*="instagram"]').forEach(a=>a.href=socials.socialInstagram);
-    if (socials.socialLinkedin) document.querySelectorAll('a[href*="linkedin"]').forEach(a=>a.href=socials.socialLinkedin);
-  }
-
-  // ── STATS ──
-  if (stats) {
-    const counters=document.querySelectorAll('.counter');
-    [[stats.stat1Num,stats.stat1Lbl],[stats.stat2Num,stats.stat2Lbl],[stats.stat3Num,stats.stat3Lbl],[stats.stat4Num,stats.stat4Lbl]].forEach(([num,lbl],i)=>{
-      if(counters[i]){
-        if(num) counters[i].dataset.target=num;
-        const p=counters[i].closest('.reveal-modern')?.querySelector('p'); if(p&&lbl) p.textContent=lbl;
-        const target=parseInt(counters[i].dataset.target)||0; let cur=0; counters[i].textContent='0';
-        const step=Math.max(1,Math.floor(target/60));
-        const t=setInterval(()=>{cur=Math.min(cur+step,target);counters[i].textContent=cur;if(cur>=target)clearInterval(t);},30);
-      }
-    });
-  }
-
-  // ── SERVICES ──
-  if (services.length) {
-    const grid = findGrid('services', '.service-card');
-    if (grid) {
-      const cm={primary:'gradient-bg-primary',warm:'gradient-bg-warm',cool:'gradient-bg-cool'};
-      const df=['primary','warm','cool','primary','warm','cool'];
-      grid.innerHTML = services.map((s,i)=>{
-        const cls=cm[s.color]||cm[df[i%3]];
-        const tags=(s.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
-        return `<div class="service-card reveal-modern">
-          <div class="service-icon ${cls}"><i class="fas ${s.icon||'fa-star'} text-white"></i></div>
-          <h3 class="text-xl md:text-2xl font-bold mb-3">${s.title||''}</h3>
-          <p class="text-gray-600 mb-4 text-sm md:text-base">${s.description||''}</p>
-          ${tags.length?`<div class="flex flex-wrap gap-2">${tags.map(t=>`<span class="badge-modern text-xs">${t}</span>`).join('')}</div>`:''}
-        </div>`;
-      }).join('');
-      console.log('[DSran] ✅ Services done:', services.length);
-    }
-  }
-
-  // ── PORTFOLIO ──
-  if (projects.length) {
-    const grid = findGrid('portfolio', '.portfolio-item-modern');
-    if (grid) {
-      grid.innerHTML = projects.map(p=>`
-        <div class="portfolio-item-modern reveal-modern active" style="height:300px;">
-          <img src="${p.image||'assets/images/certficates/business-negotation-KWI.jpg'}" alt="${p.title||''}" style="width:100%;height:100%;object-fit:cover;display:block;">
-          <div class="portfolio-overlay">
-            <h3 class="text-xl md:text-2xl font-bold text-white mb-2">${p.title||''}</h3>
-            <p class="text-white mb-4">${p.category||''}</p>
-            ${p.url?`<a href="${p.url}" target="_blank" class="btn-modern btn-glass text-white">View Project</a>`:''}
-          </div>
-        </div>`).join('');
-      console.log('[DSran] ✅ Projects done:', projects.length);
-    }
-  }
-
-  // ── PRESS ──
-  if (press.length) {
-    const grid = findGrid('press', '.glass-card');
-    if (grid) {
-      grid.innerHTML = press.map(p=>`
-        <div class="glass-card p-6 reveal-modern active">
-          ${p.image?`<div class="overflow-hidden rounded-2xl mb-6"><img src="${p.image}" alt="" class="w-full h-auto hover:scale-110 transition-transform duration-500"></div>`:''}
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">${(p.source||'PR').substring(0,2).toUpperCase()}</div>
-            <div><p class="font-bold text-gray-800">${p.source||''}</p><p class="text-sm text-gray-500">${p.date||''}</p></div>
-          </div>
-          <h3 class="text-xl md:text-2xl font-bold mb-3">${p.title||''}</h3>
-          <p class="text-gray-600 mb-4 text-sm">${p.description||''}</p>
-          ${p.url?`<a href="${p.url}" target="_blank" class="inline-flex items-center gap-2 text-purple-600 font-semibold">Read Article <i class="fas fa-arrow-right"></i></a>`:''}
-        </div>`).join('');
-      console.log('[DSran] ✅ Press done:', press.length);
-    }
-  }
-
-  // ── CERTIFICATES ──
-  if (certificates.length) {
-    const grid = findGrid('certificates', '.glass-card');
-    if (grid) {
-      const cols=['from-orange-500 to-red-600','from-blue-500 to-blue-700','from-green-500 to-emerald-700','from-purple-500 to-purple-700','from-yellow-500 to-orange-600','from-pink-500 to-rose-600'];
-      grid.innerHTML = certificates.map((c,i)=>{
-        const col=cols[i%cols.length];
-        return `<div class="glass-card overflow-hidden reveal-modern active group">
-          ${c.image
-            ?`<div class="overflow-hidden"><img src="${c.image}" alt="${c.title||''}" class="w-full h-64 object-cover cursor-pointer hover:scale-110 transition-transform duration-500 certificate-image"></div>`
-            :`<div class="w-full h-40 bg-gradient-to-br ${col} flex items-center justify-center"><i class="fas fa-certificate text-white text-5xl opacity-40"></i></div>`}
-          <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-r ${col} rounded-xl flex items-center justify-center text-white"><i class="fas fa-award text-2xl"></i></div>
-              <span class="text-sm font-semibold text-gray-500">${c.year||''}</span>
-            </div>
-            <h3 class="text-xl font-bold mb-2">${c.title||'Certificate'}</h3>
-            <p class="text-gray-600 mb-4 text-sm">Issued by ${c.issuer||''}</p>
-            ${c.url?`<div class="flex items-center gap-2 text-sm text-purple-600"><i class="fas fa-external-link-alt"></i><a href="${c.url}" target="_blank" class="font-semibold hover:underline">Verify Certificate</a></div>`:''}
-          </div>
-        </div>`;
-      }).join('');
-      console.log('[DSran] ✅ Certificates done:', certificates.length);
-    }
-  }
-
-  // ── COUNTRIES FLAGS ──
-  if (countries && countries.length) {
-    document.getElementById('countriesCount') && (document.getElementById('countriesCount').textContent = countries.length + '+');
-    const html = countries.map(c=>`
-      <div class="flag-pill">
-        <img src="https://flagcdn.com/48x36/${(c.code||'').toLowerCase()}.png"
-             alt="${c.name||''}" style="width:28px;height:21px;border-radius:4px;object-fit:cover;"
-             onerror="this.style.display='none'">
-        <span>${c.name||''}</span>
-      </div>`).join('');
-    const t1 = document.getElementById('flagTrack1');
-    const t2 = document.getElementById('flagTrack2');
-    if (t1) t1.innerHTML = html + html;
-    if (t2) t2.innerHTML = html + html;
-    console.log('[DSran] ✅ Countries done:', countries.length);
-  }
-
-  // ── CONTACT ──
-  if (contact) {
-    if (contact.contactEmail) {
-      document.querySelectorAll('a[href^="mailto"]').forEach(a=>{
-        a.href=`mailto:${contact.contactEmail}`;
-        if(a.textContent.trim().includes('@')) a.textContent=contact.contactEmail;
-      });
-    }
-    if (contact.contactPhone) {
-      document.querySelectorAll('a[href^="tel"]').forEach(a=>{
-        a.href=`tel:${contact.contactPhone.replace(/\s/g,'')}`;
-      });
-      const pd=document.getElementById('contactPhoneDisplay');
-      if(pd) pd.textContent=contact.contactPhone;
-    }
-    if (contact.contactLocation) {
-      const ld=document.getElementById('contactLocationDisplay');
-      if(ld) ld.textContent=contact.contactLocation;
-    }
-    if (contact.contactWhatsapp) {
-      document.querySelectorAll('a[href*="wa.me"]').forEach(a=>a.href=`https://wa.me/${contact.contactWhatsapp.replace(/\D/g,'')}`);
-    }
-    if (contact.contactFormspree){
-      const f=document.getElementById('contactForm');
-      if(f) f.action=`https://formspree.io/f/${contact.contactFormspree}`;
-    }
-  }
-
-  // ── CONTACT FORM SUBMIT (AJAX — no page reload) ──
-  const contactForm = document.getElementById('contactForm');
-  if (contactForm) {
-    contactForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById('contactSubmitBtn');
-      const successEl = document.getElementById('formSuccess');
-      const errorEl = document.getElementById('formError');
-
-      // Reset messages
-      successEl.classList.add('hidden');
-      errorEl.classList.add('hidden');
-
-      // Button loading state
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
-
-      try {
-        const formData = new FormData(contactForm);
-        const res = await fetch(contactForm.action, {
-          method: 'POST',
-          body: formData,
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (res.ok) {
-          successEl.classList.remove('hidden');
-          contactForm.reset();
-          btn.innerHTML = '<i class="fas fa-check mr-2"></i> Message Sent!';
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Message';
-          }, 3000);
-        } else {
-          throw new Error('Server error');
-        }
-      } catch(err) {
-        errorEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Message';
-      }
-    });
-  }
-
-  // ── FOOTER ──
-  if (footer) {
-    if (footer.footerName){const e=document.querySelector('footer .gradient-text-primary');if(e)e.textContent=footer.footerName;}
-    if (footer.footerCopyright){const e=document.querySelector('footer p.text-gray-600')||document.querySelector('footer p.text-sm');if(e)e.textContent=footer.footerCopyright;}
-    if (footer.footerEmail)     document.querySelectorAll('footer a[href^="mailto"]').forEach(a=>a.href=`mailto:${footer.footerEmail}`);
-    if (footer.footerTwitter)   document.querySelectorAll('footer a[href*="x.com"],footer a[href*="twitter"]').forEach(a=>a.href=footer.footerTwitter);
-    if (footer.footerInstagram) document.querySelectorAll('footer a[href*="instagram"]').forEach(a=>a.href=footer.footerInstagram);
-    if (footer.footerLinkedin)  document.querySelectorAll('footer a[href*="linkedin"]').forEach(a=>a.href=footer.footerLinkedin);
-  }
-
-  // ── SEO ──
-  if (seo) {
-    if (seo.seoTitle) document.title=seo.seoTitle;
-    if (seo.seoDesc){let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m);}m.content=seo.seoDesc;}
-  }
-
-  console.log('[DSran] ✅ ALL DONE!');
-})();
-    </script>
 </body>
 </html>

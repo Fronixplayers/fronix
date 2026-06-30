@@ -153,9 +153,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .toggle-switch{display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--muted);}
 
 /* ===== MODAL ===== */
-.modal-overlay{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+.modal-overlay{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;width:580px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,0.65);}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;width:580px;max-width:96vw;margin:auto;box-shadow:0 30px 80px rgba(0,0,0,0.65);}
+/* Modal form fields must be visible */
+#modalBody .f-group input,
+#modalBody .f-group textarea,
+#modalBody .f-group select,
+#modalBody input[type="text"],
+#modalBody input[type="email"],
+#modalBody input[type="url"],
+#modalBody input[type="number"],
+#modalBody textarea{
+  width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:.92rem;font-family:'DM Sans',sans-serif;
+  outline:none;transition:.2s;resize:vertical;display:block;margin-top:4px;
+}
+#modalBody .f-group input:focus,
+#modalBody .f-group textarea:focus,
+#modalBody .f-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,0.12);}
+#modalBody label{display:block;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+#modalBody .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+#modalBody .form-row.single{grid-template-columns:1fr;}
+#modalBody .f-group{display:flex;flex-direction:column;margin-bottom:12px;}
+@media(max-width:480px){#modalBody .form-row{grid-template-columns:1fr;}}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .modal-head h3{font-family:'Syne',sans-serif;font-size:1.04rem;font-weight:700;}
 .modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:.2s;}
@@ -243,58 +264,28 @@ code{background:rgba(139,92,246,0.12);padding:1px 6px;border-radius:4px;font-siz
         <span class="logo-sub">Portfolio Control Panel</span>
       </div>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
-    </div>
 
-    <!-- LOGIN -->
+    <!-- LOGIN ONLY — no signup tab -->
     <div id="loginSection">
-      <h2 class="auth-title">Welcome Back</h2>
+      <h2 class="auth-title">Welcome Back 👋</h2>
       <p class="auth-sub">Sign in to manage your portfolio</p>
       <div id="authMsg" class="auth-msg"></div>
       <div class="field"><label>Email</label>
         <div class="field-wrap"><i class="fas fa-envelope"></i>
-          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"
+                 onkeydown="if(event.key==='Enter')doLogin()">
         </div>
       </div>
       <div class="field"><label>Password</label>
         <div class="field-wrap"><i class="fas fa-lock"></i>
-          <input type="password" id="loginPassword" placeholder="Your password">
+          <input type="password" id="loginPassword" placeholder="Your password"
+                 onkeydown="if(event.key==='Enter')doLogin()">
         </div>
       </div>
       <div class="auth-forgot"><a onclick="showForgot()">Forgot password?</a></div>
-      <button class="btn-auth" id="loginBtn" onclick="doLogin()">Sign In</button>
-    </div>
-
-    <!-- SIGNUP -->
-    <div id="signupSection" style="display:none;">
-      <h2 class="auth-title">Create Account</h2>
-      <p class="auth-sub">Register as a new admin</p>
-      <div id="signupMsg" class="auth-msg"></div>
-      <div class="field"><label>Display Name</label>
-        <div class="field-wrap"><i class="fas fa-user"></i>
-          <input type="text" id="signupName" placeholder="Diljeet Singh Sran">
-        </div>
-      </div>
-      <div class="field"><label>Email</label>
-        <div class="field-wrap"><i class="fas fa-envelope"></i>
-          <input type="email" id="signupEmail" placeholder="you@example.com">
-        </div>
-      </div>
-      <div class="field"><label>Password</label>
-        <div class="field-wrap"><i class="fas fa-lock"></i>
-          <input type="password" id="signupPassword" placeholder="Min 6 characters" oninput="checkStrength(this.value)">
-        </div>
-        <div class="pass-strength"><div class="pass-bar" id="strengthBar"></div></div>
-        <div class="pass-lbl" id="strengthLabel"></div>
-      </div>
-      <div class="field"><label>Confirm Password</label>
-        <div class="field-wrap"><i class="fas fa-lock"></i>
-          <input type="password" id="signupConfirm" placeholder="Repeat password">
-        </div>
-      </div>
-      <button class="btn-auth" id="signupBtn" onclick="doSignup()">Create Account</button>
+      <button class="btn-auth" id="loginBtn" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+      </button>
     </div>
 
     <!-- FORGOT -->
@@ -304,7 +295,8 @@ code{background:rgba(139,92,246,0.12);padding:1px 6px;border-radius:4px;font-siz
       <div id="forgotMsg" class="auth-msg"></div>
       <div class="field"><label>Email</label>
         <div class="field-wrap"><i class="fas fa-envelope"></i>
-          <input type="email" id="forgotEmail" placeholder="you@example.com">
+          <input type="email" id="forgotEmail" placeholder="you@example.com"
+                 onkeydown="if(event.key==='Enter')doForgot()">
         </div>
       </div>
       <button class="btn-auth" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
@@ -771,34 +763,25 @@ function v(id){const el=document.getElementById(id);return el?el.value:'';}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function showMsg(id,type,text){const m=document.getElementById(id);m.className=`auth-msg ${type}`;m.textContent=text;m.style.display='block';}
-function clearMsgs(){['authMsg','signupMsg','forgotMsg'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none';});}
+function clearMsgs(){['authMsg','forgotMsg'].forEach(id=>{const m=document.getElementById(id);if(m)m.style.display='none';});}
 
 function switchTab(tab){
   clearMsgs();
   document.getElementById('loginSection').style.display=tab==='login'?'':'none';
-  document.getElementById('signupSection').style.display=tab==='signup'?'':'none';
-  document.getElementById('forgotSection').style.display='none';
-  document.getElementById('tab-login').classList.toggle('active',tab==='login');
-  document.getElementById('tab-signup').classList.toggle('active',tab==='signup');
+  const ss=document.getElementById('signupSection');if(ss)ss.style.display='none';
+  const fs=document.getElementById('forgotSection');if(fs)fs.style.display='none';
+  const tl=document.getElementById('tab-login');if(tl)tl.classList.toggle('active',tab==='login');
+  const ts=document.getElementById('tab-signup');if(ts)ts.classList.toggle('active',tab==='signup');
 }
 function showForgot(){
   clearMsgs();
-  ['loginSection','signupSection'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('forgotSection').style.display='';
-  document.getElementById('tab-login').classList.remove('active');
-  document.getElementById('tab-signup').classList.remove('active');
+  document.getElementById('loginSection').style.display='none';
+  const ss=document.getElementById('signupSection');if(ss)ss.style.display='none';
+  const fs=document.getElementById('forgotSection');if(fs)fs.style.display='';
+  const tl=document.getElementById('tab-login');if(tl)tl.classList.remove('active');
+  const ts=document.getElementById('tab-signup');if(ts)ts.classList.remove('active');
 }
 function showLogin(){switchTab('login');}
-
-function checkStrength(p){
-  const bar=document.getElementById('strengthBar'),lbl=document.getElementById('strengthLabel');
-  if(!p){bar.style.width='0%';lbl.textContent='';return;}
-  let s=0;
-  if(p.length>=6)s++;if(p.length>=10)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;
-  const lvl=[{w:'20%',c:'#f43f5e',t:'Very Weak'},{w:'40%',c:'#f97316',t:'Weak'},{w:'60%',c:'#f59e0b',t:'Fair'},{w:'80%',c:'#06b6d4',t:'Good'},{w:'100%',c:'#22c55e',t:'Strong'}];
-  const l=lvl[Math.min(s-1,4)];
-  bar.style.width=l.w;bar.style.background=l.c;lbl.textContent=l.t;lbl.style.color=l.c;
-}
 
 async function doLogin(){
   const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value;
@@ -807,25 +790,7 @@ async function doLogin(){
   try{await window._signIn(e,p);}
   catch(err){
     const m=err.code==='auth/invalid-credential'?'Wrong email or password.':err.code==='auth/too-many-requests'?'Too many attempts. Try later.':err.message;
-    showMsg('authMsg','error',m);btn.disabled=false;btn.innerHTML='Sign In';
-  }
-}
-async function doSignup(){
-  const name=document.getElementById('signupName').value.trim();
-  const e=document.getElementById('signupEmail').value.trim();
-  const p=document.getElementById('signupPassword').value;
-  const c=document.getElementById('signupConfirm').value;
-  if(!name||!e||!p||!c){showMsg('signupMsg','error','Fill in all fields.');return;}
-  if(p!==c){showMsg('signupMsg','error','Passwords do not match.');return;}
-  if(p.length<6){showMsg('signupMsg','error','Password must be at least 6 characters.');return;}
-  const btn=document.getElementById('signupBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-  try{
-    const cred=await window._signUp(e,p);
-    await window._updateProfile(cred.user,{displayName:name});
-    toast('Account created! Welcome, '+name+'!');
-  }catch(err){
-    const m=err.code==='auth/email-already-in-use'?'Email already registered.':err.code==='auth/invalid-email'?'Invalid email.':err.message;
-    showMsg('signupMsg','error',m);btn.disabled=false;btn.innerHTML='Create Account';
+    showMsg('authMsg','error',m);btn.disabled=false;btn.innerHTML='<i class="fas fa-sign-in-alt mr-2"></i> Sign In';
   }
 }
 async function doForgot(){
@@ -840,8 +805,10 @@ async function doLogout(){await window._signOut();toast('Logged out.');}
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
-    if(document.getElementById('loginSection').style.display!=='none')doLogin();
-    else if(document.getElementById('signupSection').style.display!=='none')doSignup();
+    const ls=document.getElementById('loginSection');
+    const fs=document.getElementById('forgotSection');
+    if(ls && ls.style.display!=='none') doLogin();
+    else if(fs && fs.style.display!=='none') doForgot();
   }
 });
 
