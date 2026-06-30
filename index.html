@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diljeet Singh Sran | Full Stack Developer & Graphic Designer</title>
+    <meta name="description" content="Diljeet Singh Sran — Full Stack Developer, Graphic Designer, Video Editor & SEO Expert with 3+ years experience across 24+ countries.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config={safelist:['grid','gap-8','p-6','overflow-hidden','reveal-modern','active','group','w-full','h-64','object-cover','cursor-pointer','certificate-image','flex','items-center','gap-3','mb-4','w-14','h-14','rounded-xl','justify-center','text-white','text-2xl','fas','fa-award','text-xl','font-bold','mb-2','text-gray-600','mb-4','text-sm','text-purple-600','fa-external-link-alt','font-semibold','hover:underline','service-card','service-icon','gradient-bg-primary','gradient-bg-warm','gradient-bg-cool','md:text-2xl','mb-3','badge-modern','text-xs','flex-wrap','gap-2','portfolio-item-modern','portfolio-overlay','btn-modern','btn-glass','glass-card','rounded-2xl','mb-6','h-auto','hover:scale-110','transition-transform','duration-500','from-orange-500','to-red-600','from-blue-500','to-blue-700','from-green-500','to-emerald-700','from-purple-500','to-purple-700','from-yellow-500','to-orange-600','from-pink-500','to-rose-600','bg-gradient-to-r','bg-gradient-to-br','h-40','fa-certificate','opacity-40','fa-arrow-right','inline-flex','gap-2','w-12','h-12','text-gray-800','text-gray-500']}
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="navbar-modern fixed w-full top-0 z-50 py-4">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <a href="#" class="text-2xl font-bold"><span class="gradient-text-primary">D Sran</span></a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#home"         class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</a>
+                <a href="#services"     class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Services</a>
+                <a href="#portfolio"    class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Portfolio</a>
+                <a href="#articles"     class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Articles</a>
+                <a href="#certificates" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Certificates</a>
+                <a href="#contact"      class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
+                <a href="admin.html"    class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors">Admin Login</a>
+            </div>
+            <div class="hidden md:block">
+                <a href="#contact" class="btn-modern btn-gradient-primary">Let's Talk</a>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-gray-700 text-2xl"><i class="fas fa-bars"></i></button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileNav" class="hidden md:hidden mt-4 px-6">
+            <div class="glass-modern rounded-3xl p-6 space-y-4">
+                <a href="#home"         class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Home</a>
+                <a href="#services"     class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Services</a>
+                <a href="#portfolio"    class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Portfolio</a>
+                <a href="#articles"     class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Articles</a>
+                <a href="#certificates" class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Certificates</a>
+                <a href="#contact"      class="mobile-link block text-gray-700 hover:text-purple-600 font-medium transition-colors py-1">Contact</a>
+                <div class="border-t border-white/30 pt-4 flex flex-col gap-3">
+                    <a href="admin.html" class="block text-center py-2 px-4 rounded-xl text-purple-600 font-semibold border-2 border-purple-200 hover:bg-purple-50 transition-colors">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </a>
+                    <a href="#contact" class="mobile-link btn-modern btn-gradient-primary w-full text-center block">
+                        <i class="fas fa-comments mr-2"></i>Let's Talk
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="home" class="hero-modern">
+        <div class="hero-bg"></div>
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6 animate-fade-up">
+                    <div class="inline-flex">
+                        <span class="badge-modern badge-gradient">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            Available For Hire
+                        </span>
+                    </div>
+                    <div class="space-y-3">
+                        <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
+                            Hi, I'm <span class="gradient-text-primary">Diljeet Singh</span>
+                            <span class="gradient-text-warm">Sran</span> 👋
+                        </h1>
+                        <p class="text-lg md:text-xl text-gray-600 leading-relaxed">
+                            A Passionate <span class="gradient-text-primary font-bold">Full Stack Developer</span> 💻 &
+                            <span class="gradient-text-warm font-bold">Graphic Designer</span> 🎨<br>
+                            & <span class="gradient-text-cool font-bold">Video Editor</span> 🎬 &
+                            <span class="gradient-text-primary font-bold">SEO Expert</span> 🚀
+                        </p>
+                        <p class="text-base md:text-lg text-gray-500">
+                            Having <span class="font-bold gradient-text-warm">3 years</span> of experience over
+                            <span class="font-bold gradient-text-cool">24+ countries</span> worldwide.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="tel:+919115906955" class="btn-modern btn-gradient-primary">
+                            <i class="fas fa-phone mr-2"></i> Book A Call
+                        </a>
+                        <button id="copyEmailBtn" data-email="sranhub@gmail.com" class="btn-modern btn-glass">
+                            <i class="fas fa-envelope mr-2"></i> Copy Email
+                        </button>
+                    </div>
+                    <div class="flex gap-4 pt-4">
+                        <a href="mailto:sranhub@gmail.com" class="social-icon-modern" title="Email"><i class="fas fa-envelope"></i></a>
+                        <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="hero-image-container animate-scale-in">
+                    <div class="hero-image-frame relative">
+                        <img src="assets/images/profile-1.png" alt="Diljeet Singh Sran" class="w-full h-auto">
+                        <div class="absolute bottom-6 left-6 right-6">
+                            <div class="glass-modern rounded-2xl p-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="fas fa-star text-yellow-400 text-xl"></i>
+                                    <span class="text-white font-bold text-lg">3+ Years Experience</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-decoration absolute -top-6 -right-6 w-32 h-32 bg-gradient-primary opacity-60"></div>
+                    <div class="hero-decoration absolute -bottom-6 -left-6 w-24 h-24 bg-gradient-warm opacity-60"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal-modern">
+                <span class="badge-modern mb-4"><i class="fas fa-briefcase mr-2"></i> What I Do</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">My <span class="gradient-text-primary">Services</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Delivering excellence across multiple domains with modern solutions</p>
+            </div>
+            <div id="services-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-primary"><i class="fas fa-code text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Web Development</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Full-stack web applications with modern technologies like React, Node.js, MongoDB & PHP.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">React</span><span class="badge-modern text-xs">Node.js</span><span class="badge-modern text-xs">MongoDB</span><span class="badge-modern text-xs">PHP</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-warm"><i class="fas fa-palette text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Graphic Design</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Eye-catching designs for branding, social media, and marketing materials.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Photoshop</span><span class="badge-modern text-xs">Illustrator</span><span class="badge-modern text-xs">Figma</span><span class="badge-modern text-xs">Canva</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-cool"><i class="fas fa-video text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Video Editing</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Professional video editing for YouTube, social media, and promotional content.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Premiere Pro</span><span class="badge-modern text-xs">After Effects</span><span class="badge-modern text-xs">DaVinci</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-primary"><i class="fas fa-search text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">SEO Optimization</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Boost your website's visibility and ranking on search engines.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">On-Page SEO</span><span class="badge-modern text-xs">Off-Page SEO</span><span class="badge-modern text-xs">Analytics</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-warm"><i class="fas fa-share-alt text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">Social Media</h3><p class="text-gray-600 mb-4 text-sm md:text-base">Strategic social media management and content creation for brand growth.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Instagram</span><span class="badge-modern text-xs">LinkedIn</span><span class="badge-modern text-xs">Youtube</span></div></div>
+                <div class="service-card reveal-modern"><div class="service-icon gradient-bg-cool"><i class="fas fa-paint-brush text-white"></i></div><h3 class="text-xl md:text-2xl font-bold mb-3">UI/UX Design</h3><p class="text-gray-600 mb-4 text-sm md:text-base">User-centered design solutions for web and mobile applications.</p><div class="flex flex-wrap gap-2"><span class="badge-modern text-xs">Figma</span><span class="badge-modern text-xs">Wireframing</span><span class="badge-modern text-xs">Prototyping</span></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="py-16 relative">
+        <div class="container mx-auto px-6">
+            <div class="glass-card p-8 md:p-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2"><span class="counter" data-target="50">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Projects Completed</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-warm mb-2"><span class="counter" data-target="24">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Countries Served</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-cool mb-2"><span class="counter" data-target="40">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Happy Clients</p></div>
+                    <div class="reveal-modern"><div class="text-4xl md:text-5xl font-bold gradient-text-primary mb-2"><span class="counter" data-target="3">0</span>+</div><p class="text-gray-600 font-medium text-sm md:text-base">Years Experience</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COUNTRIES MARQUEE -->
+    <section id="countries" class="py-16 overflow-hidden">
+        <div class="container mx-auto px-6 mb-10 text-center reveal-modern">
+            <span class="badge-modern mb-4 inline-flex"><i class="fas fa-globe mr-2"></i> Global Reach</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">Countries I've <span class="gradient-text-primary">Worked With</span></h2>
+            <p class="text-gray-600">Trusted by clients across <span id="countriesCount" class="font-bold gradient-text-warm">24+</span> countries worldwide</p>
+        </div>
+        <div class="marquee-wrapper mb-3"><div class="marquee-track" id="flagTrack1"></div></div>
+        <div class="marquee-wrapper"><div class="marquee-track marquee-reverse" id="flagTrack2"></div></div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal-modern">
+                <span class="badge-modern mb-4"><i class="fas fa-folder-open mr-2"></i> My Work</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Featured <span class="gradient-text-primary">Projects</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Showcasing my best work across different domains</p>
+            </div>
+            <div id="portfolio-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Project 1" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">Web Development</h3><p class="text-white mb-4">Full Stack Project</p></div></div>
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/excel-KWI.jpg" alt="Project 2" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">Graphic Design</h3><p class="text-white mb-4">Brand Identity</p></div></div>
+                <div class="portfolio-item-modern reveal-modern active" style="height:300px;"><img src="assets/images/certficates/business-negotation-KWI.jpg" alt="Project 3" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="portfolio-overlay"><h3 class="text-xl font-bold text-white mb-2">SEO Optimization</h3><p class="text-white mb-4">Digital Marketing</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRESS / ARTICLES -->
+    <section id="articles" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal-modern">
+                <span class="badge-modern mb-4"><i class="fas fa-newspaper mr-2"></i> In the Press</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Articles & <span class="gradient-text-primary">Features</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Press coverage and featured articles</p>
+            </div>
+            <div id="press-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-6 reveal-modern active">
+                    <div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold">PR</div><div><p class="font-bold text-gray-800">Press Feature</p><p class="text-sm text-gray-500">2024</p></div></div>
+                    <h3 class="text-xl font-bold mb-3">Articles will appear here</h3>
+                    <p class="text-gray-600 text-sm">Add articles from admin panel to display them here.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CERTIFICATES -->
+    <section id="certificates" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal-modern">
+                <span class="badge-modern mb-4"><i class="fas fa-award mr-2"></i> Achievements</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Certificates & <span class="gradient-text-primary">Awards</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Professional certifications and achievements</p>
+            </div>
+            <div id="cert-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card overflow-hidden reveal-modern active">
+                    <div class="w-full h-40 bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center"><i class="fas fa-certificate text-white text-5xl opacity-40"></i></div>
+                    <div class="p-6"><h3 class="text-xl font-bold mb-2">Your certificates</h3><p class="text-gray-600 text-sm">Add certificates from admin panel to display them here.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal-modern">
+                <span class="badge-modern mb-4"><i class="fas fa-envelope mr-2"></i> Get In Touch</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Let's <span class="gradient-text-primary">Connect</span></h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">Have a project in mind? Let's discuss how I can help you</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                <!-- Contact Info -->
+                <div class="space-y-6 reveal-modern">
+                    <div class="glass-card p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl gradient-bg-primary flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-envelope"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Email</p><a href="mailto:sranhub@gmail.com" class="text-base md:text-lg font-semibold gradient-text-primary">sranhub@gmail.com</a></div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl gradient-bg-warm flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-phone"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Phone</p><a id="contactPhoneDisplay" href="tel:+919671441422" class="text-base md:text-lg font-semibold gradient-text-warm">+91 96714 41422</a></div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl gradient-bg-cool flex items-center justify-center text-white text-xl flex-shrink-0"><i class="fas fa-map-marker-alt"></i></div>
+                            <div><p class="text-sm text-gray-500 mb-1">Location</p><p id="contactLocationDisplay" class="text-base md:text-lg font-semibold gradient-text-cool">Delhi, India</p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Contact Form -->
+                <div class="glass-card p-8 reveal-modern">
+                    <form id="contactForm" action="https://formspree.io/f/xjkvrknp" method="POST" class="space-y-6">
+                        <input type="hidden" name="_subject" value="New message from D Sran Portfolio">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                            <input type="text" name="name" required class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea name="message" required rows="4" class="w-full px-4 py-3 rounded-xl bg-white/50 border-2 border-white/30 focus:border-purple-400 focus:outline-none transition-colors resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="contactSubmitBtn" class="btn-modern btn-gradient-primary w-full text-lg">
+                            <i class="fas fa-paper-plane mr-2"></i> Send Message
+                        </button>
+                        <div id="formSuccess" class="hidden text-center py-3 px-4 rounded-xl bg-green-100 border border-green-300 text-green-700 font-medium">✅ Message sent! I'll get back to you soon.</div>
+                        <div id="formError"   class="hidden text-center py-3 px-4 rounded-xl bg-red-100 border border-red-300 text-red-700 font-medium">❌ Something went wrong. Please try again.</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-12 border-t border-white/20">
+        <div class="container mx-auto px-6">
+            <div class="text-center space-y-6">
+                <div class="text-2xl md:text-3xl font-bold"><span class="gradient-text-primary">Diljeet Singh Sran</span></div>
+                <div class="flex justify-center gap-4">
+                    <a href="mailto:sranhub@gmail.com" class="social-icon-modern"><i class="fas fa-envelope"></i></a>
+                    <a href="https://x.com/Sranhub9" target="_blank" class="social-icon-modern"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/diljeet_singh_sran_/" target="_blank" class="social-icon-modern"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/diljeet-singh-sran" target="_blank" class="social-icon-modern"><i class="fab fa-linkedin"></i></a>
+                </div>
+                <p class="text-gray-600 text-sm md:text-base">© 2026 Diljeet Singh Sran. All rights reserved. | Design by <span class="gradient-text-primary font-semibold">Altmediia</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/919671441422" target="_blank" id="whatsappBtn"
+       class="fixed bottom-6 right-5 md:bottom-8 md:right-8 w-14 h-14 md:w-16 md:h-16 rounded-full gradient-bg-primary flex items-center justify-center text-white text-2xl shadow-2xl hover:scale-110 transition-transform z-50 animate-float-gentle">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- BACK TO TOP -->
+    <button id="backToTop"
+            class="fixed bottom-24 right-5 md:bottom-28 md:right-8 w-12 h-12 md:w-14 md:h-14 rounded-full glass-modern items-center justify-center text-gray-700 shadow-xl hover:scale-110 transition-all z-50 hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- JS: UI logic + default flags -->
+    <script src="assets/js/app.js"></script>
+
+    <!-- JS: Firebase live content loader -->
+    <script type="module" src="assets/js/firebase-loader.js"></script>
+
+</body>
+</html>
