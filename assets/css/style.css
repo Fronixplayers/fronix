@@ -659,3 +659,15 @@ h1, h2, h3, h4, h5, h6 {
 /* ==================== */
 /* END OF MODERN STYLES */
 /* ==================== */
+
+/* ==================== */
+/* MARQUEE / FLAGS      */
+/* ==================== */
+.marquee-wrapper{width:100%;overflow:hidden;mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 8%,black 92%,transparent);}
+.marquee-track{display:flex;gap:12px;width:max-content;animation:marqueeLeft 28s linear infinite;}
+.marquee-track.marquee-reverse{animation:marqueeRight 34s linear infinite;}
+.marquee-track:hover,.marquee-track.marquee-reverse:hover{animation-play-state:paused;}
+@keyframes marqueeLeft{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@keyframes marqueeRight{0%{transform:translateX(-50%);}100%{transform:translateX(0);}}
+.flag-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:50px;background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.5);white-space:nowrap;font-size:.85rem;font-weight:600;color:#1a1a2e;cursor:default;box-shadow:0 3px 12px rgba(31,38,135,.07);transition:transform .2s,box-shadow .2s;}
+.flag-pill:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(31,38,135,.13);}
