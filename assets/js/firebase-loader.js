@@ -18,12 +18,13 @@ const _k2 = '_dqsPpluVA5Iy6-R8Kl31-Rg';
    Firebase Console → altmediia project → Project Settings → Your apps → Config */
 const _pid = 'altmediia';
 const _cfg = {
-  apiKey:            _k1 + _k2,
-  authDomain:        `${_pid}.firebaseapp.com`,
-  projectId:         _pid,
-  storageBucket:     `${_pid}.appspot.com`,
-  messagingSenderId: '942976075894',
-  appId:             '1:942976075894:web:altmediia-main'
+  apiKey:            "AIzaSyDLJcHDmgx-O9V-RcRdgiSmGUq-Ssm3hYY",
+  authDomain:        "altmediia.firebaseapp.com",
+  projectId:         "altmediia",
+  storageBucket:     "altmediia.firebasestorage.app",
+  messagingSenderId: "498108927505",
+  appId:             "1:498108927505:web:680ff5cb38ba53fec6ebb0",
+  measurementId:     "G-07EN9R7KPE"
 };
 
 const _app = initializeApp(_cfg, 'altmediia-site');
